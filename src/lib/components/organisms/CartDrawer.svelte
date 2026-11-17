@@ -30,7 +30,7 @@
 			<div class="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
 				<ShoppingBag class="text-muted-foreground size-10" />
 				<p class="text-muted-foreground text-sm">Todavía no has agregado productos.</p>
-				<Button href="/tienda" onclick={() => (cart.open = false)}>Ver la tienda</Button>
+				<Button href="/shop" onclick={() => (cart.open = false)}>Ver la tienda</Button>
 			</div>
 		{:else}
 			<div class="flex-1 overflow-y-auto px-4">
@@ -51,7 +51,7 @@
 							<div class="min-w-0 flex-1 space-y-1">
 								<div class="flex items-start justify-between gap-2">
 									<a
-										href="/tienda/{line.preview.productSlug}"
+										href="/shop/{line.preview.productSlug}"
 										class="truncate text-sm font-medium"
 										onclick={() => (cart.open = false)}
 									>
@@ -113,7 +113,7 @@
 
 				<Separator />
 
-				<Button href="/carrito" class="w-full" size="lg" onclick={() => (cart.open = false)}>
+				<Button href="/cart" class="w-full" size="lg" onclick={() => (cart.open = false)}>
 					Continuar con el pedido
 				</Button>
 

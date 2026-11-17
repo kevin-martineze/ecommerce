@@ -73,11 +73,11 @@
 		<div class="space-y-3">
 			<p class="eyebrow">Tienda</p>
 			<ul class="space-y-2 text-sm">
-				<li><a href="/tienda" class="text-muted-foreground hover:text-foreground">Todo</a></li>
+				<li><a href="/shop" class="text-muted-foreground hover:text-foreground">Todo</a></li>
 				{#each categories as category (category.id)}
 					<li>
 						<a
-							href="/tienda?categoria={category.slug}"
+							href="/shop?categoria={category.slug}"
 							class="text-muted-foreground hover:text-foreground"
 						>
 							{category.name}
@@ -94,7 +94,7 @@
 				{#if settings.free_shipping_threshold}
 					<li>Envío gratis desde ${settings.free_shipping_threshold.toLocaleString('es-CO')}.</li>
 				{/if}
-				<li><a href="/favoritos" class="hover:text-foreground">Mis favoritos</a></li>
+				<li><a href="/favorites" class="hover:text-foreground">Mis favoritos</a></li>
 			</ul>
 		</div>
 	</div>

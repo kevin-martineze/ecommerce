@@ -16,7 +16,7 @@
 <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
 	{#each collections as collection (collection.id)}
 		<li>
-			<a href="/colecciones/{collection.slug}" class="group block">
+			<a href="/collections/{collection.slug}" class="group block">
 				<div class="bg-muted relative aspect-[3/4] overflow-hidden">
 					{#if collection.hero_image_url}
 						<ProductImage

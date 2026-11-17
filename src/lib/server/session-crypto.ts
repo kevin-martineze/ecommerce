@@ -26,7 +26,7 @@ export const adminSessionSchema = z.object({
 	email: z.string(),
 	/**
 	 * Tienda activa. Null solo para una cuenta que administra la plataforma sin
-	 * pertenecer a ninguna tienda: entra a `/plataforma`, nunca al panel.
+	 * pertenecer a ninguna tienda: entra a `/platform`, nunca al panel.
 	 */
 	storeId: z.string().nullable()
 });

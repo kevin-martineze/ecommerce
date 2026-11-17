@@ -16,7 +16,7 @@ const widget = {
 	amountInCents: 4550000,
 	reference: 'ord-1',
 	integritySignature: 'firma-de-integridad',
-	redirectUrl: 'http://localhost:5173/pedido/1',
+	redirectUrl: 'http://localhost:5173/order/1',
 	customerEmail: 'clienta@example.com'
 };
 
@@ -30,7 +30,7 @@ describe('paymentLinkSchema', () => {
 			amount_in_cents: 4550000,
 			reference: 'ord-1',
 			integrity_signature: 'firma-de-integridad',
-			redirect_url: 'http://localhost:5173/pedido/1',
+			redirect_url: 'http://localhost:5173/order/1',
 			customer_email: 'clienta@example.com'
 		});
 	});

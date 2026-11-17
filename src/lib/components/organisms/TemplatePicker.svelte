@@ -35,7 +35,7 @@
 		current: StorefrontTemplate;
 		/** La dirección pública de la tienda, para las miniaturas y la vista previa. */
 		storeUrl: string;
-		/** Action del form, p. ej. `?/plantilla`. */
+		/** Action del form, p. ej. `?/template`. */
 		action: string;
 		/** Texto del botón de cada opción. */
 		cta?: string;

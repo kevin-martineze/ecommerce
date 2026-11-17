@@ -22,7 +22,7 @@
 </script>
 
 <a
-	href="/colecciones/{collection.slug}"
+	href="/collections/{collection.slug}"
 	class="group grid items-center gap-6 md:grid-cols-12 md:gap-12"
 	use:reveal
 >

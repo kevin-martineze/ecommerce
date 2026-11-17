@@ -58,7 +58,7 @@
 			<PasswordField name="password" label="Contraseña" required autocomplete="current-password">
 				{#snippet labelAction()}
 					<a
-						href="/admin/recuperar"
+						href="/admin/forgot-password"
 						class="text-muted-foreground hover:text-foreground text-xs underline"
 					>
 						¿La olvidaste?
@@ -81,7 +81,7 @@
 
 		<p class="text-muted-foreground space-x-3 text-center text-xs">
 			<a href="/" class="hover:text-foreground underline">Volver a la tienda</a>
-			<a href="/registro" class="hover:text-foreground underline">Crear una tienda</a>
+			<a href="/signup" class="hover:text-foreground underline">Crear una tienda</a>
 		</p>
 	</div>
 </main>

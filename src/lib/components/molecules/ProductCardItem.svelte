@@ -46,7 +46,7 @@
      `app.css` (marco, sticker de precio): la tarjeta no sabe en qué plantilla
      está y no tiene por qué saberlo. -->
 <article class="product-card group relative">
-	<a href="/tienda/{product.slug}" class="block focus-visible:outline-none">
+	<a href="/shop/{product.slug}" class="block focus-visible:outline-none">
 		<div
 			class="relative overflow-hidden"
 			style="view-transition-name: producto-{product.slug.replace(/[^a-z0-9]/g, '-')}"

@@ -59,38 +59,38 @@
 			titulo: null,
 			links: [
 				{ href: '/admin', label: 'Resumen', icon: LayoutDashboard },
-				{ href: '/admin/pedidos', label: 'Pedidos', icon: Receipt },
-				{ href: '/admin/productos', label: 'Productos', icon: Shirt },
-				{ href: '/admin/inventario', label: 'Inventario', icon: Boxes },
-				{ href: '/admin/colecciones', label: 'Colecciones', icon: Images }
+				{ href: '/admin/orders', label: 'Pedidos', icon: Receipt },
+				{ href: '/admin/products', label: 'Productos', icon: Shirt },
+				{ href: '/admin/inventory', label: 'Inventario', icon: Boxes },
+				{ href: '/admin/collections', label: 'Colecciones', icon: Images }
 			]
 		},
 		{
 			titulo: 'Tienda',
 			links: [
-				{ href: '/admin/personalizar', label: 'Diseño', icon: Paintbrush },
-				{ href: '/admin/catalogos', label: 'Catálogos', icon: Palette },
-				{ href: '/admin/cupones', label: 'Cupones', icon: Ticket },
-				{ href: '/admin/envios', label: 'Envíos', icon: Truck },
-				{ href: '/admin/dominio', label: 'Dominio', icon: Globe },
-				{ href: '/admin/avisos', label: 'Avisos', icon: BellRing }
+				{ href: '/admin/design', label: 'Diseño', icon: Paintbrush },
+				{ href: '/admin/catalogs', label: 'Catálogos', icon: Palette },
+				{ href: '/admin/coupons', label: 'Cupones', icon: Ticket },
+				{ href: '/admin/shipping', label: 'Envíos', icon: Truck },
+				{ href: '/admin/domain', label: 'Dominio', icon: Globe },
+				{ href: '/admin/restock-alerts', label: 'Avisos', icon: BellRing }
 			]
 		},
 		{
 			titulo: 'Cuenta',
 			links: [
-				{ href: '/admin/soporte', label: 'Soporte', icon: LifeBuoy },
-				{ href: '/admin/ajustes', label: 'Ajustes', icon: Settings },
-				{ href: '/admin/equipo', label: 'Equipo', icon: Users },
-				{ href: '/admin/pagos', label: 'Pagos', icon: Wallet },
+				{ href: '/admin/support', label: 'Soporte', icon: LifeBuoy },
+				{ href: '/admin/settings', label: 'Ajustes', icon: Settings },
+				{ href: '/admin/team', label: 'Equipo', icon: Users },
+				{ href: '/admin/payments', label: 'Pagos', icon: Wallet },
 				{ href: '/admin/plan', label: 'Plan', icon: CreditCard },
-				{ href: '/admin/cuenta', label: 'Mi cuenta', icon: UserRound }
+				{ href: '/admin/account', label: 'Mi cuenta', icon: UserRound }
 			]
 		}
 	];
 
 	/** Lo que solo administra la dueña: el resto de la tienda no lo ve en el menú. */
-	const soloDuena = new Set(['/admin/dominio']);
+	const soloDuena = new Set(['/admin/domain']);
 
 	const grupos = $derived(
 		gruposBase.map((grupo) => ({
@@ -101,7 +101,7 @@
 
 	const links = $derived(grupos.flatMap((grupo) => grupo.links));
 
-	const platformLink = { href: '/plataforma', label: 'Plataforma', icon: Shield };
+	const platformLink = { href: '/platform', label: 'Plataforma', icon: Shield };
 
 	function isActive(href: string): boolean {
 		return href === '/admin' ? page.url.pathname === '/admin' : page.url.pathname.startsWith(href);
@@ -129,7 +129,7 @@
 			</a>
 
 			<!-- La acción rápida: lo que más se crea es un producto. -->
-			<Button href="/admin/productos/nuevo" size="sm" class="mt-1 h-9 w-full justify-start">
+			<Button href="/admin/products/new" size="sm" class="mt-1 h-9 w-full justify-start">
 				<Plus class="size-4" />
 				Nuevo producto
 			</Button>
@@ -137,7 +137,7 @@
 			{#if data.otherStores.length > 0}
 				<!-- Una cuenta puede administrar varias tiendas. Sin esto, cambiar
 				     de una a otra era escribir el subdominio a mano. -->
-				<form method="POST" action="/admin/cambiar-tienda" class="px-2 pt-2">
+				<form method="POST" action="/admin/switch-store" class="px-2 pt-2">
 					<label class="text-muted-foreground text-xs" for="cambiar-tienda">
 						Cambiar de tienda
 					</label>
@@ -178,11 +178,11 @@
 								<Icon class="size-4 flex-none" />
 								{link.label}
 
-								{#if link.href === '/admin/pedidos' && data.pendingOrders > 0}
+								{#if link.href === '/admin/orders' && data.pendingOrders > 0}
 									<Badge class="ml-auto">{data.pendingOrders}</Badge>
 								{/if}
 
-								{#if link.href === '/admin/soporte' && data.supportUnread > 0}
+								{#if link.href === '/admin/support' && data.supportUnread > 0}
 									<Badge class="ml-auto">{data.supportUnread}</Badge>
 								{/if}
 							</a>

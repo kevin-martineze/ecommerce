@@ -49,9 +49,9 @@ async function settle(page) {
 
 /** El primer enlace a un producto cuyo slug empiece así, o el primero que haya. */
 async function productHref(page, prefix) {
-	const preferred = page.locator(`a[href^="/tienda/${prefix}"]`).first();
+	const preferred = page.locator(`a[href^="/shop/${prefix}"]`).first();
 	if ((await preferred.count()) > 0) return preferred.getAttribute('href');
-	return page.locator('a[href^="/tienda/"]').first().getAttribute('href');
+	return page.locator('a[href^="/shop/"]').first().getAttribute('href');
 }
 
 /**
@@ -128,7 +128,7 @@ const mobile = await browser.newContext({
 });
 const m = await mobile.newPage();
 
-await m.goto(`${STORE}/tienda`);
+await m.goto(`${STORE}/shop`);
 await settle(m);
 const catalogo = await m.screenshot();
 await m.goto(`${STORE}${await productHref(m, 'conjunto')}`);

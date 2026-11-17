@@ -82,7 +82,7 @@
 		</ul>
 
 		<Button
-			href="/registro?plan={plan.code}"
+			href="/signup?plan={plan.code}"
 			class={cn(
 				// `mt-auto` empuja el botón abajo para que los tres se alineen
 				// entre tarjetas; `pt-8` garantiza aire aunque la lista sea larga

@@ -48,7 +48,7 @@ function makeOrder(overrides: Partial<OrderWithItems> = {}): OrderWithItems {
 	};
 }
 
-const options = { storeName: 'Atelier', orderUrl: 'https://tienda.test/pedido/1042?t=token-1' };
+const options = { storeName: 'Atelier', orderUrl: 'https://tienda.test/order/1042?t=token-1' };
 
 describe('buildOrderMessage', () => {
 	it('incluye número, líneas, totales y datos de contacto', () => {

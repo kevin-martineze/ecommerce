@@ -107,7 +107,7 @@
 		</Card.Header>
 
 		<Card.Content>
-			<form method="POST" action="?/variantes" class="flex flex-wrap items-end gap-3" use:enhance>
+			<form method="POST" action="?/variants" class="flex flex-wrap items-end gap-3" use:enhance>
 				<div class="space-y-1.5">
 					<Label class="text-xs" for="defaultStock">Existencias iniciales</Label>
 					<NumberField
@@ -258,7 +258,7 @@
 		<form
 			id="borrar-variante-{variant.id}"
 			method="POST"
-			action="?/borrarVariante"
+			action="?/deleteVariant"
 			use:enhance={alBorrar}
 		>
 			<input type="hidden" name="variantId" value={variant.id} />

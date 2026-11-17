@@ -102,8 +102,8 @@ export function esVistaPrevia({
 }): boolean {
 	return (
 		secFetchDest === 'iframe' ||
-		pathname === '/vista-previa' ||
-		pathname.startsWith('/vista-previa/') ||
+		pathname === '/preview' ||
+		pathname.startsWith('/preview/') ||
 		preview
 	);
 }

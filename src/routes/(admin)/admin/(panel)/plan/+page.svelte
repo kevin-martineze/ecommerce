@@ -159,7 +159,7 @@
 			{#if mostrarCobro}
 				<form
 					method="POST"
-					action="?/pagar"
+					action="?/pay"
 					class="border-border space-y-2 border-t pt-4"
 					use:enhance={pagar}
 				>
@@ -262,7 +262,7 @@
 					</ul>
 
 					{#if mostrarCobro}
-						<form method="POST" action="?/pagar" class="mt-6" use:enhance={pagar}>
+						<form method="POST" action="?/pay" class="mt-6" use:enhance={pagar}>
 							<input type="hidden" name="planCode" value={otro.code} />
 							<Button
 								type="submit"

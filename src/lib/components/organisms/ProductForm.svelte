@@ -97,7 +97,7 @@
 				oninput={() => (slugTouched = true)}
 				pattern="[a-z0-9-]+"
 			/>
-			<p class="text-muted-foreground text-xs">/tienda/{form.slug || 'nombre-de-la-producto'}</p>
+			<p class="text-muted-foreground text-xs">/shop/{form.slug || 'nombre-de-la-producto'}</p>
 		</div>
 
 		<div class="space-y-2">

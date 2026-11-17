@@ -60,10 +60,10 @@
 				{/if}
 
 				<div class="flex flex-wrap gap-3 pt-1">
-					<Button href="/tienda" size="lg">Ver la tienda</Button>
+					<Button href="/shop" size="lg">Ver la tienda</Button>
 
 					{#if collectionSlug}
-						<Button href="/colecciones/{collectionSlug}" variant="outline" size="lg">
+						<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
 							Ver la colección
 						</Button>
 					{/if}
@@ -109,10 +109,10 @@
 				{/if}
 
 				<div class="flex flex-wrap gap-3">
-					<Button href="/tienda" size="lg">Ver la tienda</Button>
+					<Button href="/shop" size="lg">Ver la tienda</Button>
 
 					{#if collectionSlug}
-						<Button href="/colecciones/{collectionSlug}" variant="outline" size="lg">
+						<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
 							Ver la colección
 						</Button>
 					{/if}
@@ -148,10 +148,10 @@
 			</div>
 
 			<div class="mt-10 flex flex-wrap justify-center gap-3">
-				<Button href="/tienda" size="lg">Ver la tienda</Button>
+				<Button href="/shop" size="lg">Ver la tienda</Button>
 
 				{#if collectionSlug}
-					<Button href="/colecciones/{collectionSlug}" variant="outline" size="lg">
+					<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
 						Ver la colección
 					</Button>
 				{/if}
@@ -173,7 +173,7 @@
 
 				<div class="flex flex-wrap gap-3 pt-1">
 					<Button
-						href="/tienda"
+						href="/shop"
 						size="lg"
 						class="bg-secondary text-secondary-foreground hover:bg-secondary/90"
 					>
@@ -182,7 +182,7 @@
 
 					{#if collectionSlug}
 						<Button
-							href="/colecciones/{collectionSlug}"
+							href="/collections/{collectionSlug}"
 							variant="outline"
 							size="lg"
 							class="border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground bg-transparent"
@@ -253,7 +253,7 @@
 
 					<div class="rise rise-3 flex flex-wrap gap-3 pt-2">
 						<Button
-							href="/tienda"
+							href="/shop"
 							size="lg"
 							class={sobreFoto ? 'bg-white text-black hover:bg-white/90' : undefined}
 						>
@@ -262,7 +262,7 @@
 
 						{#if collectionSlug}
 							<Button
-								href="/colecciones/{collectionSlug}"
+								href="/collections/{collectionSlug}"
 								variant="outline"
 								size="lg"
 								class={sobreFoto

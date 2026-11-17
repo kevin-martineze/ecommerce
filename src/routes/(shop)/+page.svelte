@@ -152,7 +152,7 @@
 			index={sectionNumber('featured')}
 			eyebrow="Selección"
 			title="Lo que más nos piden"
-			href="/tienda"
+			href="/shop"
 		/>
 		{#if carousel}
 			<ProductShelf products={data.featured} label="Lo que más nos piden" />
@@ -190,7 +190,7 @@
 			index={sectionNumber('lookbook')}
 			eyebrow="Lookbook"
 			title="Colecciones"
-			href="/colecciones"
+			href="/collections"
 			linkLabel="Ver todas"
 		/>
 
@@ -212,7 +212,7 @@
 			index={sectionNumber('newest')}
 			eyebrow="Recién llegado"
 			title="Novedades"
-			href="/tienda"
+			href="/shop"
 		/>
 		{#if carousel}
 			<ProductShelf products={fresh} label="Novedades" />

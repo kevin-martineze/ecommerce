@@ -61,7 +61,7 @@
 	}
 
 	function clearAll() {
-		goto('/tienda', { keepFocus: true, noScroll: true });
+		goto('/shop', { keepFocus: true, noScroll: true });
 		onapply?.();
 	}
 

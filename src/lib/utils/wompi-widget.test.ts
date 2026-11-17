@@ -13,7 +13,7 @@ const widgetValido = {
 	amount_in_cents: 4550000,
 	reference: 'ord-1',
 	integrity_signature: 'firma-de-integridad',
-	redirect_url: 'http://localhost:5173/pedido/1',
+	redirect_url: 'http://localhost:5173/order/1',
 	customer_email: null
 };
 
@@ -66,7 +66,7 @@ const widget: WompiWidget = {
 	amount_in_cents: 4550000,
 	reference: 'ord-1',
 	integrity_signature: 'firma-de-integridad',
-	redirect_url: 'http://localhost:5173/pedido/1',
+	redirect_url: 'http://localhost:5173/order/1',
 	customer_email: 'clienta@example.com'
 };
 
@@ -116,7 +116,7 @@ describe('openWompiWidget', () => {
 			reference: 'ord-1',
 			publicKey: 'pub_test_llave_publica',
 			signature: { integrity: 'firma-de-integridad' },
-			redirectUrl: 'http://localhost:5173/pedido/1',
+			redirectUrl: 'http://localhost:5173/order/1',
 			customerData: { email: 'clienta@example.com' }
 		});
 	});

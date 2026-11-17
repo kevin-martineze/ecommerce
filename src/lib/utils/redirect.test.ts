@@ -6,7 +6,7 @@ import { safeRedirectTarget } from '$lib/utils/redirect';
 
 describe('safeRedirectTarget', () => {
 	it('acepta rutas del propio sitio, con su query', () => {
-		expect(safeRedirectTarget('/admin/productos?q=vestido')).toBe('/admin/productos?q=vestido');
+		expect(safeRedirectTarget('/admin/products?q=vestido')).toBe('/admin/products?q=vestido');
 	});
 
 	it('cae al panel cuando no hay destino', () => {

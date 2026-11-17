@@ -148,7 +148,7 @@
 	</Card.Header>
 
 	<Card.Content>
-		<form method="POST" action="?/ejes" class="space-y-6" use:enhance>
+		<form method="POST" action="?/axes" class="space-y-6" use:enhance>
 			<input type="hidden" name="options" value={payload} />
 
 			{#if ejes.length === 0}

@@ -14,9 +14,9 @@ import { expect, test } from '@playwright/test';
  */
 
 test('una prenda llega al carrito y el carrito sobrevive al recargue', async ({ page }) => {
-	await page.goto('/tienda');
+	await page.goto('/shop');
 
-	await page.locator('article a[href^="/tienda/"]').first().click();
+	await page.locator('article a[href^="/shop/"]').first().click();
 
 	// El clic vuelve en cuanto la navegación arranca, así que el título que se
 	// lee abajo puede ser todavía el del listado. Esperar al botón de comprar
@@ -45,7 +45,7 @@ test('una prenda llega al carrito y el carrito sobrevive al recargue', async ({ 
 	await expect(agregar).toBeVisible();
 	await agregar.click();
 
-	await page.goto('/carrito');
+	await page.goto('/cart');
 	await expect(page.getByText(nombre, { exact: false }).first()).toBeVisible();
 
 	// El carrito vive en el navegador: si no sobrevive a esto, no sirve de nada.
@@ -61,6 +61,6 @@ test('la portada lleva a la tienda y muestra prendas', async ({ page }) => {
 		.first()
 		.click();
 
-	await expect(page).toHaveURL(/\/tienda/);
-	await expect(page.locator('article a[href^="/tienda/"]').first()).toBeVisible();
+	await expect(page).toHaveURL(/\/shop/);
+	await expect(page.locator('article a[href^="/shop/"]').first()).toBeVisible();
 });

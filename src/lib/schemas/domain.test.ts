@@ -18,7 +18,7 @@ describe('limpiarDominio', () => {
 
 describe('dominioSchema', () => {
 	it('acepta un dominio propio y lo devuelve limpio', () => {
-		const result = dominioSchema('globerce.store').safeParse('https://WWW.Mitienda.co/tienda');
+		const result = dominioSchema('globerce.store').safeParse('https://WWW.Mitienda.co/shop');
 
 		expect(result).toEqual({ success: true, data: 'www.mitienda.co' });
 	});

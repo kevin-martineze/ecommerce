@@ -57,7 +57,7 @@
 				>
 					{data.welcomeUrl.replace(/^https?:\/\//, '')}
 				</a>. Empieza creando tus productos en
-				<a href="/admin/productos/nuevo" class="underline underline-offset-4">Productos</a>: se
+				<a href="/admin/products/new" class="underline underline-offset-4">Productos</a>: se
 				publican cuando las marques como activas.
 			</p>
 		</Alert.Description>
@@ -121,7 +121,7 @@
 		<Card.Header>
 			<div class="flex items-center justify-between gap-3">
 				<Card.Title>Últimos pedidos</Card.Title>
-				<Button href="/admin/pedidos" variant="ghost" size="sm">Ver todos</Button>
+				<Button href="/admin/orders" variant="ghost" size="sm">Ver todos</Button>
 			</div>
 		</Card.Header>
 
@@ -133,7 +133,7 @@
 					{#each data.recentOrders as order (order.id)}
 						<li class="flex items-center justify-between gap-3 py-3">
 							<div class="min-w-0">
-								<a href="/admin/pedidos/{order.id}" class="text-sm font-medium">
+								<a href="/admin/orders/{order.id}" class="text-sm font-medium">
 									#{order.number} · {order.customer_name}
 								</a>
 								<p class="text-muted-foreground text-xs">
@@ -158,7 +158,7 @@
 		<Card.Header>
 			<div class="flex items-center justify-between gap-3">
 				<Card.Title>Reponer pronto</Card.Title>
-				<Button href="/admin/inventario" variant="ghost" size="sm">Inventario</Button>
+				<Button href="/admin/inventory" variant="ghost" size="sm">Inventario</Button>
 			</div>
 		</Card.Header>
 

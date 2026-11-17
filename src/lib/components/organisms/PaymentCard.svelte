@@ -92,7 +92,7 @@
 		{#if abierto}
 			<form
 				method="POST"
-				action="?/tarjeta"
+				action="?/card"
 				class="border-border space-y-4 border-t pt-4"
 				use:enhance={async ({ cancel, formData }) => {
 					// El número no viaja: se borra del envío antes de nada.
@@ -174,7 +174,7 @@
 				</Button>
 
 				{#if method.connected}
-					<form id="quitar-tarjeta" method="POST" action="?/quitarTarjeta" use:enhance={alBorrar}>
+					<form id="quitar-tarjeta" method="POST" action="?/removeCard" use:enhance={alBorrar}>
 						<Button
 							type="button"
 							variant="ghost"

@@ -21,10 +21,10 @@ export const GET: RequestHandler = async (event) => {
 	const body = `User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /carrito
-Disallow: /pedido
-Disallow: /favoritos
-Disallow: /vista-previa
+Disallow: /cart
+Disallow: /order
+Disallow: /favorites
+Disallow: /preview
 
 Sitemap: ${site}/sitemap.xml
 `;

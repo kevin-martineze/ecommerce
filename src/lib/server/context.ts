@@ -98,7 +98,7 @@ export function panelContext(
 	if (!session) loginRedirect(event);
 
 	// Una sesión sin tienda solo la tiene quien administra la plataforma.
-	if (!session.storeId) redirect(303, '/plataforma');
+	if (!session.storeId) redirect(303, '/platform');
 
 	return {
 		storeId: session.storeId,

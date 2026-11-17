@@ -58,7 +58,7 @@
 
 		{#each hotspots as item (item.product.id)}
 			<a
-				href="/tienda/{item.product.slug}"
+				href="/shop/{item.product.slug}"
 				class="group absolute -translate-x-1/2 -translate-y-1/2"
 				style="left: {item.hotspotX}%; top: {item.hotspotY}%"
 				aria-label="Ver {item.product.name}"

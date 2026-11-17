@@ -79,7 +79,7 @@ esquema y los datos viven en la API.
   `tienda_session`. Toda carga del panel pasa por `requireAdmin`, que además
   verifica contra la API que la membresía siga viva. Una sesión sin tienda
   (`storeId: null`) solo la tiene quien administra la plataforma: entra a
-  `/plataforma` (`requirePlatformAdmin`), nunca al panel.
+  `/platform` (`requirePlatformAdmin`), nunca al panel.
 - **Los permisos los decide la API.** El panel oculta lo que el rol no puede
   hacer (`data.role`), pero la regla vive allá; un 403 llega con su mensaje.
 - **Todo `redirectTo` que llegue en la URL pasa por `safeRedirectTarget`.**
@@ -168,8 +168,8 @@ arregla la causa: nunca `--no-verify`.
 
 Lee un archivo equivalente que ya exista y replica el patrón:
 
-- Página de listado con filtros → `src/routes/(shop)/tienda/+page.svelte`
-- Página con form action → `src/routes/(shop)/carrito/+page.server.ts`
-- Pantalla de administración → `src/routes/(admin)/admin/(panel)/cupones/`
+- Página de listado con filtros → `src/routes/(shop)/shop/+page.svelte`
+- Página con form action → `src/routes/(shop)/cart/+page.server.ts`
+- Pantalla de administración → `src/routes/(admin)/admin/(panel)/coupons/`
 - Llamada a la API (tienda pública) → `src/lib/server/api/storefront.ts`
 - Llamada a la API (panel) → `src/lib/server/api/panel-catalog.ts`

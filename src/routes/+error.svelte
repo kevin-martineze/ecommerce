@@ -29,6 +29,6 @@
 
 	<div class="flex flex-wrap justify-center gap-3">
 		<Button href="/">Ir al inicio</Button>
-		<Button href="/tienda" variant="outline">Ver la tienda</Button>
+		<Button href="/shop" variant="outline">Ver la tienda</Button>
 	</div>
 </main>

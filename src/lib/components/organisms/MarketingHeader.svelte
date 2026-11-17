@@ -51,7 +51,7 @@
 				<Button href="/admin/login" variant="ghost" class="hidden h-9 px-4 sm:inline-flex">
 					Entrar
 				</Button>
-				<Button href="/registro" class="h-9 px-4">Empieza gratis</Button>
+				<Button href="/signup" class="h-9 px-4">Empieza gratis</Button>
 			{/if}
 		</div>
 	</div>

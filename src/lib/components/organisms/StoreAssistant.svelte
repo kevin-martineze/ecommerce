@@ -61,7 +61,7 @@
 		bajar();
 
 		try {
-			const response = await fetch('/asistente', {
+			const response = await fetch('/assistant', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ messages: turnos })

@@ -72,7 +72,7 @@ export async function requireAdmin(event: GuardEvent): Promise<PanelAccess> {
 	}
 
 	if (!session.storeId) {
-		if (account.isPlatformAdmin) redirect(303, '/plataforma');
+		if (account.isPlatformAdmin) redirect(303, '/platform');
 
 		clearSession(event.cookies);
 		redirect(303, '/admin/login?error=sin-permiso');

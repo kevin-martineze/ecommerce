@@ -29,7 +29,7 @@ function nuevaTienda() {
 test('registrarse, elegir plantilla y entrar al panel', async ({ page }) => {
 	const tienda = nuevaTienda();
 
-	await page.goto('/registro?plan=pro');
+	await page.goto('/signup?plan=pro');
 
 	// El plan viene marcado desde la página de precios.
 	await expect(page.locator('input[name="planCode"][value="pro"]')).toBeChecked();
@@ -45,7 +45,7 @@ test('registrarse, elegir plantilla y entrar al panel', async ({ page }) => {
 	await page.getByRole('button', { name: /crear mi tienda/i }).click();
 
 	// Primer paso: elegir con qué se viste la tienda.
-	await expect(page).toHaveURL(/\/admin\/bienvenida/);
+	await expect(page).toHaveURL(/\/admin\/welcome/);
 	await expect(page.getByRole('heading', { name: /cómo quieres que se vea/i })).toBeVisible();
 
 	await page
@@ -64,7 +64,7 @@ test('registrarse, elegir plantilla y entrar al panel', async ({ page }) => {
 test('el formulario de registro se queja campo por campo, sin llamar al servidor', async ({
 	page
 }) => {
-	await page.goto('/registro');
+	await page.goto('/signup');
 
 	await esperarRegistroHidratado(page);
 
@@ -81,7 +81,7 @@ test('el formulario de registro se queja campo por campo, sin llamar al servidor
 });
 
 test('la contraseña se puede mirar', async ({ page }) => {
-	await page.goto('/registro');
+	await page.goto('/signup');
 
 	await esperarRegistroHidratado(page);
 

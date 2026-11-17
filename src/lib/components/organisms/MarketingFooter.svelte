@@ -25,16 +25,16 @@
 		{
 			titulo: 'Tu cuenta',
 			enlaces: [
-				{ href: '/registro', label: 'Empieza gratis' },
+				{ href: '/signup', label: 'Empieza gratis' },
 				{ href: '/admin/login', label: 'Entrar' }
 			]
 		},
 		{
 			titulo: 'Globerce',
 			enlaces: [
-				{ href: '/contacto', label: 'Contacto' },
-				{ href: '/terminos', label: 'Términos' },
-				{ href: '/privacidad', label: 'Privacidad' }
+				{ href: '/contact', label: 'Contacto' },
+				{ href: '/terms', label: 'Términos' },
+				{ href: '/privacy', label: 'Privacidad' }
 			]
 		}
 	];

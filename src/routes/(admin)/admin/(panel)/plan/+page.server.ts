@@ -42,7 +42,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	pagar: async (event) => {
+	pay: async (event) => {
 		const formData = await event.request.formData();
 		const planCode = planCodeSchema.safeParse(formData.get('planCode'));
 
@@ -65,7 +65,7 @@ export const actions: Actions = {
 	 * Lo que llega es un token hecho en el navegador, nunca un número: si acá
 	 * apareciera uno sería un error de programación, y el esquema lo corta.
 	 */
-	tarjeta: async (event) => {
+	card: async (event) => {
 		const formData = await event.request.formData();
 		const parsed = paymentTokensSchema.safeParse({
 			cardToken: formData.get('cardToken'),
@@ -83,7 +83,7 @@ export const actions: Actions = {
 		return { message: 'Tu plan se cobrará solo con esta tarjeta.' };
 	},
 
-	quitarTarjeta: async (event) => {
+	removeCard: async (event) => {
 		const result = await removePaymentMethod(panelContext(event));
 
 		if (!result.ok) return failWith(result);

@@ -66,7 +66,7 @@ export const actions: Actions = {
 
 			if (account.ok && account.data.isPlatformAdmin) {
 				writeSession(cookies, session);
-				redirect(303, '/plataforma');
+				redirect(303, '/platform');
 			}
 
 			await logout(session.refreshToken, ip);

@@ -117,11 +117,11 @@
 		const term = query.trim();
 		searchOpen = false;
 
-		goto(term ? `/tienda?q=${encodeURIComponent(term)}` : '/tienda');
+		goto(term ? `/shop?q=${encodeURIComponent(term)}` : '/shop');
 	}
 
 	function categoryHref(category: Category): string {
-		return `/tienda?categoria=${encodeURIComponent(category.slug)}`;
+		return `/shop?categoria=${encodeURIComponent(category.slug)}`;
 	}
 
 	function panelId(node: CategoryNode): string {
@@ -261,7 +261,7 @@
 								>
 									{#each collections as collection (collection.id)}
 										<a
-											href="/colecciones/{collection.slug}"
+											href="/collections/{collection.slug}"
 											class="hover:text-foreground text-sm font-semibold tracking-wide uppercase"
 										>
 											{collection.name}
@@ -269,7 +269,7 @@
 									{/each}
 
 									<a
-										href="/colecciones"
+										href="/collections"
 										class="text-muted-foreground hover:text-foreground col-span-full text-sm underline underline-offset-4"
 									>
 										Ver todas
@@ -293,7 +293,7 @@
 				<Search class="size-5" />
 			</Button>
 
-			<Button href="/favoritos" variant="ghost" size="icon" aria-label="Favoritos" class="relative">
+			<Button href="/favorites" variant="ghost" size="icon" aria-label="Favoritos" class="relative">
 				<Heart class="size-5" />
 				{#if favorites.count > 0}
 					<span
@@ -398,7 +398,7 @@
 								{#each collections as collection (collection.id)}
 									<li>
 										<a
-											href="/colecciones/{collection.slug}"
+											href="/collections/{collection.slug}"
 											class="hover:bg-accent block px-2 py-2 text-sm"
 											onclick={() => (menuOpen = false)}
 										>
@@ -408,7 +408,7 @@
 								{/each}
 								<li>
 									<a
-										href="/colecciones"
+										href="/collections"
 										class="hover:bg-accent text-muted-foreground block px-2 py-2 text-sm"
 										onclick={() => (menuOpen = false)}
 									>
@@ -422,7 +422,7 @@
 			</Accordion.Root>
 
 			<a
-				href="/favoritos"
+				href="/favorites"
 				class="hover:bg-accent mt-2 block px-2 py-3 text-sm"
 				onclick={() => (menuOpen = false)}
 			>
