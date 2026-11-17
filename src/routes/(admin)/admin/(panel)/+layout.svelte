@@ -113,6 +113,8 @@
 			     la dueña quiere abrir cada dos por tres. -->
 			<a
 				href={data.storeUrl}
+				target="_blank"
+				rel="noopener noreferrer"
 				class="hover:bg-sidebar-accent flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors"
 			>
 				<GloberceMark size={24} label="" />

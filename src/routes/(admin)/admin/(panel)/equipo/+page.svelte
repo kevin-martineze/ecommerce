@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { tick } from 'svelte';
 
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -34,6 +36,8 @@
 		await tick();
 		document.getElementById(`role-submit-${userId}`)?.click();
 	}
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -140,16 +144,28 @@
 
 					{#if data.canManage}
 						<Table.Cell class="text-right">
-							<form method="POST" action="?/quitar" use:enhance>
+							<form
+								id="quitar-{member.user_id}"
+								method="POST"
+								action="?/quitar"
+								use:enhance={alBorrar}
+							>
 								<input type="hidden" name="userId" value={member.user_id} />
 								<Button
-									type="submit"
+									type="button"
 									variant="ghost"
 									size="icon"
 									aria-label={`Quitar a ${member.email}`}
-									onclick={(event) => {
-										if (!confirm(`¿Quitar a ${member.email} del equipo?`)) event.preventDefault();
-									}}
+									onclick={() =>
+										borrado.ask(
+											`quitar-${member.user_id}`,
+											`¿Quitar a ${member.email} del equipo?`,
+											{
+												description: 'Esa persona deja de tener acceso al panel.',
+												confirmLabel: 'Quitar',
+												pendingLabel: 'Quitando…'
+											}
+										)}
 								>
 									<Trash2 class="size-4" />
 								</Button>
@@ -187,3 +203,13 @@
 		</Table.Root>
 	</section>
 {/if}
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>

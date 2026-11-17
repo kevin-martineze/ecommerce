@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import type { AdminVariantRow, ProductOption } from '$lib/server/api/panel-catalog';
 
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -75,6 +77,8 @@
 	);
 
 	const faltan = $derived(Math.max(0, posibles - variants.length));
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <div class="space-y-6">
@@ -206,8 +210,16 @@
 
 											{#if variant.stock === 0 && !variant.active}
 												<Button
-													type="submit"
-													form="borrar-variante-{variant.id}"
+													type="button"
+													onclick={() =>
+														borrado.ask(
+															`borrar-variante-${variant.id}`,
+															`¿Borrar ${variant.label || 'esta combinación'}?`,
+															{
+																description:
+																	'Si ya está en pedidos, se desactiva en vez de borrarse.'
+															}
+														)}
 													size="sm"
 													variant="ghost"
 													class="text-destructive"
@@ -235,8 +247,23 @@
 			<input type="hidden" name="variantId" value={variant.id} />
 		</form>
 
-		<form id="borrar-variante-{variant.id}" method="POST" action="?/borrarVariante" use:enhance>
+		<form
+			id="borrar-variante-{variant.id}"
+			method="POST"
+			action="?/borrarVariante"
+			use:enhance={alBorrar}
+		>
 			<input type="hidden" name="variantId" value={variant.id} />
 		</form>
 	{/each}
 </div>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>

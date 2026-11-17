@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { untrack } from 'svelte';
 
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -11,9 +13,9 @@
 	import * as Card from '$lib/components/atoms/card';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
-	import * as Table from '$lib/components/atoms/table';
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
+	import EditableRowCard from '$lib/components/organisms/EditableRowCard.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import { themePreviewUrl } from '$lib/template-preview';
 	import { slugify } from '$lib/utils/slug';
@@ -34,7 +36,7 @@
 	}
 
 	/**
-	 * Los cambios de cada fila viven aquí, por id. Así la tabla sigue pintando
+	 * Los cambios de cada fila viven aquí, por id. Así la lista sigue pintando
 	 * lo guardado y lo que la dueña escribe se suma sin tocar `data`.
 	 */
 	interface CategoryEdit {
@@ -93,6 +95,8 @@
 	function editCategory(id: string, patch: CategoryEdit) {
 		categoryEdits[id] = { ...categoryEdits[id], ...patch };
 	}
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -156,48 +160,45 @@
 					<Button type="submit" size="sm">Agregar categoría</Button>
 				</form>
 
-				<Table.Root class="table-stack">
-					<Table.Header>
-						<Table.Row>
-							<Table.Head>Nombre</Table.Head>
-							<Table.Head class="w-40">Enlace</Table.Head>
-							<Table.Head class="w-36">Orden</Table.Head>
-							<Table.Head class="w-28">Visible</Table.Head>
-							<Table.Head class="w-28">Uso</Table.Head>
-							<Table.Head class="w-32"></Table.Head>
-						</Table.Row>
-					</Table.Header>
-
-					<Table.Body>
-						{#each rows as category (category.id)}
-							{@const enUso = usoCategoria(category.id)}
-							<Table.Row>
-								<Table.Cell data-label="Nombre">
+				<div class="space-y-4">
+					{#each rows as category (category.id)}
+						{@const enUso = usoCategoria(category.id)}
+						<EditableRowCard>
+							<div class="grid gap-4 md:grid-cols-2">
+								<div class="space-y-1.5">
+									<Label for="cat-nombre-{category.id}">Nombre</Label>
 									<Input
+										id="cat-nombre-{category.id}"
 										form="categoria-{category.id}"
 										name="name"
 										value={category.name}
 										oninput={(event) =>
 											editCategory(category.id, { name: event.currentTarget.value })}
-										aria-label="Nombre"
 									/>
-								</Table.Cell>
+								</div>
 
-								<Table.Cell data-label="Enlace" class="text-muted-foreground font-mono text-xs">
-									/{category.slug}
-								</Table.Cell>
+								<div class="space-y-1.5">
+									<p class="text-sm font-medium">Enlace</p>
+									<p class="text-muted-foreground flex h-9 items-center font-mono text-xs">
+										/{category.slug}
+									</p>
+								</div>
+							</div>
 
-								<Table.Cell data-label="Orden">
+							<div class="flex flex-wrap items-end gap-4">
+								<div class="space-y-1.5">
+									<Label for="cat-orden-{category.id}">Orden</Label>
 									<NumberField
+										id="cat-orden-{category.id}"
 										form="categoria-{category.id}"
 										name="sortOrder"
 										value={category.sortOrder}
 										onchange={(value) => editCategory(category.id, { sortOrder: value })}
-										aria-label="Orden"
+										class="w-32"
 									/>
-								</Table.Cell>
+								</div>
 
-								<Table.Cell data-label="Visible">
+								<div class="pb-2">
 									<CheckboxField
 										id="cat-visible-{category.id}"
 										form="categoria-{category.id}"
@@ -206,55 +207,67 @@
 										checked={category.active}
 										onchange={(checked) => editCategory(category.id, { active: checked })}
 									/>
-								</Table.Cell>
+								</div>
 
-								<Table.Cell data-label="Uso" class="text-muted-foreground text-xs">
+								<p class="text-muted-foreground pb-2 text-xs">
 									{enUso > 0 ? `${enUso} productos` : 'sin usar'}
-								</Table.Cell>
+								</p>
+							</div>
 
-								<Table.Cell data-label="">
-									<div class="flex items-center gap-1">
-										<Button
-											type="submit"
-											form="categoria-{category.id}"
-											size="sm"
-											variant="outline"
-										>
-											Guardar
-										</Button>
+							{#snippet acciones()}
+								<Button type="submit" form="categoria-{category.id}" size="sm" variant="outline">
+									Guardar
+								</Button>
 
-										<Button
-											type="submit"
-											form="borrar-categoria-{category.id}"
-											size="sm"
-											variant="ghost"
-											class="text-destructive"
-											aria-label="Borrar {category.name}"
-										>
-											<Trash2 class="size-3" />
-										</Button>
-									</div>
-								</Table.Cell>
-							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
+								<Button
+									type="button"
+									onclick={() =>
+										borrado.ask(`borrar-categoria-${category.id}`, `¿Borrar ${category.name}?`, {
+											description: 'Lo que ya esté en uso no se borra: se oculta.'
+										})}
+									size="sm"
+									variant="ghost"
+									class="text-destructive"
+									aria-label="Borrar {category.name}"
+								>
+									<Trash2 class="size-3" />
+									Borrar
+								</Button>
+							{/snippet}
+						</EditableRowCard>
+					{/each}
+				</div>
 			</Card.Content>
 		</Card.Root>
 	</div>
 </LivePreviewLayout>
 
 <!--
-	Los formularios de cada fila viven fuera de la tabla: el HTML no admite
-	<form> dentro de <tbody>, así que los campos lo referencian por id.
+	Los formularios de cada fila viven fuera de la lista, en un bloque oculto:
+	los campos los referencian por id.
 -->
 <div hidden>
 	{#each data.categories as category (category.id)}
 		<form id="categoria-{category.id}" method="POST" action="?/actualizarCategoria" use:enhance>
 			<input type="hidden" name="id" value={category.id} />
 		</form>
-		<form id="borrar-categoria-{category.id}" method="POST" action="?/borrarCategoria" use:enhance>
+		<form
+			id="borrar-categoria-{category.id}"
+			method="POST"
+			action="?/borrarCategoria"
+			use:enhance={alBorrar}
+		>
 			<input type="hidden" name="id" value={category.id} />
 		</form>
 	{/each}
 </div>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>

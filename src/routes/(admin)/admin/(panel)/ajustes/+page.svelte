@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { untrack } from 'svelte';
 
 	import { enhance } from '$app/forms';
@@ -30,7 +32,6 @@
 
 	let saving = $state(false);
 	let logoSaving = $state(false);
-	let logoRemoving = $state(false);
 
 	/** La zona de la tienda que se resalta según el campo que se está editando. */
 	let focus = $state<PreviewZone>('store-header');
@@ -56,6 +57,8 @@
 			data.current.theme
 		)
 	);
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -202,20 +205,29 @@
 	</form>
 
 	{#if data.current.logo_url}
-		<form
-			method="POST"
-			action="?/quitarLogo"
-			class="mt-3"
-			use:enhance={() => {
-				logoRemoving = true;
-
-				return async ({ update }) => {
-					await update();
-					logoRemoving = false;
-				};
-			}}
+		<Button
+			type="button"
+			variant="ghost"
+			onclick={() =>
+				borrado.ask('quitar-logo', '¿Quitar el logo?', {
+					description: 'La tienda vuelve a mostrar el nombre.',
+					confirmLabel: 'Quitar',
+					pendingLabel: 'Quitando…'
+				})}>Quitar logo</Button
 		>
-			<Button type="submit" variant="ghost" disabled={logoRemoving}>Quitar logo</Button>
-		</form>
 	{/if}
 </section>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>
+
+<div hidden>
+	<form id="quitar-logo" method="POST" action="?/quitarLogo" use:enhance={alBorrar}></form>
+</div>

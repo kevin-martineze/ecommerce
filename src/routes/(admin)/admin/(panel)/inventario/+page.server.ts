@@ -2,7 +2,7 @@ import { fail } from '@sveltejs/kit';
 
 import type { Actions, PageServerLoad } from './$types';
 import { stockUpdateSchema } from '$lib/schemas/admin';
-import { listInventory, updateVariant } from '$lib/server/api/panel-catalog';
+import { listInventory, removeVariant, updateVariant } from '$lib/server/api/panel-catalog';
 import { failWith, orFail, panelContext } from '$lib/server/context';
 
 export const load: PageServerLoad = async (event) => {
@@ -32,5 +32,22 @@ export const actions: Actions = {
 		if (!result.ok) return failWith(result);
 
 		return { message: 'Stock actualizado.' };
+	},
+
+	borrar: async (event) => {
+		const ctx = panelContext(event);
+		const formData = await event.request.formData();
+
+		// Si la variante está en un pedido, la API la desactiva en vez de borrarla.
+		const result = await removeVariant(ctx, String(formData.get('variantId') ?? ''));
+
+		if (!result.ok) return failWith(result);
+
+		return {
+			message:
+				result.data.result === 'deactivated'
+					? 'Variante desactivada: está en pedidos.'
+					: 'Variante borrada.'
+		};
 	}
 };

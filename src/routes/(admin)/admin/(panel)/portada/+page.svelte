@@ -11,17 +11,19 @@
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
-	import * as Table from '$lib/components/atoms/table';
 	import { Textarea } from '$lib/components/atoms/textarea';
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+	import EditableRowCard from '$lib/components/organisms/EditableRowCard.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import { templateOf } from '$lib/domain/templates';
 	import { isEmptyTheme } from '$lib/domain/theme';
 	import { themePreviewUrl } from '$lib/template-preview';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 
 	interface Props {
 		data: PageData;
@@ -38,7 +40,7 @@
 	let focus = $state<PreviewZone>('hero');
 
 	/**
-	 * Los cambios de cada bloque viven aquí, por id. Así la tabla sigue pintando
+	 * Los cambios de cada bloque viven aquí, por id. Así la lista sigue pintando
 	 * lo guardado y lo que la dueña escribe se suma sin tocar `data`.
 	 */
 	interface HighlightEdit {
@@ -61,12 +63,14 @@
 	);
 	let newActive = $state(true);
 
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
+
 	const collectionOptions = $derived([
 		{ value: '', label: 'Ninguna: usar mi propio título' },
 		...data.collections.map((collection) => ({ value: collection.id, label: collection.name }))
 	]);
 
-	/** Mismas columnas para la cabecera y cada fila, así todo queda alineado. */
 	const chosenCollection = $derived(
 		data.collections.find((collection) => collection.id === heroCollectionId) ?? null
 	);
@@ -314,66 +318,64 @@
 					</form>
 
 					{#if rows.length > 0}
-						<Table.Root class="table-stack">
-							<Table.Header>
-								<Table.Row>
-									<Table.Head class="w-44">Etiqueta</Table.Head>
-									<Table.Head class="w-60">Título</Table.Head>
-									<Table.Head>Texto</Table.Head>
-									<Table.Head class="w-36">Orden</Table.Head>
-									<Table.Head class="w-28">Visible</Table.Head>
-									<Table.Head class="w-32"></Table.Head>
-								</Table.Row>
-							</Table.Header>
-
-							<Table.Body>
-								{#each rows as highlight (highlight.id)}
-									<Table.Row>
-										<Table.Cell data-label="Etiqueta">
+						<div class="space-y-4">
+							{#each rows as highlight (highlight.id)}
+								<EditableRowCard>
+									<div class="grid gap-4 md:grid-cols-2">
+										<div class="space-y-1.5">
+											<Label for="eyebrow-{highlight.id}">Etiqueta</Label>
 											<Input
+												id="eyebrow-{highlight.id}"
 												form="bloque-{highlight.id}"
 												name="eyebrow"
 												value={highlight.eyebrow}
 												oninput={(event) =>
 													editHighlight(highlight.id, { eyebrow: event.currentTarget.value })}
-												aria-label="Etiqueta"
 											/>
-										</Table.Cell>
+										</div>
 
-										<Table.Cell data-label="Título">
+										<div class="space-y-1.5">
+											<Label for="title-{highlight.id}">Título</Label>
 											<Input
+												id="title-{highlight.id}"
 												form="bloque-{highlight.id}"
 												name="title"
 												value={highlight.title}
 												oninput={(event) =>
 													editHighlight(highlight.id, { title: event.currentTarget.value })}
-												aria-label="Título"
 											/>
-										</Table.Cell>
+										</div>
+									</div>
 
-										<Table.Cell data-label="Texto">
-											<Input
-												form="bloque-{highlight.id}"
-												name="body"
-												value={highlight.body}
-												oninput={(event) =>
-													editHighlight(highlight.id, { body: event.currentTarget.value })}
-												aria-label="Texto"
-											/>
-										</Table.Cell>
+									<div class="space-y-1.5">
+										<Label for="body-{highlight.id}">Texto</Label>
+										<Textarea
+											id="body-{highlight.id}"
+											form="bloque-{highlight.id}"
+											name="body"
+											rows={2}
+											maxlength={300}
+											value={highlight.body}
+											oninput={(event) =>
+												editHighlight(highlight.id, { body: event.currentTarget.value })}
+										/>
+									</div>
 
-										<Table.Cell data-label="Orden">
+									<div class="flex flex-wrap items-end gap-4">
+										<div class="space-y-1.5">
+											<Label for="order-{highlight.id}">Orden</Label>
 											<NumberField
+												id="order-{highlight.id}"
 												form="bloque-{highlight.id}"
 												name="sortOrder"
 												value={highlight.sortOrder}
 												max={999}
+												class="w-32"
 												onchange={(value) => editHighlight(highlight.id, { sortOrder: value })}
-												aria-label="Orden"
 											/>
-										</Table.Cell>
+										</div>
 
-										<Table.Cell data-label="Visible">
+										<div class="pb-2">
 											<CheckboxField
 												id="bloque-visible-{highlight.id}"
 												form="bloque-{highlight.id}"
@@ -382,41 +384,50 @@
 												checked={highlight.active}
 												onchange={(checked) => editHighlight(highlight.id, { active: checked })}
 											/>
-										</Table.Cell>
+										</div>
+									</div>
 
-										<Table.Cell data-label="">
-											<div class="flex items-center gap-1">
-												<Button
-													type="submit"
-													form="bloque-{highlight.id}"
-													size="sm"
-													variant="outline"
-												>
-													Guardar
-												</Button>
+									{#snippet acciones()}
+										<Button type="submit" form="bloque-{highlight.id}" size="sm" variant="outline">
+											Guardar
+										</Button>
 
-												<Button
-													type="submit"
-													form="borrar-bloque-{highlight.id}"
-													size="sm"
-													variant="ghost"
-													class="text-destructive"
-													aria-label="Borrar mensaje"
-												>
-													<Trash2 class="size-3" />
-												</Button>
-											</div>
-										</Table.Cell>
-									</Table.Row>
-								{/each}
-							</Table.Body>
-						</Table.Root>
+										<Button
+											type="button"
+											size="sm"
+											variant="ghost"
+											class="text-destructive"
+											aria-label="Borrar mensaje"
+											onclick={() =>
+												borrado.ask(
+													`borrar-bloque-${highlight.id}`,
+													`¿Borrar el mensaje «${highlight.title}»?`,
+													{ description: 'Se quita de la portada. No se puede deshacer.' }
+												)}
+										>
+											<Trash2 class="size-3" />
+											Borrar
+										</Button>
+									{/snippet}
+								</EditableRowCard>
+							{/each}
+						</div>
 					{/if}
 				</Card.Content>
 			</Card.Root>
 		</div>
 	</div>
 </LivePreviewLayout>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>
 
 <!-- El HTML no admite <form> dentro de <tbody>: viven aquí y se referencian por id. -->
 <div hidden>
@@ -425,7 +436,12 @@
 			<input type="hidden" name="id" value={highlight.id} />
 		</form>
 
-		<form id="borrar-bloque-{highlight.id}" method="POST" action="?/borrarBloque" use:enhance>
+		<form
+			id="borrar-bloque-{highlight.id}"
+			method="POST"
+			action="?/borrarBloque"
+			use:enhance={alBorrar}
+		>
 			<input type="hidden" name="id" value={highlight.id} />
 		</form>
 	{/each}

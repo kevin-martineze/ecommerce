@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	import { enhance } from '$app/forms';
@@ -55,6 +57,8 @@
 	);
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -204,9 +208,26 @@
 										</Button>
 									</form>
 
-									<form method="POST" action="?/eliminar" use:enhance>
+									<form
+										id="borrar-cupon-{coupon.id}"
+										method="POST"
+										action="?/eliminar"
+										use:enhance={alBorrar}
+									>
 										<input type="hidden" name="id" value={coupon.id} />
-										<Button type="submit" size="sm" variant="ghost" class="text-destructive">
+										<Button
+											type="button"
+											size="sm"
+											variant="ghost"
+											class="text-destructive"
+											aria-label="Borrar cupón {coupon.code}"
+											onclick={() =>
+												borrado.ask(
+													`borrar-cupon-${coupon.id}`,
+													`¿Borrar el cupón ${coupon.code}?`,
+													{ description: 'Si ya se usó, se desactiva en vez de borrarse.' }
+												)}
+										>
 											<Trash2 class="size-3" />
 										</Button>
 									</form>
@@ -219,3 +240,13 @@
 		</div>
 	{/if}
 </LivePreviewLayout>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>

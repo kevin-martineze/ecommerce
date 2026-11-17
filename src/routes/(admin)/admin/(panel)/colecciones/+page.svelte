@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
@@ -64,6 +66,8 @@
 	function linksOf(collectionId: string) {
 		return data.links.filter((link) => link.collection_id === collectionId);
 	}
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -170,7 +174,8 @@
 						{/if}
 
 						<Button
-							href="/colecciones/{collection.slug}"
+							href="{data.storeUrl}/colecciones/{collection.slug}"
+							rel="noopener noreferrer"
 							target="_blank"
 							size="sm"
 							variant="outline"
@@ -199,10 +204,24 @@
 							</Button>
 						</form>
 
-						<form method="POST" action="?/eliminar" use:enhance>
+						<form
+							id="borrar-coleccion-{collection.id}"
+							method="POST"
+							action="?/eliminar"
+							use:enhance={alBorrar}
+						>
 							<input type="hidden" name="id" value={collection.id} />
 							<Button
-								type="submit"
+								type="button"
+								onclick={() =>
+									borrado.ask(
+										`borrar-coleccion-${collection.id}`,
+										`¿Borrar la colección ${collection.name}?`,
+										{
+											description:
+												'Los productos no se borran; solo deja de existir esta colección.'
+										}
+									)}
 								size="sm"
 								variant="ghost"
 								class="text-destructive"
@@ -245,8 +264,18 @@
 
 										<Table.Cell data-label="">
 											<Button
-												type="submit"
-												form="quitar-{collection.id}-{link.product_id}"
+												type="button"
+												onclick={() =>
+													borrado.ask(
+														`quitar-${collection.id}-${link.product_id}`,
+														'¿Quitar este producto de la colección?',
+														{
+															description:
+																'El producto sigue en la tienda; solo deja de salir en esta colección.',
+															confirmLabel: 'Quitar',
+															pendingLabel: 'Quitando…'
+														}
+													)}
 												size="sm"
 												variant="ghost"
 												class="text-destructive"
@@ -313,7 +342,7 @@
 						id="quitar-{collection.id}-{link.product_id}"
 						method="POST"
 						action="?/quitarProducto"
-						use:enhance
+						use:enhance={alBorrar}
 					>
 						<input type="hidden" name="collectionId" value={collection.id} />
 						<input type="hidden" name="productId" value={link.product_id} />
@@ -323,3 +352,13 @@
 		{/each}
 	</div>
 {/if}
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>
