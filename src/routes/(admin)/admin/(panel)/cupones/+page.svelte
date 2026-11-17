@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
