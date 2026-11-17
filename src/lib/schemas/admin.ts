@@ -2,13 +2,39 @@ import { z } from 'zod';
 
 import { HERO_LAYOUTS, STOREFRONT_TEMPLATES } from '$lib/domain/templates';
 import { HEX_COLOR, THEME_CORNERS, THEME_FONTS } from '$lib/domain/theme';
+import { parseAmount } from '$lib/utils/money';
+
+/**
+ * Un monto como lo escribe la dueña: "89.900", "$ 89900", "89 900". Lo que no es
+ * un monto (signo, decimal, letra) no pasa: el esquema lo rechaza. Así "-5" no
+ * se vuelve 5 y "8.9" no se vuelve 89.
+ */
+const MONTO_ESCRITO = /^\s*\$?\s*(\d+|\d{1,3}([.\s]\d{3})+)\s*$/;
+
+/** Lo que llega del formulario: un monto escrito se lee; cualquier otra cosa pasa tal cual. */
+function leerMonto(value: unknown): unknown {
+	if (typeof value !== 'string') return value;
+	if (value.trim() === '') return undefined;
+	if (!MONTO_ESCRITO.test(value)) return value;
+
+	return parseAmount(value) ?? undefined;
+}
 
 /** Precios en pesos enteros: la administradora los escribe con o sin puntos. */
-const price = z.coerce
-	.number({ invalid_type_error: 'Escribe un precio válido.' })
-	.int('El precio no lleva decimales.')
-	.min(0, 'El precio no puede ser negativo.')
-	.max(100_000_000, 'Ese precio parece un error.');
+const price = z.preprocess(
+	leerMonto,
+	z
+		.number({
+			required_error: 'Escribe un precio.',
+			invalid_type_error: 'Escribe un precio válido.'
+		})
+		.int('El precio no lleva decimales.')
+		.min(0, 'El precio no puede ser negativo.')
+		.max(100_000_000, 'Ese precio parece un error.')
+);
+
+/** El precio propio de una variante: vacío es «el del producto». */
+export const priceOverrideSchema = price.nullable();
 
 export const loginSchema = z.object({
 	email: z.string().trim().email('Correo inválido.'),
@@ -103,7 +129,16 @@ export const couponSchema = z
 			.toUpperCase()
 			.regex(/^[A-Z0-9]{3,40}$/, 'Solo letras y números, entre 3 y 40 caracteres.'),
 		type: z.enum(['percent', 'fixed']),
-		value: z.coerce.number().int().min(1, 'El valor debe ser mayor que cero.'),
+		value: z.preprocess(
+			leerMonto,
+			z
+				.number({
+					required_error: 'Escribe el valor del cupón.',
+					invalid_type_error: 'Escribe un valor válido.'
+				})
+				.int()
+				.min(1, 'El valor debe ser mayor que cero.')
+		),
 		minSubtotal: price.default(0),
 		startsAt: z.string().optional().default(''),
 		endsAt: z.string().optional().default(''),
