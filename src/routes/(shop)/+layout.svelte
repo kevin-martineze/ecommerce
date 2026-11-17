@@ -7,6 +7,7 @@
 	import { page } from '$app/state';
 
 	import PreviewFocus from '$lib/components/molecules/PreviewFocus.svelte';
+	import PreviewEditable from '$lib/components/molecules/PreviewEditable.svelte';
 	import CartDrawer from '$lib/components/organisms/CartDrawer.svelte';
 	import SiteFooter from '$lib/components/organisms/SiteFooter.svelte';
 	import MegaMenuHeader from '$lib/components/organisms/MegaMenuHeader.svelte';
@@ -103,6 +104,7 @@
 {#if data.draftPreview}
 	<!-- Solo dentro del editor: resalta la zona que el módulo está editando. -->
 	<PreviewFocus />
+	<PreviewEditable />
 {/if}
 
 <CartDrawer />

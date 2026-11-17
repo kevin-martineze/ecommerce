@@ -19,6 +19,9 @@ import type { StoreTheme } from '$lib/domain/theme';
 export const DRAFT_READY = 'globerce:borrador-listo';
 export const DRAFT_UPDATE = 'globerce:borrador';
 
+/** La tienda pide al editor que abra la zona en la que hizo clic: lleva solo el nombre de la zona. */
+export const PREVIEW_EDIT_MESSAGE = 'globerce:editar';
+
 export const DRAFT_CONTENT_KINDS = [
 	'home',
 	'product',
@@ -39,6 +42,7 @@ export type DraftContentKind = (typeof DRAFT_CONTENT_KINDS)[number];
 export const PREVIEW_ZONES = [
 	'hero',
 	'highlights',
+	'announcement',
 	'featured',
 	'lookbook',
 	'collection-header',
@@ -61,6 +65,7 @@ export const PREVIEW_ZONE_LABEL: Record<PreviewZone, string> = {
 	'collection-header': 'Aquí aparece tu colección',
 	'product-card': 'Aquí se ve tu producto',
 	prodhipping: 'Aquí se explica el envío',
+	announcement: 'Aquí aparece tu anuncio',
 	'cart-coupon': 'Aquí se aplica tu cupón',
 	'store-header': 'Aquí se ve el nombre de tu tienda',
 	'categories-menu': 'Aquí aparece tu menú',

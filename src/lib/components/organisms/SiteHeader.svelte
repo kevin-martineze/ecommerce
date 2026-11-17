@@ -73,7 +73,10 @@
 </script>
 
 {#if settings.announcement}
-	<div class="bg-primary text-primary-foreground px-4 py-2 text-center text-xs tracking-wide">
+	<div
+		class="bg-primary text-primary-foreground px-4 py-2 text-center text-xs tracking-wide"
+		data-preview-zone={draftPreview ? 'announcement' : undefined}
+	>
 		{settings.announcement}
 	</div>
 {/if}

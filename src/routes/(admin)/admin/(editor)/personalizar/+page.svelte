@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { untrack } from 'svelte';
+	import { tick, untrack } from 'svelte';
 
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
@@ -10,7 +10,7 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	import { enhance } from '$app/forms';
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 
 	import { Badge } from '$lib/components/atoms/badge';
@@ -29,6 +29,7 @@
 	import EditableRowCard from '$lib/components/organisms/EditableRowCard.svelte';
 	import ThemeControls from '$lib/components/organisms/ThemeControls.svelte';
 	import { armarBorrador, focoDe, type Seccion, seccionDe } from '$lib/domain/diseno';
+	import { destinoDeZona, type EditableZoneName } from '$lib/domain/editable-zones';
 	import { describeDesignChanges, type DesignSnapshot } from '$lib/domain/design-changes';
 	import type { DraftHighlight } from '$lib/domain/preview';
 	import { accentProblem, isEmptyTheme } from '$lib/domain/theme';
@@ -210,6 +211,30 @@
 	const previewSrc = $derived(
 		themePreviewUrl(new URL(path, data.previewUrl).toString(), saved.template, saved.theme)
 	);
+
+	/**
+	 * Un clic en una zona editable de la vista previa: abre la sección de Diseño
+	 * que la edita, sin tocar el borrador, y enfoca el campo con un pulso breve.
+	 */
+	async function editarZona(zona: EditableZoneName) {
+		const destino = destinoDeZona(zona);
+
+		await goto(destino.url, { replaceState: true, keepFocus: true, noScroll: true });
+		await tick();
+
+		if (!destino.campo) return;
+
+		const campo = document.getElementById(destino.campo);
+
+		if (!campo) return;
+
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		campo.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+		campo.focus({ preventScroll: true });
+		campo.classList.add('pulso-edicion');
+		window.setTimeout(() => campo.classList.remove('pulso-edicion'), 1000);
+	}
 
 	function discard() {
 		template = saved.template;
@@ -559,6 +584,7 @@
 
 					<div
 						class="border-border space-y-4 border-t pt-5"
+						id="mensajes-de-abajo"
 						role="group"
 						aria-label="Mensajes de abajo"
 						onfocusin={() => (enMensajes = true)}
@@ -745,7 +771,13 @@
 		</aside>
 
 		<section class="bg-muted/60 h-[75vh] min-h-0 p-4 lg:h-auto lg:p-6">
-			<DraftPreview src={previewSrc} {draft} {device} title="Vista previa de tu tienda" />
+			<DraftPreview
+				src={previewSrc}
+				{draft}
+				{device}
+				title="Vista previa de tu tienda"
+				onedit={editarZona}
+			/>
 		</section>
 	</div>
 </div>

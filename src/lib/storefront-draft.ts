@@ -21,6 +21,12 @@ export { DRAFT_READY, DRAFT_UPDATE };
  *
  * Lo que llega se lee campo a campo en `$lib/schemas/storefront-draft`: nada
  * que no sea una plantilla, un ajuste o un contenido conocido llega a pintarse.
+ *
+ * Sentido contrario: al hacer clic en una zona editable de la vista previa, la
+ * tienda avisa al editor con `{ type: PREVIEW_EDIT_MESSAGE, zone }` ('globerce:editar',
+ * ver `/domain/editable-zones`). Solo sale dentro del iframe, y el editor
+ * lo acepta solo de su origen y de su ventana (`DraftPreview`), leído con
+ * `readPreviewEdit`.
  */
 export function draftMessage(draft: StorefrontDraft) {
 	return {
