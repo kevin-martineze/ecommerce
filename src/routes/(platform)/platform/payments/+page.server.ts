@@ -13,7 +13,7 @@ function currentMonth(): string {
 }
 
 export const load: PageServerLoad = async (event) => {
-	const requested = event.url.searchParams.get('mes');
+	const requested = event.url.searchParams.get('month');
 	const month = requested && MONTH.test(requested) ? requested : currentMonth();
 
 	return { report: orFail(await listPayments(accountContext(event), month)) };

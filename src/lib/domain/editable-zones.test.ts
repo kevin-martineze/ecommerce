@@ -49,13 +49,13 @@ describe('isEditableZone', () => {
 });
 
 describe('mapeo zona → URL de sección', () => {
-	it('cada sección tiene su ?seccion=', () => {
-		expect(urlDeSeccion('marca')).toBe('?seccion=marca');
-		expect(urlDeSeccion('portada')).toBe('?seccion=portada');
+	it('cada sección tiene su ?section=', () => {
+		expect(urlDeSeccion('marca')).toBe('?section=marca');
+		expect(urlDeSeccion('portada')).toBe('?section=portada');
 	});
 
 	it('una zona lleva a su sección y a su campo', () => {
-		expect(destinoDeZona('store-header')).toEqual({ url: '?seccion=marca', campo: 'storeName' });
-		expect(destinoDeZona('hero')).toEqual({ url: '?seccion=portada', campo: 'heroCollectionId' });
+		expect(destinoDeZona('store-header')).toEqual({ url: '?section=marca', campo: 'storeName' });
+		expect(destinoDeZona('hero')).toEqual({ url: '?section=portada', campo: 'heroCollectionId' });
 	});
 });

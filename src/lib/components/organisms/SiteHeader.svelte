@@ -146,7 +146,7 @@
 
 			{#each categories as category (category.id)}
 				<a
-					href="/shop?categoria={category.slug}"
+					href="/shop?category={category.slug}"
 					class="text-muted-foreground hover:text-foreground text-sm transition-colors"
 				>
 					{category.name}
@@ -235,7 +235,7 @@
 
 			{#each categories as category (category.id)}
 				<a
-					href="/shop?categoria={category.slug}"
+					href="/shop?category={category.slug}"
 					class="hover:bg-accent px-2 py-3 text-sm"
 					onclick={() => (menuOpen = false)}
 				>

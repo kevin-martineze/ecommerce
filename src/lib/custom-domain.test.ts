@@ -7,7 +7,7 @@ import { customDomainRedirect, esVistaPrevia, redirectToCustomDomain } from '$li
 const base = {
 	slug: 'boutique',
 	pathname: '/shop/vestidos',
-	search: '?orden=precio',
+	search: '?sort=precio',
 	isSharedPath: false,
 	rootDomain: 'globerce.store',
 	siteUrl: 'https://globerce.store'
@@ -22,7 +22,7 @@ describe('customDomainRedirect', () => {
 		for (const domainStatus of ['pending', 'failed', 'disabled'] as const) {
 			expect(customDomainRedirect({ ...base, domainStatus })).toEqual({
 				status: 302,
-				location: 'https://boutique.globerce.store/shop/vestidos?orden=precio'
+				location: 'https://boutique.globerce.store/shop/vestidos?sort=precio'
 			});
 		}
 	});
@@ -47,7 +47,7 @@ describe('customDomainRedirect', () => {
 			})
 		).toEqual({
 			status: 302,
-			location: 'http://localhost:5173/shop/vestidos?orden=precio'
+			location: 'http://localhost:5173/shop/vestidos?sort=precio'
 		});
 	});
 });

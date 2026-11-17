@@ -18,7 +18,7 @@ import { safeRedirectTarget } from '$lib/utils/redirect';
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (locals.session) redirect(303, safeRedirectTarget(url.searchParams.get('redirectTo')));
 
-	return { notice: url.searchParams.get('aviso') ?? url.searchParams.get('error') };
+	return { notice: url.searchParams.get('notice') ?? url.searchParams.get('error') };
 };
 
 export const actions: Actions = {

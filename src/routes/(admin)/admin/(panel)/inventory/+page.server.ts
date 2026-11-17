@@ -12,7 +12,7 @@ import { failWith, orFail, panelContext } from '$lib/server/context';
 import { stockUpdateSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
-	const onlyLow = event.url.searchParams.get('bajo') === '1';
+	const onlyLow = event.url.searchParams.get('low') === '1';
 
 	// Agrupado por producto, empezando por lo que está por agotarse, para editar
 	// como quien revisa el perchero.

@@ -339,19 +339,19 @@ const MAX_PRICE = 100_000_000;
 
 /** Lee los filtros desde la URL: son la fuente de verdad, no el estado local. */
 export function parseFilters(url: URL): ProductFilters {
-	const sortParam = url.searchParams.get('orden');
-	const page = Math.floor(Number(url.searchParams.get('pagina') ?? '1'));
+	const sortParam = url.searchParams.get('sort');
+	const page = Math.floor(Number(url.searchParams.get('page') ?? '1'));
 	const min = Math.floor(Number(url.searchParams.get('min') ?? ''));
 	const max = Math.floor(Number(url.searchParams.get('max') ?? ''));
 
 	// Se recorta a los límites que valida la API: un enlace manipulado muestra
 	// un listado razonable en vez de un error.
 	return {
-		category: url.searchParams.get('categoria')?.slice(0, 80) || null,
-		// `?opcion=Color:Rojo`. Se descarta lo que no tenga esa forma: un enlace
+		category: url.searchParams.get('category')?.slice(0, 80) || null,
+		// `?option=Color:Rojo`. Se descarta lo que no tenga esa forma: un enlace
 		// manipulado muestra el listado completo en vez de un error.
 		options: url.searchParams
-			.getAll('opcion')
+			.getAll('option')
 			.slice(0, 20)
 			.map((entrada) => entrada.slice(0, 120))
 			.filter((entrada) => /^[^:]+:[^:]+$/.test(entrada)),

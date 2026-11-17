@@ -20,7 +20,7 @@ export const load: PageServerLoad = async (event) => {
 
 	// Sin colección elegida no se carga ninguna: una colección nueva no debe
 	// heredar la foto ni los productos de otra mientras la dueña escribe.
-	const requested = event.url.searchParams.get('coleccion');
+	const requested = event.url.searchParams.get('collection');
 
 	if (!requested) return { collection: null };
 

@@ -23,7 +23,7 @@ import { DRAFT_READY, readDraftMessage } from '$lib/storefront-draft';
  *
  * Vive fuera de los componentes a propósito: dentro del `iframe` la clienta de
  * prueba puede navegar de la portada a un producto, y el borrador tiene que
- * seguir puesto aunque la URL ya no traiga `?ajustes=1`. Por eso, una vez que
+ * seguir puesto aunque la URL ya no traiga `?theme=1`. Por eso, una vez que
  * se empieza a escuchar, se escucha hasta que la página se cierre.
  */
 class StorefrontDraftState {

@@ -8,23 +8,23 @@ import type { StoreTheme } from '$lib/domain/theme';
  * `$lib/server/template-preview.ts`; esto es lo que también necesita el
  * panel para armar los enlaces, y por eso no vive en `server/`.
  */
-export const PREVIEW_PARAM = 'plantilla';
-/** `&solo=1`: solo esta petición, sin cookie ni aviso. Para la miniatura. */
-export const PREVIEW_ONCE_PARAM = 'solo';
-export const PREVIEW_EXIT = 'salir';
+export const PREVIEW_PARAM = 'template';
+/** `&once=1`: solo esta petición, sin cookie ni aviso. Para la miniatura. */
+export const PREVIEW_ONCE_PARAM = 'once';
+export const PREVIEW_EXIT = 'exit';
 
 /**
  * Los ajustes en borrador, para la miniatura del panel mientras la dueña los
- * prueba. Solo valen con `&solo=1`: nunca se guardan en la cookie ni se
+ * prueba. Solo valen con `&once=1`: nunca se guardan en la cookie ni se
  * anuncian. Con `ajustes=1` la miniatura usa estos y no los guardados, así
  * que un ajuste que falta significa «el de la plantilla».
  */
-export const THEME_PREVIEW_PARAM = 'ajustes';
+export const THEME_PREVIEW_PARAM = 'theme';
 export const THEME_PREVIEW_KEYS = {
 	accent: 'color',
-	fonts: 'letras',
-	corners: 'esquinas',
-	hero: 'portada'
+	fonts: 'fonts',
+	corners: 'corners',
+	hero: 'hero'
 } as const satisfies Record<keyof StoreTheme, string>;
 
 /** La URL con que se abre una tienda vestida con `template`, para mirarla. */

@@ -73,7 +73,7 @@
 	</p>
 	<p class="text-muted-foreground text-sm">
 		El logo, el nombre y la barra de anuncio están en
-		<a href="/admin/design?seccion=marca" class="text-foreground underline underline-offset-4">
+		<a href="/admin/design?section=marca" class="text-foreground underline underline-offset-4">
 			Diseño › Marca
 		</a>.
 	</p>

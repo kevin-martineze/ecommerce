@@ -121,7 +121,7 @@
 	}
 
 	function categoryHref(category: Category): string {
-		return `/shop?categoria=${encodeURIComponent(category.slug)}`;
+		return `/shop?category=${encodeURIComponent(category.slug)}`;
 	}
 
 	function panelId(node: CategoryNode): string {

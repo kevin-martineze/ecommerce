@@ -39,10 +39,10 @@
 	function setStatus(status: string | null) {
 		const url = new URL(page.url);
 
-		if (status) url.searchParams.set('estado', status);
-		else url.searchParams.delete('estado');
+		if (status) url.searchParams.set('status', status);
+		else url.searchParams.delete('status');
 
-		url.searchParams.delete('pagina');
+		url.searchParams.delete('page');
 		goto(url, { keepFocus: true, noScroll: true });
 	}
 
@@ -55,13 +55,13 @@
 		if (term) url.searchParams.set('q', term);
 		else url.searchParams.delete('q');
 
-		url.searchParams.delete('pagina');
+		url.searchParams.delete('page');
 		goto(url, { keepFocus: true, noScroll: true });
 	}
 
 	function pageUrl(target: number): string {
 		const url = new URL(page.url);
-		url.searchParams.set('pagina', String(target));
+		url.searchParams.set('page', String(target));
 		return `${url.pathname}${url.search}`;
 	}
 </script>

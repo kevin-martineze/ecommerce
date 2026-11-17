@@ -19,7 +19,7 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	const ctx = publicContext(event);
-	const requested = event.url.searchParams.get('producto');
+	const requested = event.url.searchParams.get('product');
 
 	if (requested) {
 		return { product: orFail(await getProduct(ctx, requested)) };

@@ -20,6 +20,6 @@ export const load: PageServerLoad = async (event) => {
 		recentOrders: orFail(recent).orders.slice(0, 8),
 		// Recién creada: se muestra dónde quedó. Solo si es la tienda de la sesión,
 		// para que el parámetro no sirva para pintar un enlace cualquiera.
-		welcomeUrl: event.url.searchParams.get('bienvenida') === storeSlug ? storeUrl : null
+		welcomeUrl: event.url.searchParams.get('welcome') === storeSlug ? storeUrl : null
 	};
 };

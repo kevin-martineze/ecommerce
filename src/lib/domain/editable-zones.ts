@@ -34,7 +34,7 @@ export function isEditableZone(valor: unknown): valor is EditableZoneName {
 
 /** La URL de una sección de Diseño, relativa a la página del editor. */
 export function urlDeSeccion(seccion: Seccion): string {
-	return `?seccion=${seccion}`;
+	return `?section=${seccion}`;
 }
 
 /** A dónde lleva el clic en una zona: la sección y el campo a enfocar. */

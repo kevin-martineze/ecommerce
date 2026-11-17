@@ -22,10 +22,10 @@ import {
 /**
  * Probar una plantilla en la tienda de verdad, sin guardarla.
  *
- * `?plantilla=<código>` viste la vitrina con esa plantilla para quien la
+ * `?template=<código>` viste la vitrina con esa plantilla para quien la
  * abre y lo deja en una cookie de este host, así la vista previa sobrevive a
- * pasar de la portada a un producto y al carrito. `?plantilla=salir` la
- * apaga. Con `&solo=1` no se guarda nada: es lo que usa el panel para pintar
+ * pasar de la portada a un producto y al carrito. `?template=exit` la
+ * apaga. Con `&once=1` no se guarda nada: es lo que usa el panel para pintar
  * la miniatura de cada plantilla dentro de un `iframe`, y ahí tampoco se
  * anuncia la vista previa.
  *

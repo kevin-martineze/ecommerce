@@ -68,7 +68,7 @@
 
 	<div class="flex items-center gap-2">
 		<Button
-			href={`/platform/payments?mes=${shiftMonth(report.month, -1)}`}
+			href={`/platform/payments?month=${shiftMonth(report.month, -1)}`}
 			variant="outline"
 			size="icon"
 			aria-label="Mes anterior"
@@ -77,7 +77,7 @@
 		</Button>
 		<span class="min-w-40 text-center text-sm">{monthLabel}</span>
 		<Button
-			href={`/platform/payments?mes=${shiftMonth(report.month, 1)}`}
+			href={`/platform/payments?month=${shiftMonth(report.month, 1)}`}
 			variant="outline"
 			size="icon"
 			aria-label="Mes siguiente"

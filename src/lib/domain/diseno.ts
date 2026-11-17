@@ -14,9 +14,9 @@ export const SECCIONES = ['estilo', 'marca', 'portada'] as const;
 
 export type Seccion = (typeof SECCIONES)[number];
 
-/** La sección que se ve, leída de `?seccion=`. Si falta o no existe: estilo. */
+/** La sección que se ve, leída de `?section=`. Si falta o no existe: estilo. */
 export function seccionDe(search: string): Seccion {
-	const valor = new URLSearchParams(search).get('seccion');
+	const valor = new URLSearchParams(search).get('section');
 
 	return SECCIONES.find((seccion) => seccion === valor) ?? 'estilo';
 }

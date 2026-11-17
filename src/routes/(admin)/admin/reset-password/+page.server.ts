@@ -39,6 +39,6 @@ export const actions: Actions = {
 
 		// La API cerró todas las sesiones de la cuenta; la de este navegador también.
 		clearSession(event.cookies);
-		redirect(303, '/admin/login?aviso=restablecida');
+		redirect(303, '/admin/login?notice=restablecida');
 	}
 };

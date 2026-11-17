@@ -40,10 +40,10 @@ export const actions: Actions = {
 		// `load` del layout, así que acá no hay `parent()` de donde sacarla. El
 		// panel solo pinta la bienvenida si coincide con la tienda de la sesión,
 		// así que un valor cambiado a mano no muestra nada.
-		const slug = event.url.searchParams.get('tienda') ?? '';
+		const slug = event.url.searchParams.get('store') ?? '';
 
 		// Elegida la plantilla, el onboarding terminó: al panel, con la
 		// bienvenida que enseña dónde quedó la tienda.
-		redirect(303, `/admin?bienvenida=${encodeURIComponent(slug)}`);
+		redirect(303, `/admin?welcome=${encodeURIComponent(slug)}`);
 	}
 };

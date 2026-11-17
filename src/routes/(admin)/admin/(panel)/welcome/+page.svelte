@@ -28,12 +28,12 @@
 <TemplatePicker
 	current={data.settings.template}
 	storeUrl={data.previewUrl}
-	action="?/template&tienda={data.storeSlug}"
+	action="?/template&store={data.storeSlug}"
 	cta="Empezar con esta"
 />
 
 <p class="text-muted-foreground mt-6 text-sm">
-	<a href="/admin?bienvenida={data.storeSlug}" class="hover:text-foreground underline">
+	<a href="/admin?welcome={data.storeSlug}" class="hover:text-foreground underline">
 		Lo decido después
 	</a>
 	· Tu tienda ya está en

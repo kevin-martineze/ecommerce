@@ -44,7 +44,7 @@
 		<Button href="/admin/inventory" variant={data.onlyLow ? 'outline' : 'default'} size="sm">
 			Todo
 		</Button>
-		<Button href="/admin/inventory?bajo=1" variant={data.onlyLow ? 'default' : 'outline'} size="sm">
+		<Button href="/admin/inventory?low=1" variant={data.onlyLow ? 'default' : 'outline'} size="sm">
 			Stock bajo
 		</Button>
 	</div>

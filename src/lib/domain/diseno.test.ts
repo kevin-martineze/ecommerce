@@ -25,12 +25,12 @@ describe('seccionDe', () => {
 	});
 
 	it('lee la sección de la URL', () => {
-		expect(seccionDe('?seccion=marca')).toBe('marca');
-		expect(seccionDe('?seccion=portada')).toBe('portada');
+		expect(seccionDe('?section=marca')).toBe('marca');
+		expect(seccionDe('?section=portada')).toBe('portada');
 	});
 
 	it('una sección desconocida cae en Estilo', () => {
-		expect(seccionDe('?seccion=otra')).toBe('estilo');
+		expect(seccionDe('?section=otra')).toBe('estilo');
 	});
 });
 

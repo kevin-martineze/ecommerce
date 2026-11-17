@@ -53,7 +53,7 @@ test('registrarse, elegir plantilla y entrar al panel', async ({ page }) => {
 		.first()
 		.click();
 
-	await expect(page).toHaveURL(/\/admin\?bienvenida=/);
+	await expect(page).toHaveURL(/\/admin\?welcome=/);
 	await expect(page.getByText(/tu tienda está lista/i)).toBeVisible();
 
 	// Y el plan quedó en el que eligió al registrarse.

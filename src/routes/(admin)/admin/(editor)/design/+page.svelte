@@ -414,7 +414,7 @@
 			<nav class="border-border flex gap-1 border-b p-2" aria-label="Secciones de Diseño">
 				{#each SECCIONES_TABS as tab (tab.id)}
 					<a
-						href="?seccion={tab.id}"
+						href="?section={tab.id}"
 						aria-current={seccion === tab.id ? 'page' : undefined}
 						class={cn(
 							'flex-1 rounded-md px-2 py-1.5 text-center text-sm transition-colors',

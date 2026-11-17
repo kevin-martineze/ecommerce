@@ -26,7 +26,7 @@ export const GET: RequestHandler = async (event) => {
 		{ loc: `${site}/`, lastmod: null },
 		{ loc: `${site}/shop`, lastmod: null },
 		{ loc: `${site}/collections`, lastmod: null },
-		...categories.map((slug) => ({ loc: `${site}/shop?categoria=${slug}`, lastmod: null })),
+		...categories.map((slug) => ({ loc: `${site}/shop?category=${slug}`, lastmod: null })),
 		...collections.map((slug) => ({ loc: `${site}/collections/${slug}`, lastmod: null })),
 		...products.map((product) => ({
 			loc: `${site}/shop/${product.slug}`,

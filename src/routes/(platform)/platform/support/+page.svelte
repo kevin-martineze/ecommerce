@@ -50,9 +50,9 @@
 		const params = new SvelteURLSearchParams(page.url.searchParams);
 
 		if (target > 1) {
-			params.set('pagina', String(target));
+			params.set('page', String(target));
 		} else {
-			params.delete('pagina');
+			params.delete('page');
 		}
 
 		const query = params.toString();
@@ -86,7 +86,7 @@
 >
 	<div class="space-y-2">
 		<Label for="estado">Estado</Label>
-		<SelectField id="estado" name="estado" bind:value={estado} options={estadoOptions} />
+		<SelectField id="status" name="status" bind:value={estado} options={estadoOptions} />
 	</div>
 
 	<div class="space-y-2">

@@ -42,15 +42,15 @@
 
 	function changeSort(event: Event & { currentTarget: HTMLSelectElement }) {
 		const url = new URL(page.url);
-		url.searchParams.set('orden', event.currentTarget.value);
-		url.searchParams.delete('pagina');
+		url.searchParams.set('sort', event.currentTarget.value);
+		url.searchParams.delete('page');
 
 		goto(url, { keepFocus: true, noScroll: true });
 	}
 
 	function pageUrl(target: number): string {
 		const url = new URL(page.url);
-		url.searchParams.set('pagina', String(target));
+		url.searchParams.set('page', String(target));
 		return `${url.pathname}${url.search}`;
 	}
 </script>

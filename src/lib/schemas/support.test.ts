@@ -49,17 +49,13 @@ describe('supportReplySchema', () => {
 
 describe('parsePlatformSupportFilters', () => {
 	it('lee estado, búsqueda y página de la URL', () => {
-		const filtros = parsePlatformSupportFilters(
-			new URLSearchParams('estado=OPEN&q=pagos&pagina=3')
-		);
+		const filtros = parsePlatformSupportFilters(new URLSearchParams('status=OPEN&q=pagos&page=3'));
 
 		expect(filtros).toEqual({ status: 'OPEN', q: 'pagos', page: 3 });
 	});
 
 	it('ignora lo que no entiende en vez de romper la bandeja', () => {
-		const filtros = parsePlatformSupportFilters(
-			new URLSearchParams('estado=INVENTADO&pagina=-4&q=')
-		);
+		const filtros = parsePlatformSupportFilters(new URLSearchParams('status=INVENTADO&page=-4&q='));
 
 		expect(filtros).toEqual({ status: null, q: null, page: 1 });
 	});

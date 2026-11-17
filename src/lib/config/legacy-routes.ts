@@ -52,12 +52,64 @@ const LEGACY_ROUTES: ReadonlyArray<readonly [string, string]> = [
 	['/terminos', '/terms']
 ];
 
-/** La ruta nueva de una URL vieja, o `null` si la ruta no se mudó. */
-export function legacyRedirect(pathname: string): string | null {
+/**
+ * Los parámetros de la URL que se renombraron. Ninguna clave nueva coincide con
+ * una vieja, así que se traducen en cualquier ruta.
+ */
+const LEGACY_PARAMS: Readonly<Record<string, string>> = {
+	ajustes: 'theme',
+	aviso: 'notice',
+	bajo: 'low',
+	bienvenida: 'welcome',
+	categoria: 'category',
+	coleccion: 'collection',
+	concepto: 'concept',
+	esquinas: 'corners',
+	estado: 'status',
+	galeria: 'gallery',
+	letras: 'fonts',
+	mes: 'month',
+	monto: 'amount',
+	opcion: 'option',
+	orden: 'sort',
+	pagina: 'page',
+	plantilla: 'template',
+	producto: 'product',
+	referencia: 'reference',
+	seccion: 'section',
+	solo: 'once',
+	tienda: 'store',
+	volver: 'returnTo'
+};
+
+function movedPath(pathname: string): string | null {
 	for (const [from, to] of LEGACY_ROUTES) {
 		if (pathname === from) return to;
 		if (pathname.startsWith(`${from}/`)) return to + pathname.slice(from.length);
 	}
 
 	return null;
+}
+
+/**
+ * La ruta y la búsqueda nuevas de una URL vieja (`/shop?category=x`), o `null`
+ * si ni la ruta ni sus parámetros se mudaron.
+ */
+export function legacyRedirect(url: URL): string | null {
+	const path = movedPath(url.pathname);
+	const params = new URLSearchParams();
+	let renamed = false;
+
+	for (const [key, value] of url.searchParams) {
+		const next = LEGACY_PARAMS[key];
+
+		if (next) renamed = true;
+		params.append(next ?? key, value);
+	}
+
+	if (!path && !renamed) return null;
+
+	const search = renamed ? params.toString() : url.search.slice(1);
+
+	return (path ?? url.pathname) + (search ? `?${search}` : '');
 }

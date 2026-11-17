@@ -77,7 +77,7 @@
 				{#each categories as category (category.id)}
 					<li>
 						<a
-							href="/shop?categoria={category.slug}"
+							href="/shop?category={category.slug}"
 							class="text-muted-foreground hover:text-foreground"
 						>
 							{category.name}

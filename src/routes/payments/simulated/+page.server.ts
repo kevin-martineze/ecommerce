@@ -20,8 +20,8 @@ import { clientAddress } from '$lib/server/context';
  * por defecto.
  */
 export const load: PageServerLoad = ({ url }) => {
-	const referencia = url.searchParams.get('referencia');
-	const monto = Number(url.searchParams.get('monto') ?? '0');
+	const referencia = url.searchParams.get('reference');
+	const monto = Number(url.searchParams.get('amount') ?? '0');
 
 	if (!referencia || !Number.isFinite(monto) || monto <= 0) {
 		error(400, 'Este cobro no es válido.');
@@ -30,9 +30,9 @@ export const load: PageServerLoad = ({ url }) => {
 	return {
 		referencia,
 		monto,
-		concepto: url.searchParams.get('concepto') ?? 'Pago',
+		concepto: url.searchParams.get('concept') ?? 'Pago',
 		// A dónde se vuelve, pase lo que pase.
-		volver: url.searchParams.get('volver') ?? '/admin/plan'
+		volver: url.searchParams.get('returnTo') ?? '/admin/plan'
 	};
 };
 

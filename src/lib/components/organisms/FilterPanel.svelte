@@ -30,7 +30,7 @@
 	function updateUrl(mutate: (params: URLSearchParams) => void) {
 		const url = new URL(page.url);
 		mutate(url.searchParams);
-		url.searchParams.delete('pagina');
+		url.searchParams.delete('page');
 
 		goto(url, { keepFocus: true, noScroll: true });
 		onapply?.();
@@ -48,8 +48,8 @@
 
 	function setCategory(slug: string | null) {
 		updateUrl((params) => {
-			if (slug) params.set('categoria', slug);
-			else params.delete('categoria');
+			if (slug) params.set('category', slug);
+			else params.delete('category');
 		});
 	}
 
@@ -134,7 +134,7 @@
 							<Checkbox
 								id="opcion-{clave}"
 								checked={selected}
-								onCheckedChange={(checked) => toggleMulti('opcion', clave, checked === true)}
+								onCheckedChange={(checked) => toggleMulti('option', clave, checked === true)}
 							/>
 							<Label for="opcion-{clave}" class="flex cursor-pointer items-center gap-2 text-sm">
 								<span
@@ -157,7 +157,7 @@
 								? 'bg-primary text-primary-foreground border-primary'
 								: 'hover:bg-accent'}"
 							aria-pressed={selected}
-							onclick={() => toggleMulti('opcion', clave, !selected)}
+							onclick={() => toggleMulti('option', clave, !selected)}
 						>
 							{valor.value}
 						</button>

@@ -82,7 +82,7 @@
 
 	const previewSrc = $derived.by(() => {
 		const url = new URL('/preview/product', data.previewUrl);
-		url.searchParams.set('producto', product.slug);
+		url.searchParams.set('product', product.slug);
 
 		return themePreviewUrl(url.toString(), data.settings.template, data.settings.theme);
 	});

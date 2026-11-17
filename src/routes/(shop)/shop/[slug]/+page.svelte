@@ -166,7 +166,7 @@
 		<a href="/shop" class="hover:text-foreground">Tienda</a>
 		{#if product.categorySlug}
 			<span>/</span>
-			<a href="/shop?categoria={product.categorySlug}" class="hover:text-foreground">
+			<a href="/shop?category={product.categorySlug}" class="hover:text-foreground">
 				{product.categoryName}
 			</a>
 		{/if}

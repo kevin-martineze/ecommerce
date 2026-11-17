@@ -9,8 +9,8 @@ import { orFail, panelContext } from '$lib/server/context';
 import { isOrderStatus } from '$lib/domain/orders';
 
 export const load: PageServerLoad = async (event) => {
-	const statusParam = event.url.searchParams.get('estado');
-	const page = Number(event.url.searchParams.get('pagina') ?? '1');
+	const statusParam = event.url.searchParams.get('status');
+	const page = Number(event.url.searchParams.get('page') ?? '1');
 
 	const filters = {
 		status: isOrderStatus(statusParam) ? statusParam : null,

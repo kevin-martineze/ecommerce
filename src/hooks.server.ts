@@ -50,9 +50,9 @@ async function lookupCustomDomain(event: RequestEvent, host: string): Promise<Do
 export const handle: Handle = async ({ event, resolve }) => {
 	// Las URLs en español de antes del refactor: 308 para que el método y el
 	// cuerpo de un POST viejo lleguen igual a la ruta nueva.
-	const legacy = legacyRedirect(event.url.pathname);
+	const legacy = legacyRedirect(event.url);
 
-	if (legacy) redirect(308, legacy + event.url.search);
+	if (legacy) redirect(308, legacy);
 
 	// Valida la configuración en cada petición: si falta una variable, el error
 	// dice cuál, en vez de aparecer más tarde como un fallo de la API.

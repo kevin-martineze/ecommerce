@@ -11,7 +11,7 @@ import { storeFilterStatusSchema } from '$lib/schemas/platform';
 export const load: PageServerLoad = async (event) => {
 	const ctx = accountContext(event);
 	const params = event.url.searchParams;
-	const status = storeFilterStatusSchema.safeParse(params.get('estado'));
+	const status = storeFilterStatusSchema.safeParse(params.get('status'));
 
 	const filters = {
 		q: params.get('q')?.trim().slice(0, 120) || null,
