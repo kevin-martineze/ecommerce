@@ -91,12 +91,23 @@ esquema y los datos viven en la API.
     Si una primitiva no existe: `pnpm dlx shadcn-svelte@latest add <nombre>` y
     luego crea el átomo que la re-exporta.
 21. **Atomic design:** `atoms → molecules → organisms → templates → pages`. Un
-    componente solo importa de niveles inferiores. Los layouts (estructura,
-    slots y scroll) vienen de GlobUI y se re-exportan en
-    `$lib/components/layouts/*`; nadie importa directo de `@glob-ui/svelte`.
+    componente solo importa de niveles inferiores. Los **layouts**
+    (`$lib/components/layouts/*`) son propios y deciden estructura, slots y
+    scroll: `AppShellLayout` (panel: barra lateral y solo `main` hace scroll),
+    `StackedLayout` (barra, contenido y pie con scroll de ventana; la barra es
+    `sticky`, `overlay` o `static`), `PageLayout` (encabezado, contenido y
+    columna lateral), `SplitLayout` (filtros, ficha o resumen), `AuthLayout`,
+    `CanvasLayout` (editor a pantalla completa) y `SettingsLayout`. La raíz
+    lleva `data-layout` y cada slot `data-slot` y `data-scroll`; lo pegado se
+    pone bajo la barra con `var(--layout-header-h)`.
     Un **template** (`$lib/components/templates/*`) usa un layout, fija sus
-    slots (marca, navegación) y expone props para lo demás. Una **página** solo
-    pone el contenido que cambia: nunca alturas, `overflow`, `sticky` ni `100vh`.
+    slots (marca, navegación) y expone props para lo demás: `AdminTemplate`,
+    `PageTemplate`, `PreviewTemplate`, `EditorTemplate`, `StorefrontTemplate`,
+    `MarketingTemplate`, `LegalTemplate`, `PlatformTemplate`, `AuthTemplate`,
+    `ErrorTemplate`. El `<h1>` lo pone el template (`PageHeader`). Una
+    **página** solo pone el contenido que cambia: nunca alturas, `overflow`,
+    `sticky` ni `100vh`. Las cabeceras y pies (organismos) tampoco: su
+    posición y su landmark (`<header>`, `<footer>`) los pone el layout.
 22. **Solo tokens de Tailwind** (`bg-background`, `text-muted-foreground`,
     `text-sale`, `bg-whatsapp`…). Cero `bg-[#…]`, cero `text-[12px]`.
 23. **`cn()` para clases dinámicas.**

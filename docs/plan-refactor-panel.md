@@ -30,11 +30,12 @@ con sus pruebas, los átomos sobre shadcn-svelte y las reglas de
 
 ### 1. Layouts y templates con la metodología de GlobUI
 
-Las tres capas de `GlobUI/docs/design/layouts-and-templates.md`:
+Las tres capas de `GlobUI/docs/design/layouts-and-templates.md`, implementadas
+en este proyecto sin depender de la librería (ver decisión 3):
 
 | Capa     | Dónde vive                           | Hace                                                        | Nunca hace                  |
 | -------- | ------------------------------------ | ----------------------------------------------------------- | --------------------------- |
-| Layout   | `@glob-ui/svelte/*`                  | Estructura, slots, scroll, landmarks, menú móvil en `Sheet` | Pintar contenido            |
+| Layout   | `$lib/components/layouts/` (propios) | Estructura, slots, scroll, landmarks, menú móvil en `Sheet` | Pintar contenido            |
 | Template | `$lib/components/templates/` (nuevo) | Fija slots (marca, navegación) y expone props para lo demás | Poner alturas u `overflow`  |
 | Página   | `src/routes/**/+page.svelte`         | Solo el contenido que cambia                                | Decidir estructura o scroll |
 
@@ -89,7 +90,15 @@ La vista: `const editor = new DesignEditor(untrack(() => data.settings));`.
 El ViewModel vive junto a su ruta (no en `$lib`) porque no se reutiliza; se
 prueba con Vitest sin montar la página.
 
-### 3. Adoptar GlobUI: sí, pero solo los layouts por ahora
+### 3. Adoptar GlobUI: no por ahora; la metodología sí
+
+**Revisión:** se decidió no depender de `@glob-ui/svelte`. Los layouts y
+templates se escribieron en `$lib/components/layouts/` y
+`$lib/components/templates/` siguiendo el mismo contrato (`data-layout`,
+`data-slot`, `data-scroll`, `SkipLink`, scroll de app o de documento). Si la
+librería se publica más adelante, el cambio queda en esas dos carpetas: las
+páginas no importan layouts directo. El análisis original queda abajo como
+referencia.
 
 Estado real de `@glob-ui/svelte` (0.3.0 en el repo):
 
@@ -292,13 +301,13 @@ la regla también comprueba que cada import esté en la sección correcta y
 
 | Fase                   | Estado                                                                                                                                                                                                   |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0 · Preparación        | Hecha, salvo el puente de tokens: espera a `@glob-ui/svelte` publicado.                                                                                                                                  |
+| 0 · Preparación        | Hecha. Sin puente de tokens: los layouts son propios y usan los tokens de shadcn.                                                                                                                        |
 | 1 · Nombres en inglés  | Hecha: rutas, URLs, actions, archivos e identificadores, con 308 en `legacy-routes.ts`. API: rama `refactor/english-routes`.                                                                             |
-| 2 · Cascarón del panel | Bloqueada: espera a `@glob-ui/svelte`.                                                                                                                                                                   |
+| 2 · Cascarón del panel | Hecha con `AppShellLayout` propio: `AdminTemplate`, `AdminSidebar`, `TabNav` móvil y `ADMIN_NAV` en `$lib/config/admin-nav.ts`.                                                                          |
 | 3 · Formularios        | Hecha: `parseForm`, `FormState`, `FormField`, `FormSection`. Quedan actions con preparación propia (productos, colecciones, diseño, ajustes, carrito) para cuando sus esquemas absorban esa preparación. |
-| 4 · Templates          | `AuthTemplate` hecho. El resto espera a GlobUI.                                                                                                                                                          |
+| 4 · Templates          | Hecha: `PageTemplate`, `PreviewTemplate`, `EditorTemplate`, `AuthTemplate` en el panel; `StorefrontTemplate`, `MarketingTemplate`, `LegalTemplate`, `PlatformTemplate` y `ErrorTemplate` fuera de él.    |
 | 5 · ViewModels         | Hechos: `DesignEditor` (+ `HighlightsEditor`), `CouponDraft`, `CollectionDraft`, `ShippingEditor`, sobre `StorefrontPreview`. Productos no lo necesita (≤ 3 `$state`).                                   |
-| 6 · Resto              | Layouts locales `AuthLayout`, `CanvasLayout`, `SettingsLayout`. `SettingsLayout` se adopta con `SettingsTemplate` (fase 4).                                                                              |
+| 6 · Resto              | Layouts `AppShellLayout`, `PageLayout`, `StackedLayout`, `SplitLayout`, `AuthLayout`, `CanvasLayout`, `SettingsLayout`. `SettingsLayout` sin uso: su menú repetiría el grupo «Cuenta» de la barra.       |
 
 ## Fases
 
