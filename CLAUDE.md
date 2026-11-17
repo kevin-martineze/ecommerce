@@ -90,8 +90,13 @@ esquema y los datos viven en la API.
     `$lib/components/ui/*`.** Los átomos son el lugar de los overrides de marca.
     Si una primitiva no existe: `pnpm dlx shadcn-svelte@latest add <nombre>` y
     luego crea el átomo que la re-exporta.
-21. **Atomic design:** `atoms → molecules → organisms`. Un componente solo
-    importa de niveles inferiores.
+21. **Atomic design:** `atoms → molecules → organisms → templates → pages`. Un
+    componente solo importa de niveles inferiores. Los layouts (estructura,
+    slots y scroll) vienen de GlobUI y se re-exportan en
+    `$lib/components/layouts/*`; nadie importa directo de `@glob-ui/svelte`.
+    Un **template** (`$lib/components/templates/*`) usa un layout, fija sus
+    slots (marca, navegación) y expone props para lo demás. Una **página** solo
+    pone el contenido que cambia: nunca alturas, `overflow`, `sticky` ni `100vh`.
 22. **Solo tokens de Tailwind** (`bg-background`, `text-muted-foreground`,
     `text-sale`, `bg-whatsapp`…). Cero `bg-[#…]`, cero `text-[12px]`.
 23. **`cn()` para clases dinámicas.**
@@ -114,8 +119,30 @@ esquema y los datos viven en la API.
 ### Imports
 
 31. **Alias `$lib/`** para todo lo de `src/lib/`. Cero `../../`.
-32. **Orden:** tipos → `svelte`/`@sveltejs/*` → librerías externas → `$app/*` →
-    `$lib/*` → relativos. Línea en blanco entre grupos.
+32. **Secciones con encabezado, en este orden:** `// Tipos`, `// Svelte`,
+    `// Librerías`, `// Iconos`, `// App`, `// Servidor`, `// Componentes`,
+    `// Estado`, `// Dominio`, `// Utilidades`, `// Recursos`. Solo las que
+    tengan imports, con una línea en blanco entre ellas y ordenadas por ruta
+    dentro de cada una. La regla `local/import-sections`
+    (`eslint/import-sections.js`) decide la sección por la ruta y
+    `pnpm lint:fix` las escribe.
+
+### Nombres
+
+33. **Todo lo que es código va en inglés:** carpetas de rutas (y por lo tanto
+    las URLs), componentes, archivos, funciones, variables y nombres de form
+    actions (`?/create`, `?/delete`). Los comentarios y los textos de cara al
+    público van en español.
+34. **Una URL que cambia deja una redirección 308** en
+    `$lib/config/legacy-routes.ts`. Nunca se rompe un enlace publicado.
+
+### ViewModels
+
+35. **Una pantalla con más de ~5 `$state` o con un borrador que se
+    previsualiza tiene ViewModel:** una clase con runes en un `*.svelte.ts`
+    junto a su ruta (`design-editor.svelte.ts`), con su prueba. La vista solo
+    pinta y llama sus métodos. Un listado que carga en el servidor y muta por
+    form action no lo necesita.
 
 ---
 

@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

@@ -1,19 +1,29 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { tick } from 'svelte';
 
+	// Iconos
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+
+	// Dominio
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
 
 	interface Props {

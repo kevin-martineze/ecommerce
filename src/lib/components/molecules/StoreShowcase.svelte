@@ -1,6 +1,11 @@
 <script lang="ts">
+	// Tipos
 	import type { Shot } from '$lib/config/capturas';
+
+	// Dominio
 	import { HOST_MAQUETA } from '$lib/config/maqueta';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

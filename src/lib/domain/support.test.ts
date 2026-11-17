@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { esperaDesde } from '$lib/domain/support';
 
 const AHORA = new Date('2026-11-03T12:00:00.000Z');

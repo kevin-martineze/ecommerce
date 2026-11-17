@@ -1,7 +1,13 @@
 <script lang="ts">
+	// Tipos
 	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { DraftHighlight } from '$lib/domain/preview';
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { tick, untrack } from 'svelte';
 
+	// Iconos
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import Monitor from '@lucide/svelte/icons/monitor';
@@ -9,35 +15,40 @@
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import { Textarea } from '$lib/components/atoms/textarea';
 	import ActionToasts from '$lib/components/molecules/ActionToasts.svelte';
-	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
 	import ChangeList from '$lib/components/molecules/ChangeList.svelte';
+	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
 	import ConfirmDialog from '$lib/components/molecules/ConfirmDialog.svelte';
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import DraftPreview from '$lib/components/molecules/DraftPreview.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import EditableRowCard from '$lib/components/organisms/EditableRowCard.svelte';
 	import ThemeControls from '$lib/components/organisms/ThemeControls.svelte';
-	import { armarBorrador, focoDe, type Seccion, seccionDe } from '$lib/domain/diseno';
-	import { destinoDeZona, type EditableZoneName } from '$lib/domain/editable-zones';
-	import { describeDesignChanges, type DesignSnapshot } from '$lib/domain/design-changes';
-	import type { DraftHighlight } from '$lib/domain/preview';
-	import { accentProblem, isEmptyTheme } from '$lib/domain/theme';
-	import { themePreviewUrl } from '$lib/template-preview';
-	import { cn } from '$lib/utils';
+
+	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 
-	import type { PageData } from './$types';
+	// Dominio
+	import { describeDesignChanges, type DesignSnapshot } from '$lib/domain/design-changes';
+	import { armarBorrador, focoDe, type Seccion, seccionDe } from '$lib/domain/diseno';
+	import { destinoDeZona, type EditableZoneName } from '$lib/domain/editable-zones';
+	import { accentProblem, isEmptyTheme } from '$lib/domain/theme';
+
+	// Utilidades
+	import { themePreviewUrl } from '$lib/template-preview';
+	import { cn } from '$lib/utils';
 
 	interface Props {
 		data: PageData;

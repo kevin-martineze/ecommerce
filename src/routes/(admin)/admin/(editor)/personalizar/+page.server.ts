@@ -1,14 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { accentProblem, isEmptyTheme } from '$lib/domain/theme';
-import {
-	heroSchema,
-	homeHighlightSchema,
-	storeThemeSchema,
-	templateSchema,
-	tiendaSchema
-} from '$lib/schemas/admin';
+// Servidor
 import {
 	createHighlight,
 	getSettings,
@@ -22,6 +18,16 @@ import {
 } from '$lib/server/api/panel-content';
 import { requireAdmin } from '$lib/server/auth';
 import { failWith, orFail, panelContext, storeUrl } from '$lib/server/context';
+
+// Dominio
+import { accentProblem, isEmptyTheme } from '$lib/domain/theme';
+import {
+	heroSchema,
+	homeHighlightSchema,
+	storeThemeSchema,
+	templateSchema,
+	tiendaSchema
+} from '$lib/schemas/admin';
 
 /**
  * El editor de Diseño: estilo, marca y portada, con la tienda al lado.

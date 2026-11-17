@@ -1,9 +1,15 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { ajustesSchema } from '$lib/schemas/admin';
+// Servidor
 import { getSettings, updateSettings } from '$lib/server/api/panel-content';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { ajustesSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	return { current: orFail(await getSettings(panelContext(event))) };

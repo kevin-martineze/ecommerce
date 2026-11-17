@@ -1,22 +1,32 @@
 <script lang="ts">
-	import { onMount, tick, untrack } from 'svelte';
-
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-
-	import { enhance } from '$app/forms';
-
+	// Tipos
 	import type { Plan } from '$lib/domain/account';
 	import type { FieldErrors } from '$lib/utils/form';
+
+	// Svelte
+	import { onMount, tick, untrack } from 'svelte';
+
+	// Iconos
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+
+	// App
+	import { enhance } from '$app/forms';
+
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
 	import PhoneField from '$lib/components/molecules/PhoneField.svelte';
 	import PlanOption from '$lib/components/molecules/PlanOption.svelte';
 	import Stepper from '$lib/components/molecules/Stepper.svelte';
 	import TextField from '$lib/components/molecules/TextField.svelte';
+
+	// Dominio
 	import { TIENDA_MAQUETA } from '$lib/config/maqueta';
 	import { TRIAL_DAYS } from '$lib/domain/account';
 	import { joinPhone, splitPhone } from '$lib/domain/phone';
 	import { PASSWORD_MIN, registerSchema, storeFieldsSchema } from '$lib/schemas/account';
+
+	// Utilidades
 	import { fieldErrors } from '$lib/utils/form';
 	import { formatMoney } from '$lib/utils/money';
 	import { slugify } from '$lib/utils/slug';

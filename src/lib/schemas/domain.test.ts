@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { dominioSchema, limpiarDominio } from '$lib/schemas/domain';
 
 const rechaza = (raw: string, root = 'globerce.store') => {

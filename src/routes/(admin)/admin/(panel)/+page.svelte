@@ -1,12 +1,20 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import PartyPopper from '@lucide/svelte/icons/party-popper';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import * as Alert from '$lib/components/atoms/alert';
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
+
+	// Dominio
 	import { ORDER_STATUS_LABEL } from '$lib/domain/orders';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

@@ -1,14 +1,20 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { completeWompiKeys, parseWompiKeys } from '$lib/domain/wompi';
-import { paymentKeysSchema } from '$lib/schemas/admin';
+// Servidor
 import {
 	connectPaymentAccount,
 	disconnectPaymentAccount,
 	getPaymentAccount
 } from '$lib/server/api/panel-payments';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { completeWompiKeys, parseWompiKeys } from '$lib/domain/wompi';
+import { paymentKeysSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	const [account, { role }] = await Promise.all([

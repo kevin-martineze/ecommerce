@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Componentes
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
+
+	// Dominio
 	import { TRIAL_DAYS } from '$lib/domain/account';
 
 	/**

@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
+
+	// Dominio
 	import { EMPRESA, VIGENCIA_LEGAL } from '$lib/config/empresa';
 
 	/**

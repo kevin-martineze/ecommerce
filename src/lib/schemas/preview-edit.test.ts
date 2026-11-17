@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { EDITABLE_ZONE_NAMES } from '$lib/domain/editable-zones';
 import { PREVIEW_EDIT_MESSAGE } from '$lib/domain/preview';
 import { readPreviewEdit } from '$lib/schemas/preview-edit';

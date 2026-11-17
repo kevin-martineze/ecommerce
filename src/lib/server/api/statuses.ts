@@ -1,11 +1,14 @@
+// Tipos
 import type { MemberRole, StoreStatus, SubscriptionStatus } from '$lib/domain/account';
 import type { ProductStatus } from '$lib/domain/catalog';
 import type { OrderPaymentStatus, OrderStatus } from '$lib/domain/orders';
 import type { StorefrontTemplate } from '$lib/domain/templates';
 import type { StoreTheme } from '$lib/domain/theme';
 
+// Librerías
 import { z } from 'zod';
 
+// Dominio
 import { templateOf } from '$lib/domain/templates';
 import { EMPTY_THEME, readTheme } from '$lib/domain/theme';
 

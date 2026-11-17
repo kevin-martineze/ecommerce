@@ -1,15 +1,23 @@
-import { fail, redirect } from '@sveltejs/kit';
-
-import type { Actions, PageServerLoad } from './$types';
+// Tipos
 import type { ApiFailure } from '$lib/server/api/client';
 import type { FieldErrors } from '$lib/utils/form';
-import { joinPhone } from '$lib/domain/phone';
-import { planCodeSchema, registerSchema, storeFieldsSchema } from '$lib/schemas/account';
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
+import { fail, redirect } from '@sveltejs/kit';
+
+// Servidor
 import { createStore, register } from '$lib/server/api/auth';
 import { listPublicPlans } from '$lib/server/api/plans';
 import { accountContext, clientAddress, displayStatus } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
 import { toAdminSession, writeSession } from '$lib/server/session';
+
+// Dominio
+import { joinPhone } from '$lib/domain/phone';
+import { planCodeSchema, registerSchema, storeFieldsSchema } from '$lib/schemas/account';
+
+// Utilidades
 import { fieldErrors } from '$lib/utils/form';
 
 export const load: PageServerLoad = async (event) => {

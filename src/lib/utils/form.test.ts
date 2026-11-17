@@ -1,6 +1,8 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
+// Utilidades
 import { fieldErrors } from '$lib/utils/form';
 
 const schema = z.object({

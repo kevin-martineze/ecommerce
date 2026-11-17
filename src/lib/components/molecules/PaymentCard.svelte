@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Dominio
 	import { TIENDA_MAQUETA } from '$lib/config/maqueta';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

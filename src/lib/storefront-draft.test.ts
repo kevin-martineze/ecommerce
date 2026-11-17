@@ -1,8 +1,13 @@
+// Tipos
 import type { StorefrontDraft } from '$lib/storefront-draft';
 
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { EMPTY_THEME } from '$lib/domain/theme';
+
+// Utilidades
 import { DRAFT_READY, draftMessage, isReadyMessage, readDraftMessage } from '$lib/storefront-draft';
 
 describe('mensajes del borrador', () => {

@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { RUBROS } from '$lib/domain/rubros';
 
 describe('RUBROS', () => {

@@ -1,28 +1,38 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	// Tipos
+	import type { StorefrontDraft } from '$lib/domain/preview';
+	import type { ProductFormValues } from '$lib/domain/product-form';
+	import type { ActionData, PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 
+	// Iconos
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import Star from '@lucide/svelte/icons/star';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { ActionData, PageData } from './$types';
-	import type { StorefrontDraft } from '$lib/domain/preview';
-	import type { ProductFormValues } from '$lib/domain/product-form';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import * as Tabs from '$lib/components/atoms/tabs';
-	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
-	import ProductForm from '$lib/components/organisms/ProductForm.svelte';
-	import OptionEditor from '$lib/components/organisms/OptionEditor.svelte';
-	import VariantMatrix from '$lib/components/organisms/VariantMatrix.svelte';
 	import FormFeedback from '$lib/components/molecules/FormFeedback.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+	import OptionEditor from '$lib/components/organisms/OptionEditor.svelte';
+	import ProductForm from '$lib/components/organisms/ProductForm.svelte';
+	import VariantMatrix from '$lib/components/organisms/VariantMatrix.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+
+	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
 
 	interface Props {

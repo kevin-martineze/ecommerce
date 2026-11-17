@@ -1,3 +1,4 @@
+// App
 import { browser } from '$app/environment';
 
 const STORAGE_KEY = 'tienda:favorites:v1';

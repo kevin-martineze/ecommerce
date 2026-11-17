@@ -1,6 +1,8 @@
 <script lang="ts">
+	// App
 	import { page } from '$app/state';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 
 	const isNotFound = $derived(page.status === 404);

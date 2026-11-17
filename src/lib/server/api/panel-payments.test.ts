@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Servidor
 import { accountSchema } from '$lib/server/api/panel-payments';
 
 const base = {

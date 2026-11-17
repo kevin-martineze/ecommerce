@@ -1,8 +1,14 @@
 <script lang="ts">
+	// Tipos
+	import type { CardErrors, CardInput } from '$lib/domain/card';
+
+	// Iconos
 	import Lock from '@lucide/svelte/icons/lock';
 
-	import type { CardErrors, CardInput } from '$lib/domain/card';
+	// Componentes
 	import TextField from '$lib/components/molecules/TextField.svelte';
+
+	// Dominio
 	import { cardBrand, formatCardNumber, formatExpiry } from '$lib/domain/card';
 
 	/**

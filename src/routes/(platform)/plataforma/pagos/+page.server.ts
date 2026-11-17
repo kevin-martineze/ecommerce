@@ -1,4 +1,7 @@
+// Tipos
 import type { PageServerLoad } from './$types';
+
+// Servidor
 import { listPayments } from '$lib/server/api/platform';
 import { accountContext, orFail } from '$lib/server/context';
 

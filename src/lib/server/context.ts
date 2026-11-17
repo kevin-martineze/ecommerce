@@ -1,9 +1,14 @@
+// Tipos
 import type { RequestEvent } from '@sveltejs/kit';
 import type { ApiFailure, ApiResult } from '$lib/server/api/client';
 
+// Svelte
 import { error, fail, redirect } from '@sveltejs/kit';
 
+// Servidor
 import { serverEnv } from '$lib/server/env';
+
+// Utilidades
 import { parsePlatformHosts, storefrontUrl, storeSlugFromHost } from '$lib/tenant';
 
 /** Con qué tienda y desde dónde habla la tienda pública con la API. */

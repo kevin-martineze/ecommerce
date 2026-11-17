@@ -1,3 +1,4 @@
+// Tipos
 import type { PricedLine } from '$lib/domain/orders';
 
 /** Tope por línea: el mismo que valida la API. */

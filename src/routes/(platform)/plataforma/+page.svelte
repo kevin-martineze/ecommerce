@@ -1,10 +1,16 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import * as Table from '$lib/components/atoms/table';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

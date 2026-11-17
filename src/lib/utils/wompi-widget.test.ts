@@ -1,7 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
+// Tipos
 import type { WompiWidget } from '$lib/domain/wompi';
 
+// Librerías
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Utilidades
 import { esWidget, openWompiWidget, pagoConWidget } from '$lib/utils/wompi-widget';
 
 const widgetValido = {

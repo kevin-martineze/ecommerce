@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { categorySchema } from '$lib/schemas/admin';
+// Servidor
 import {
 	createCategory,
 	listCategories,
@@ -10,6 +13,9 @@ import {
 	updateCategory
 } from '$lib/server/api/panel-catalog';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { categorySchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = panelContext(event);

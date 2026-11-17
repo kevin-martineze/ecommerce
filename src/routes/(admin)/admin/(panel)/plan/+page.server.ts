@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { planCodeSchema, paymentTokensSchema } from '$lib/schemas/account';
+// Servidor
 import { getBillingSetup } from '$lib/server/api/billing';
 import {
 	checkoutSubscription,
@@ -11,6 +14,9 @@ import {
 } from '$lib/server/api/panel-team';
 import { listPublicPlans } from '$lib/server/api/plans';
 import { clientAddress, failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { planCodeSchema, paymentTokensSchema } from '$lib/schemas/account';
 
 export const load: PageServerLoad = async (event) => {
 	const ip = clientAddress(event);

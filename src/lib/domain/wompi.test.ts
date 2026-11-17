@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { completeWompiKeys, mixedModes, parseWompiKeys, wompiMode } from '$lib/domain/wompi';
 
 const PEGADO_ETIQUETADO = `

@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { collectionSchema } from '$lib/schemas/admin';
+// Servidor
 import { listProducts } from '$lib/server/api/panel-catalog';
 import {
 	createCollection,
@@ -12,6 +15,11 @@ import {
 	uploadCollectionHero
 } from '$lib/server/api/panel-content';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { collectionSchema } from '$lib/schemas/admin';
+
+// Utilidades
 import { slugify } from '$lib/utils/slug';
 
 export const load: PageServerLoad = async (event) => {

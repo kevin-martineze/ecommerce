@@ -1,6 +1,10 @@
+// Tipos
+import type { PageServerLoad } from './$types';
+
+// Svelte
 import { error } from '@sveltejs/kit';
 
-import type { PageServerLoad } from './$types';
+// Servidor
 import { listShippingZones } from '$lib/server/api/checkout';
 import { orFail, publicContext } from '$lib/server/context';
 

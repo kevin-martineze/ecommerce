@@ -1,3 +1,4 @@
+// Tipos
 import type { SubmitFunction } from '@sveltejs/kit';
 
 /** Lo que el diálogo de confirmación muestra y el form que va a enviar. */

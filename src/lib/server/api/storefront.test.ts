@@ -1,5 +1,7 @@
+// Librerías
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+// Servidor
 import { apiRequest } from '$lib/server/api/client';
 import { findStoreByDomain, getStorefront } from '$lib/server/api/storefront';
 

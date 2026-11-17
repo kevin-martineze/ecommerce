@@ -1,15 +1,20 @@
+// Tipos
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import type { StoreByDomain } from '$lib/server/domain-cache';
 
+// Svelte
 import { redirect } from '@sveltejs/kit';
 
-import { customDomainRedirect } from '$lib/custom-domain';
-import { isSharedPath } from '$lib/marketing-host';
+// Servidor
 import { findStoreByDomain } from '$lib/server/api/storefront';
 import { clientAddress } from '$lib/server/context';
-import { serverEnv } from '$lib/server/env';
 import { getCachedDomain, setCachedDomain } from '$lib/server/domain-cache';
+import { serverEnv } from '$lib/server/env';
 import { resolveSession } from '$lib/server/session';
+
+// Utilidades
+import { customDomainRedirect } from '$lib/custom-domain';
+import { isSharedPath } from '$lib/marketing-host';
 import { parsePlatformHosts, resolveHost } from '$lib/tenant';
 
 type DomainLookup = { ok: true; store: StoreByDomain | null } | { ok: false; message: string };

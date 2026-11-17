@@ -1,18 +1,28 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 
+	// Iconos
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import { Separator } from '$lib/components/atoms/separator';
 	import { Textarea } from '$lib/components/atoms/textarea';
+
+	// Dominio
 	import { ORDER_PAYMENT_LABEL, ORDER_STATUSES, ORDER_STATUS_LABEL } from '$lib/domain/orders';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

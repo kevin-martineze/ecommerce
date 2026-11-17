@@ -1,12 +1,15 @@
-import type { CartTotals, OrderItem, PricedLine, PublicOrderView } from '$lib/domain/orders';
-import type { AppliedCoupon, ShippingZone } from '$lib/domain/settings';
-import type { WompiWidget } from '$lib/domain/wompi';
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PricedCart, RawCartLine } from '$lib/server/cart';
 import type { PublicContext } from '$lib/server/context';
+import type { CartTotals, OrderItem, PricedLine, PublicOrderView } from '$lib/domain/orders';
+import type { AppliedCoupon, ShippingZone } from '$lib/domain/settings';
+import type { WompiWidget } from '$lib/domain/wompi';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { widgetSchema } from '$lib/server/api/payment-widget';
 import { publicRequest } from '$lib/server/api/request';
 import { orderPaymentStatusSchema, orderStatusSchema } from '$lib/server/api/statuses';

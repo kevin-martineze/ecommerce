@@ -1,9 +1,15 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { templateSchema } from '$lib/schemas/admin';
+// Servidor
 import { getSettings, updateSettings } from '$lib/server/api/panel-content';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { templateSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	const [settings, { storeSlug, storeUrl, previewUrl }] = await Promise.all([

@@ -1,11 +1,17 @@
+// Tipos
+import type { LayoutServerLoad } from './$types';
+
+// Svelte
 import { error, redirect } from '@sveltejs/kit';
 
-import type { LayoutServerLoad } from './$types';
-import { esVistaPrevia, redirectToCustomDomain } from '$lib/custom-domain';
+// Servidor
 import { getStorefront } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
 import { resolveTemplatePreview } from '$lib/server/template-preview';
+
+// Utilidades
+import { esVistaPrevia, redirectToCustomDomain } from '$lib/custom-domain';
 import { parsePlatformHosts } from '$lib/tenant';
 
 export const load: LayoutServerLoad = async (event) => {

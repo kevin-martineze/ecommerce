@@ -1,11 +1,17 @@
-import { error, fail, redirect } from '@sveltejs/kit';
-
+// Tipos
 import type { PublicOrderView } from '$lib/domain/orders';
 import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
+import { error, fail, redirect } from '@sveltejs/kit';
+
+// Servidor
 import { getPublicOrder, markWhatsappOpened, startOrderPayment } from '$lib/server/api/checkout';
 import { getOrderByNumber } from '$lib/server/api/panel-commerce';
 import { getStorefront } from '$lib/server/api/storefront';
 import { panelContext, publicContext } from '$lib/server/context';
+
+// Utilidades
 import { buildOrderMessage, buildWhatsAppUrl } from '$lib/utils/whatsapp';
 
 export const load: PageServerLoad = async (event) => {

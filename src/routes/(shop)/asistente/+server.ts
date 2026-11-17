@@ -1,6 +1,10 @@
+// Tipos
+import type { RequestHandler } from './$types';
+
+// Svelte
 import { json } from '@sveltejs/kit';
 
-import type { RequestHandler } from './$types';
+// Servidor
 import { askAssistant } from '$lib/server/api/assistant';
 import { publicContext } from '$lib/server/context';
 

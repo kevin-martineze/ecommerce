@@ -1,6 +1,11 @@
+// Tipos
 import type { Actions, PageServerLoad } from './$types';
+
+// Servidor
 import { listRestock, markRestockNotified } from '$lib/server/api/panel-commerce';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Utilidades
 import { buildRestockUrl } from '$lib/utils/whatsapp';
 
 export const load: PageServerLoad = async (event) => {

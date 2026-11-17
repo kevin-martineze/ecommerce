@@ -1,5 +1,7 @@
+// Librerías
 import { z } from 'zod';
 
+// Dominio
 import {
 	SUPPORT_CATEGORIES,
 	SUPPORT_STATUSES,

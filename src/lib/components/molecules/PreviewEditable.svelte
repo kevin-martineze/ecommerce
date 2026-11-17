@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Dominio
 	import { EDITABLE_ZONES, isEditableZone } from '$lib/domain/editable-zones';
 	import { PREVIEW_EDIT_MESSAGE } from '$lib/domain/preview';
 

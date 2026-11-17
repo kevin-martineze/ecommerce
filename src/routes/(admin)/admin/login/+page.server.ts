@@ -1,10 +1,18 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { loginSchema } from '$lib/schemas/admin';
+// Servidor
 import { login, logout, me, switchStore } from '$lib/server/api/auth';
 import { clientAddress, displayStatus, storeSlugFor } from '$lib/server/context';
 import { toAdminSession, writeSession } from '$lib/server/session';
+
+// Dominio
+import { loginSchema } from '$lib/schemas/admin';
+
+// Utilidades
 import { safeRedirectTarget } from '$lib/utils/redirect';
 
 export const load: PageServerLoad = async ({ locals, url }) => {

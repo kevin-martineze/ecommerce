@@ -1,9 +1,12 @@
+// Tipos
 import type { RequestEvent } from '@sveltejs/kit';
 import type { ApiMe, ApiSessionStore } from '$lib/server/api/auth';
 import type { AdminSession } from '$lib/server/session-crypto';
 
+// Svelte
 import { error, redirect } from '@sveltejs/kit';
 
+// Servidor
 import { me, switchStore } from '$lib/server/api/auth';
 import { accountContext, clientAddress, storeSlugFor } from '$lib/server/context';
 import { clearSession, toAdminSession, writeSession } from '$lib/server/session';

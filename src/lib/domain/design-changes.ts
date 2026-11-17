@@ -1,8 +1,10 @@
+// Tipos
 import type { Seccion } from '$lib/domain/diseno';
 import type { StorefrontTemplate } from '$lib/domain/templates';
 
-import { CORNER_OPTIONS, FONT_OPTIONS, HERO_OPTIONS } from '$lib/domain/theme';
+// Dominio
 import { templateOf } from '$lib/domain/templates';
+import { CORNER_OPTIONS, FONT_OPTIONS, HERO_OPTIONS } from '$lib/domain/theme';
 
 /** Lo que el editor de Diseño guarda para una tienda: el estado escalar completo. */
 export interface DesignSnapshot {

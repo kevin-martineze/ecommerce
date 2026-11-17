@@ -1,6 +1,10 @@
+// Tipos
+import type { Actions } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions } from './$types';
+// Servidor
 import { lookupProducts } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
 

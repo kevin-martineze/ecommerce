@@ -1,12 +1,17 @@
+// Tipos
 import type { Cookies } from '@sveltejs/kit';
 import type { ApiSession } from '$lib/server/api/auth';
 import type { AdminSession } from '$lib/server/session-crypto';
 
+// App
 import { dev } from '$app/environment';
 
+// Servidor
 import { refresh } from '$lib/server/api/auth';
 import { serverEnv } from '$lib/server/env';
 import { needsRefresh, sealSession, unsealSession } from '$lib/server/session-crypto';
+
+// Utilidades
 import { sessionCookieDomain } from '$lib/tenant';
 
 /** Sesión del panel en cookie. El formato del contenido está en `session-crypto.ts`. */

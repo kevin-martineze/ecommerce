@@ -1,13 +1,22 @@
 <script lang="ts">
+	// Tipos
+	import type { StorefrontTemplate } from '$lib/domain/templates';
+
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { StorefrontTemplate } from '$lib/domain/templates';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import StorefrontFrame from '$lib/components/molecules/StorefrontFrame.svelte';
+
+	// Dominio
 	import { TEMPLATES } from '$lib/domain/templates';
+
+	// Utilidades
 	import { previewUrl } from '$lib/template-preview';
 	import { cn } from '$lib/utils';
 

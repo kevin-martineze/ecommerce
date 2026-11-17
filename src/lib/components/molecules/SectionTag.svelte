@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Iconos
 	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 
 	/**

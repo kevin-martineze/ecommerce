@@ -1,10 +1,14 @@
 <script lang="ts">
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import * as Popover from '$lib/components/atoms/popover';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

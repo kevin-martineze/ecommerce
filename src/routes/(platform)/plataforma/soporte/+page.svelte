@@ -1,16 +1,23 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 
+	// App
 	import { page } from '$app/state';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+
+	// Dominio
 	import {
 		esperaDesde,
 		SUPPORT_CATEGORY_LABEL,

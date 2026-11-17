@@ -1,5 +1,7 @@
+// Librerías
 import { expect, test } from '@playwright/test';
 
+// Utilidades
 import { esperarRegistroHidratado } from './hidratacion';
 
 /**

@@ -1,12 +1,19 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import CreditCard from '@lucide/svelte/icons/credit-card';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import WompiKeysPaste from '$lib/components/molecules/WompiKeysPaste.svelte';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

@@ -1,6 +1,10 @@
+// Tipos
+import type { RequestHandler } from './$types';
+
+// Svelte
 import { redirect } from '@sveltejs/kit';
 
-import type { RequestHandler } from './$types';
+// Servidor
 import { switchStore } from '$lib/server/api/auth';
 import { accountContext } from '$lib/server/context';
 import { toAdminSession, writeSession } from '$lib/server/session';

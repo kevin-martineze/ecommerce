@@ -1,3 +1,4 @@
+// Librerías
 import { z } from 'zod';
 
 /** Doce caracteres y sin más reglas, igual que la API (ver `RegisterStoreDto`). */

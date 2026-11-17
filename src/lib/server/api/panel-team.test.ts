@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Servidor
 import { checkoutSchema } from '$lib/server/api/panel-team';
 
 const cobro = {

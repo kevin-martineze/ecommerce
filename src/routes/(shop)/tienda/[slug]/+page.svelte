@@ -1,14 +1,21 @@
 <script lang="ts">
+	// Tipos
+	import type { ActionData, PageData } from './$types';
+
+	// Librerías
+	import { toast } from 'svelte-sonner';
+
+	// Iconos
 	import BellRing from '@lucide/svelte/icons/bell-ring';
 	import Heart from '@lucide/svelte/icons/heart';
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 
+	// App
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
-	import { toast } from 'svelte-sonner';
 
-	import type { ActionData, PageData } from './$types';
+	// Componentes
 	import * as Accordion from '$lib/components/atoms/accordion';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
@@ -16,8 +23,12 @@
 	import ProductGallery from '$lib/components/organisms/ProductGallery.svelte';
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
 	import VariantPicker from '$lib/components/organisms/VariantPicker.svelte';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 	import { formatMoney } from '$lib/utils/money';
 	import { buildProductInquiryUrl } from '$lib/utils/whatsapp';

@@ -1,13 +1,18 @@
 <script lang="ts">
+	// Tipos
 	import type { CatalogFacets, ProductFilters } from '$lib/domain/catalog';
 
+	// App
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Checkbox } from '$lib/components/atoms/checkbox';
 	import { Label } from '$lib/components/atoms/label';
 	import { Separator } from '$lib/components/atoms/separator';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

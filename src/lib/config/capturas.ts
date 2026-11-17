@@ -1,3 +1,4 @@
+// Recursos
 import catalogoCelular300 from '$lib/assets/marketing/tienda-catalogo-celular-300.webp';
 import catalogoCelular600 from '$lib/assets/marketing/tienda-catalogo-celular-600.webp';
 import destacados1920 from '$lib/assets/marketing/tienda-destacados-1920.webp';

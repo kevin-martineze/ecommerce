@@ -1,10 +1,17 @@
 <script lang="ts">
+	// Tipos
 	import type { PageData } from './$types';
+
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import { Separator } from '$lib/components/atoms/separator';
+
+	// Estado
 	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	/**

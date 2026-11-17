@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Dominio
 	import { FOTO_PRODUCTO } from '$lib/config/fotos';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

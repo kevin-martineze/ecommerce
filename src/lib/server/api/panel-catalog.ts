@@ -1,9 +1,12 @@
-import type { Category, ProductStatus } from '$lib/domain/catalog';
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PanelContext } from '$lib/server/context';
+import type { Category, ProductStatus } from '$lib/domain/catalog';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { panelRequest, segment } from '$lib/server/api/request';
 import { productStatusSchema, toApiProductStatus } from '$lib/server/api/statuses';
 

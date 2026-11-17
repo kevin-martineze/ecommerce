@@ -1,7 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { StorefrontTemplate } from '$lib/domain/templates';
+
+	// Componentes
 	import BrandColorPicker from '$lib/components/molecules/BrandColorPicker.svelte';
 	import ChoiceTile from '$lib/components/molecules/ChoiceTile.svelte';
+
+	// Dominio
 	import { TEMPLATES, templateOf } from '$lib/domain/templates';
 	import {
 		accentProblem,

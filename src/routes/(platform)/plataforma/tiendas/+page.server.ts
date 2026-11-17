@@ -1,7 +1,12 @@
+// Tipos
 import type { PageServerLoad } from './$types';
-import { storeFilterStatusSchema } from '$lib/schemas/platform';
+
+// Servidor
 import { listPlans, listStores } from '$lib/server/api/platform';
 import { accountContext, orFail } from '$lib/server/context';
+
+// Dominio
+import { storeFilterStatusSchema } from '$lib/schemas/platform';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = accountContext(event);

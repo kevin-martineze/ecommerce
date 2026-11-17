@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Utilidades
 import { customDomainRedirect, esVistaPrevia, redirectToCustomDomain } from '$lib/custom-domain';
 
 const base = {

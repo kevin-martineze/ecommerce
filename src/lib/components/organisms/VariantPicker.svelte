@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { ProductOption, VariantOption } from '$lib/domain/catalog';
 
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

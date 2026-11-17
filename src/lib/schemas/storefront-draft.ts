@@ -1,7 +1,10 @@
-import { z } from 'zod';
-
+// Tipos
 import type { StorefrontDraft } from '$lib/domain/preview';
 
+// Librerías
+import { z } from 'zod';
+
+// Dominio
 import { DRAFT_UPDATE, PREVIEW_ZONES } from '$lib/domain/preview';
 import { STOREFRONT_TEMPLATES } from '$lib/domain/templates';
 import { readUnknownTheme } from '$lib/domain/theme';

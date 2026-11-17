@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Tipos
 	import type { CobroWompi } from '$lib/utils/wompi-checkout.svelte';
 
 	interface Props {

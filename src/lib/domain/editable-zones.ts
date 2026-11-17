@@ -1,3 +1,4 @@
+// Tipos
 import type { Seccion } from '$lib/domain/diseno';
 
 /**

@@ -1,9 +1,13 @@
-import { createHash } from 'node:crypto';
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
 
+// Svelte
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { checkoutSchema } from '$lib/schemas/checkout';
+// Librerías
+import { createHash } from 'node:crypto';
+
+// Servidor
 import {
 	createOrder,
 	listShippingZones,
@@ -12,6 +16,9 @@ import {
 } from '$lib/server/api/checkout';
 import { parseCartPayload } from '$lib/server/cart';
 import { publicContext } from '$lib/server/context';
+
+// Dominio
+import { checkoutSchema } from '$lib/schemas/checkout';
 
 /** Dos envíos idénticos dentro de esta ventana son el mismo pedido. */
 const DUPLICATE_WINDOW_MS = 2 * 60 * 1000;

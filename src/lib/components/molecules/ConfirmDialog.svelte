@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Dialog from '$lib/components/atoms/dialog';
 

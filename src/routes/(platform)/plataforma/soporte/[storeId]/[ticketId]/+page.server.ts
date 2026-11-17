@@ -1,13 +1,19 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { supportReplySchema, supportStatusSchema } from '$lib/schemas/support';
+// Servidor
 import {
 	getPlatformThread,
 	replyPlatformSupport,
 	setPlatformSupportStatus
 } from '$lib/server/api/platform-support';
 import { accountContext, failWith, orFail } from '$lib/server/context';
+
+// Dominio
+import { supportReplySchema, supportStatusSchema } from '$lib/schemas/support';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = accountContext(event);

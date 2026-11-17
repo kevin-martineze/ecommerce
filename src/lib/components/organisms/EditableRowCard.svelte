@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
 
 	/**

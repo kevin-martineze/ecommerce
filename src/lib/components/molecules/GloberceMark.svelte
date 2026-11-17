@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Recursos
 	import logo from '$lib/assets/logo.png';
 
 	/**

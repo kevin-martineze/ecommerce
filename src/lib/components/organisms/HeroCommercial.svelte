@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Svelte
 	import { onMount } from 'svelte';
 
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Pause from '@lucide/svelte/icons/pause';
@@ -8,10 +10,15 @@
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
+
+	// Dominio
 	import { FOTO_PRODUCTO, FOTO_RUBRO } from '$lib/config/fotos';
 	import { HOST_MAQUETA, TIENDA_MAQUETA } from '$lib/config/maqueta';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 	import { formatMoney } from '$lib/utils/money';
 

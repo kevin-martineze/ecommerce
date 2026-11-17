@@ -1,11 +1,18 @@
 <script lang="ts">
+	// Tipos
+	import type { ActionData, PageData } from './$types';
+
+	// Iconos
 	import Heart from '@lucide/svelte/icons/heart';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { ActionData, PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
+
+	// Estado
 	import { favorites } from '$lib/stores/favorites.svelte';
 
 	interface Props {

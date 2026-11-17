@@ -1,15 +1,24 @@
 <script lang="ts">
+	// Tipos
 	import type { PageData } from './$types';
-	import { reveal } from '$lib/actions/reveal';
+
+	// Componentes
 	import SectionHeading from '$lib/components/molecules/SectionHeading.svelte';
 	import CollectionBand from '$lib/components/organisms/CollectionBand.svelte';
 	import CollectionMosaic from '$lib/components/organisms/CollectionMosaic.svelte';
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
 	import ProductShelf from '$lib/components/organisms/ProductShelf.svelte';
 	import StoreHero from '$lib/components/organisms/StoreHero.svelte';
+
+	// Estado
+	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
+
+	// Dominio
 	import { templateOf } from '$lib/domain/templates';
 	import { heroOf } from '$lib/domain/theme';
-	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
+
+	// Utilidades
+	import { reveal } from '$lib/actions/reveal';
 
 	interface Props {
 		data: PageData;

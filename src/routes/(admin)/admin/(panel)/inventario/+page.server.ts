@@ -1,9 +1,15 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { stockUpdateSchema } from '$lib/schemas/admin';
+// Servidor
 import { listInventory, removeVariant, updateVariant } from '$lib/server/api/panel-catalog';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { stockUpdateSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	const onlyLow = event.url.searchParams.get('bajo') === '1';

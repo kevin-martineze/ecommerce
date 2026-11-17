@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { hsvToHex } from '$lib/domain/color';
 import { TEMPLATES } from '$lib/domain/templates';
 import {

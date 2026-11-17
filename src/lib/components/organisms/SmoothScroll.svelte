@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
 
+	// Svelte
 	import { onMount } from 'svelte';
 
 	/**

@@ -15,12 +15,12 @@
  * Todo se hace con Playwright, que ya es dependencia: las fotos se pasan a
  * WebP en el propio navegador, sin herramientas aparte.
  */
+// Librerías
+import { chromium } from '@playwright/test';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-
-import { chromium } from '@playwright/test';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'src/lib/assets/marketing');

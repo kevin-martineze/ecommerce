@@ -1,10 +1,16 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Table from '$lib/components/atoms/table';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

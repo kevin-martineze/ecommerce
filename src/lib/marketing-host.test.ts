@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Utilidades
 import { isSharedPath, MARKETING_HOME, rerouteForHost } from '$lib/marketing-host';
 
 describe('rerouteForHost', () => {

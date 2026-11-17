@@ -1,10 +1,11 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	// Tipos
+	import type { PageData } from './$types';
+
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
-	import { DOMAIN_STATUS_LABEL } from '$lib/domain/domain';
+	// Componentes
 	import * as Alert from '$lib/components/atoms/alert';
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
@@ -12,6 +13,13 @@
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+
+	// Dominio
+	import { DOMAIN_STATUS_LABEL } from '$lib/domain/domain';
 
 	interface Props {
 		data: PageData;

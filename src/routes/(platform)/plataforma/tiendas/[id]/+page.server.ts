@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { paymentSchema, planChangeSchema, storeStatusSchema } from '$lib/schemas/platform';
+// Servidor
 import {
 	changePlan,
 	getStore,
@@ -10,6 +13,9 @@ import {
 	setStoreStatus
 } from '$lib/server/api/platform';
 import { accountContext, failWith, orFail } from '$lib/server/context';
+
+// Dominio
+import { paymentSchema, planChangeSchema, storeStatusSchema } from '$lib/schemas/platform';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = accountContext(event);

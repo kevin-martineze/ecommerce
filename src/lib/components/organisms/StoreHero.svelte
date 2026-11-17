@@ -1,7 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { HeroLayout } from '$lib/domain/templates';
-	import { parallax } from '$lib/actions/parallax';
+
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
+
+	// Utilidades
+	import { parallax } from '$lib/actions/parallax';
 	import { cn } from '$lib/utils';
 
 	/**

@@ -1,13 +1,18 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
+	import type { StorefrontDraft } from '$lib/domain/preview';
 
+	// Iconos
 	import Monitor from '@lucide/svelte/icons/monitor';
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 
-	import type { StorefrontDraft } from '$lib/domain/preview';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Sheet from '$lib/components/atoms/sheet';
 	import DraftPreview from '$lib/components/molecules/DraftPreview.svelte';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

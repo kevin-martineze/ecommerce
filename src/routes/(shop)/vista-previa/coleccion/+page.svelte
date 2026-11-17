@@ -1,8 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { DraftCollection } from '$lib/domain/preview';
-
 	import type { PageData } from './$types';
+
+	// Componentes
 	import CollectionShowcase from '$lib/components/organisms/CollectionShowcase.svelte';
+
+	// Estado
 	import { draftImageUrl } from '$lib/stores/draft-image.svelte';
 	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
 

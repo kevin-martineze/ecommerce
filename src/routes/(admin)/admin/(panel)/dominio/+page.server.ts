@@ -1,10 +1,16 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { dominioSchema } from '$lib/schemas/domain';
+// Servidor
 import { getDomain, removeDomain, saveDomain, verifyDomain } from '$lib/server/api/panel-domain';
 import { failWith, orFail, panelContext } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
+
+// Dominio
+import { dominioSchema } from '$lib/schemas/domain';
 
 /** Dominio propio: solo la dueña (`OWNER`) lo configura. El resto va al inicio del panel. */
 export const load: PageServerLoad = async (event) => {

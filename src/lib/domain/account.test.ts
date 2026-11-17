@@ -1,7 +1,10 @@
+// Tipos
 import type { Plan, SubscriptionSummary } from '$lib/domain/account';
 
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { planFeatures, subscriptionNotice, usagePercent } from '$lib/domain/account';
 
 function summary(overrides: Partial<SubscriptionSummary>): SubscriptionSummary {

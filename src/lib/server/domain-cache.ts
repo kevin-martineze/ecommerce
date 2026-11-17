@@ -1,3 +1,4 @@
+// Tipos
 import type { DomainStatus } from '$lib/domain/domain';
 
 /**

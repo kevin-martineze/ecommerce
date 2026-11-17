@@ -1,14 +1,21 @@
 <script lang="ts">
+	// Tipos
 	import type { PageData } from './$types';
+
+	// Iconos
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import * as Table from '$lib/components/atoms/table';
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+
+	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 
 	interface Props {

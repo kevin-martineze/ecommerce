@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
 
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

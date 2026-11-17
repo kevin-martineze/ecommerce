@@ -1,5 +1,7 @@
+// Librerías
 import { z } from 'zod';
 
+// Dominio
 import { SUPPORT_CATEGORIES, SUPPORT_STATUSES, type SupportStatus } from '$lib/domain/support';
 
 /** Lo que la dueña escribe para abrir un caso. El servidor vuelve a validarlo: esto es la primera vez, no la última. */

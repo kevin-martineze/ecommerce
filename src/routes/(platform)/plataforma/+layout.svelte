@@ -1,14 +1,20 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 
+	// Iconos
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import Shield from '@lucide/svelte/icons/shield';
 
+	// App
 	import { page } from '$app/state';
 
-	import type { LayoutData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import ActionToasts from '$lib/components/molecules/ActionToasts.svelte';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

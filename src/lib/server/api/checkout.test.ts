@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Servidor
 import { paymentLinkSchema } from '$lib/server/api/checkout';
 
 const enlace = {

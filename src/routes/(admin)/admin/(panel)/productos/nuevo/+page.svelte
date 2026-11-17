@@ -1,11 +1,17 @@
 <script lang="ts">
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-
-	import type { ActionData, PageData } from './$types';
+	// Tipos
 	import type { StorefrontDraft } from '$lib/domain/preview';
 	import type { ProductFormValues } from '$lib/domain/product-form';
+	import type { ActionData, PageData } from './$types';
+
+	// Iconos
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+
+	// Componentes
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import ProductForm from '$lib/components/organisms/ProductForm.svelte';
+
+	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
 
 	interface Props {

@@ -1,19 +1,28 @@
 <script lang="ts">
+	// Tipos
+	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { ActionData, PageData } from './$types';
+
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import CreditCard from '@lucide/svelte/icons/credit-card';
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 
+	// App
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 
-	import type { SubmitFunction } from '@sveltejs/kit';
-	import type { ActionData, PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Separator } from '$lib/components/atoms/separator';
 	import CobroWompiEstado from '$lib/components/molecules/CobroWompiEstado.svelte';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
-	import { formatMoney } from '$lib/utils/money';
 	import { cobroWompi } from '$lib/utils/wompi-checkout.svelte';
+
+	// Utilidades
+	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {
 		data: PageData;

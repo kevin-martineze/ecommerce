@@ -1,3 +1,4 @@
+// Tipos
 import type { ZodError } from 'zod';
 
 /**

@@ -1,7 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { HTMLInputAttributes } from 'svelte/elements';
+
+	// Componentes
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

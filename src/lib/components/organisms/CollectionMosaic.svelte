@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Collection } from '$lib/domain/settings';
 
+	// Componentes
 	import ProductImage from '$lib/components/molecules/ProductImage.svelte';
 
 	interface Props {

@@ -1,14 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import {
-	priceOverrideSchema,
-	productAttributesSchema,
-	productOptionsSchema,
-	productSchema,
-	stockUpdateSchema,
-	variantMatrixSchema
-} from '$lib/schemas/admin';
+// Servidor
 import {
 	generateVariants,
 	getProduct,
@@ -24,6 +20,18 @@ import {
 	uploadProductImage
 } from '$lib/server/api/panel-catalog';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import {
+	priceOverrideSchema,
+	productAttributesSchema,
+	productOptionsSchema,
+	productSchema,
+	stockUpdateSchema,
+	variantMatrixSchema
+} from '$lib/schemas/admin';
+
+// Utilidades
 import { slugify } from '$lib/utils/slug';
 
 export const load: PageServerLoad = async (event) => {

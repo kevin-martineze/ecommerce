@@ -1,4 +1,7 @@
+// Tipos
 import type { LayoutServerLoad } from './$types';
+
+// Servidor
 import { requirePlatformAdmin } from '$lib/server/auth';
 
 export const load: LayoutServerLoad = async (event) => {

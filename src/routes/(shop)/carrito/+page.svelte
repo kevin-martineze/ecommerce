@@ -1,21 +1,33 @@
 <script lang="ts">
+	// Tipos
+	import type { ActionData, PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 
+	// Iconos
 	import Minus from '@lucide/svelte/icons/minus';
 	import Plus from '@lucide/svelte/icons/plus';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { ActionData, PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import { Separator } from '$lib/components/atoms/separator';
 	import { Textarea } from '$lib/components/atoms/textarea';
-	import { COUPON_REJECTION_LABEL } from '$lib/domain/settings';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
+
+	// Dominio
+	import { COUPON_REJECTION_LABEL } from '$lib/domain/settings';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

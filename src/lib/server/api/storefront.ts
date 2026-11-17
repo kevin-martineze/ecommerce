@@ -1,3 +1,6 @@
+// Tipos
+import type { ApiResult } from '$lib/server/api/client';
+import type { PublicContext } from '$lib/server/context';
 import type {
 	CatalogFacets,
 	Category,
@@ -7,16 +10,18 @@ import type {
 	ProductSort
 } from '$lib/domain/catalog';
 import type { Collection, HomeHighlight, StoreSettings } from '$lib/domain/settings';
-import type { ApiResult } from '$lib/server/api/client';
-import type { PublicContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
-import { DOMAIN_STATUSES } from '$lib/domain/domain';
-import { isProductSort } from '$lib/domain/catalog';
+// Servidor
 import { apiRequest } from '$lib/server/api/client';
 import { publicRequest, segment } from '$lib/server/api/request';
 import { templateSchema, themeSchema } from '$lib/server/api/statuses';
+
+// Dominio
+import { isProductSort } from '$lib/domain/catalog';
+import { DOMAIN_STATUSES } from '$lib/domain/domain';
 
 /**
  * Tienda pública (`/public/:storeSlug/*` de la API).

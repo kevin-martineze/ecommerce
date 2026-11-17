@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { PageData } from './$types';
+
+	// Componentes
 	import CollectionShowcase from '$lib/components/organisms/CollectionShowcase.svelte';
 
 	interface Props {

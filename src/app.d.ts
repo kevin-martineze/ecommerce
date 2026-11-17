@@ -1,3 +1,4 @@
+// Tipos
 import type { AdminSession } from '$lib/server/session-crypto';
 
 declare global {

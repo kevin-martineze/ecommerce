@@ -1,10 +1,15 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';

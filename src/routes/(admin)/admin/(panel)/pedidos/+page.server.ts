@@ -1,7 +1,12 @@
+// Tipos
 import type { PageServerLoad } from './$types';
-import { isOrderStatus } from '$lib/domain/orders';
+
+// Servidor
 import { listOrders } from '$lib/server/api/panel-commerce';
 import { orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { isOrderStatus } from '$lib/domain/orders';
 
 export const load: PageServerLoad = async (event) => {
 	const statusParam = event.url.searchParams.get('estado');

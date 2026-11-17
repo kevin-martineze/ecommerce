@@ -1,10 +1,18 @@
 <script lang="ts">
+	// Tipos
+	import type { Plan } from '$lib/domain/account';
+
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 
-	import type { Plan } from '$lib/domain/account';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
+
+	// Dominio
 	import { planFeatures } from '$lib/domain/account';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 	import { formatMoney } from '$lib/utils/money';
 

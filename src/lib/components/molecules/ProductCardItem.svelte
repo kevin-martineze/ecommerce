@@ -1,14 +1,24 @@
 <script lang="ts">
+	// Tipos
 	import type { ProductCard } from '$lib/domain/catalog';
 
+	// Svelte
 	import { getContext } from 'svelte';
 
+	// Iconos
 	import Heart from '@lucide/svelte/icons/heart';
 
-	import ProductImage from '$lib/components/molecules/ProductImage.svelte';
+	// Componentes
 	import PriceTag from '$lib/components/molecules/PriceTag.svelte';
-	import { CARD_LOOK, type CardLook } from '$lib/domain/card-look';
+	import ProductImage from '$lib/components/molecules/ProductImage.svelte';
+
+	// Estado
 	import { favorites } from '$lib/stores/favorites.svelte';
+
+	// Dominio
+	import { CARD_LOOK, type CardLook } from '$lib/domain/card-look';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 	import { discountPercent } from '$lib/utils/money';
 

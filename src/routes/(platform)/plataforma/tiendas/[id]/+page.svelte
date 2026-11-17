@@ -1,14 +1,18 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 
+	// Iconos
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
@@ -17,8 +21,16 @@
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import StoreStatusBadge from '$lib/components/molecules/StoreStatusBadge.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+
+	// Dominio
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
 	import { DOMAIN_STATUS_LABEL } from '$lib/domain/domain';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

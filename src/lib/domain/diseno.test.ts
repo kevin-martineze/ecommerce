@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { armarBorrador, focoDe, seccionDe, type BorradorDiseno } from '$lib/domain/diseno';
 
 const borrador: BorradorDiseno = {

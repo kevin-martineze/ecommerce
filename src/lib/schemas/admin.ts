@@ -1,7 +1,11 @@
+// Librerías
 import { z } from 'zod';
 
+// Dominio
 import { HERO_LAYOUTS, STOREFRONT_TEMPLATES } from '$lib/domain/templates';
 import { HEX_COLOR, THEME_CORNERS, THEME_FONTS } from '$lib/domain/theme';
+
+// Utilidades
 import { parseAmount } from '$lib/utils/money';
 
 /**

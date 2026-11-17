@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
+
+	// Componentes
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
 
 	interface Props {

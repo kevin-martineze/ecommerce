@@ -1,10 +1,16 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { resetPasswordSchema } from '$lib/schemas/account';
+// Servidor
 import { resetPassword } from '$lib/server/api/auth';
 import { clientAddress, displayStatus } from '$lib/server/context';
 import { clearSession } from '$lib/server/session';
+
+// Dominio
+import { resetPasswordSchema } from '$lib/schemas/account';
 
 export const load: PageServerLoad = ({ url }) => {
 	return { token: url.searchParams.get('token') ?? '' };

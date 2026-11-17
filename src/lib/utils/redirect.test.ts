@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Utilidades
 import { safeRedirectTarget } from '$lib/utils/redirect';
 
 describe('safeRedirectTarget', () => {

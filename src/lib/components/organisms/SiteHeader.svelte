@@ -1,22 +1,32 @@
 <script lang="ts">
+	// Tipos
 	import type { Category } from '$lib/domain/catalog';
 	import type { Collection, StoreSettings } from '$lib/domain/settings';
 
+	// Iconos
 	import Heart from '@lucide/svelte/icons/heart';
 	import Menu from '@lucide/svelte/icons/menu';
 	import Search from '@lucide/svelte/icons/search';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 
+	// App
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import * as Sheet from '$lib/components/atoms/sheet';
-	import { templateOf } from '$lib/domain/templates';
 	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
+
+	// Dominio
+	import { templateOf } from '$lib/domain/templates';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

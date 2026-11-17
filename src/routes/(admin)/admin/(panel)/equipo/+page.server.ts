@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { error, fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { inviteSchema, memberRoleSchema } from '$lib/schemas/account';
+// Servidor
 import {
 	changeMemberRole,
 	invite,
@@ -11,6 +14,9 @@ import {
 	revokeInvitation
 } from '$lib/server/api/panel-team';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { inviteSchema, memberRoleSchema } from '$lib/schemas/account';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = panelContext(event);

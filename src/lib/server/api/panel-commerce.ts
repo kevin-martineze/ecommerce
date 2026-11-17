@@ -1,11 +1,14 @@
+// Tipos
+import type { ApiResult } from '$lib/server/api/client';
+import type { PanelContext } from '$lib/server/context';
 import type { Order, OrderItem, OrderStatus, OrderWithItems } from '$lib/domain/orders';
 import type { Coupon, ShippingZone } from '$lib/domain/settings';
 import type { CouponInput } from '$lib/schemas/admin';
-import type { ApiResult } from '$lib/server/api/client';
-import type { PanelContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { panelRequest, segment } from '$lib/server/api/request';
 import {
 	orderPaymentStatusSchema,

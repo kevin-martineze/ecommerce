@@ -1,6 +1,8 @@
+// Tipos
 import type { DraftHighlight, PreviewZone, StorefrontDraft } from '$lib/domain/preview';
 import type { StorefrontTemplate } from '$lib/domain/templates';
 
+// Dominio
 import { readTheme } from '$lib/domain/theme';
 
 /**

@@ -1,3 +1,4 @@
+// Librerías
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import { z } from 'zod';
 

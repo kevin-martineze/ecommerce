@@ -1,9 +1,17 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { error, fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { isOrderStatus } from '$lib/domain/orders';
+// Servidor
 import { getOrder, updateOrder } from '$lib/server/api/panel-commerce';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { isOrderStatus } from '$lib/domain/orders';
+
+// Utilidades
 import { buildOrderMessage, buildWhatsAppUrl } from '$lib/utils/whatsapp';
 
 export const load: PageServerLoad = async (event) => {

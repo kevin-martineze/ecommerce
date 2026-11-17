@@ -1,10 +1,16 @@
 <script lang="ts">
+	// Tipos
+	import type { DesignChange, ModoCambios } from '$lib/domain/design-changes';
+
+	// Iconos
 	import Minus from '@lucide/svelte/icons/minus';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Plus from '@lucide/svelte/icons/plus';
 
-	import type { DesignChange, ModoCambios } from '$lib/domain/design-changes';
+	// Dominio
 	import { textoDelCambio } from '$lib/domain/design-changes';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

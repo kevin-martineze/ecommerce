@@ -1,4 +1,9 @@
 <script lang="ts">
+	// Tipos
+	import type { Rubro } from '$lib/components/molecules/VariantDemo.svelte';
+	import type { PageData } from './$types';
+
+	// Iconos
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import BookOpen from '@lucide/svelte/icons/book-open';
 	import Check from '@lucide/svelte/icons/check';
@@ -7,8 +12,7 @@
 	import Shirt from '@lucide/svelte/icons/shirt';
 	import Zap from '@lucide/svelte/icons/zap';
 
-	import type { PageData } from './$types';
-	import type { Rubro } from '$lib/components/molecules/VariantDemo.svelte';
+	// Componentes
 	import * as Accordion from '$lib/components/atoms/accordion';
 	import { Button } from '$lib/components/atoms/button';
 	import ModuleIcon, { type ModuleName } from '$lib/components/molecules/ModuleIcon.svelte';
@@ -23,9 +27,13 @@
 	import MarketingFooter from '$lib/components/organisms/MarketingFooter.svelte';
 	import MarketingHeader from '$lib/components/organisms/MarketingHeader.svelte';
 	import SmoothScroll from '$lib/components/organisms/SmoothScroll.svelte';
+
+	// Dominio
 	import { CAPTURA_DESTACADOS, CAPTURA_PRODUCTO_CELULAR } from '$lib/config/capturas';
 	import { FOTO_CLIENTA_NOCHE, FOTO_EMPRENDEDORA, FOTO_RUBRO } from '$lib/config/fotos';
 	import { TRIAL_DAYS } from '$lib/domain/account';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

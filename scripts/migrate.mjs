@@ -9,10 +9,10 @@
  *   node scripts/migrate.mjs                        aplica las pendientes
  *   node scripts/migrate.mjs supabase/seed.sql      aplica un archivo suelto
  */
+// Librerías
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
-
 import postgres from 'postgres';
 
 const MIGRATIONS_DIR = 'supabase/migrations';

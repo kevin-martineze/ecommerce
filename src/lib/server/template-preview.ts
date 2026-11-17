@@ -1,11 +1,16 @@
+// Tipos
 import type { Cookies } from '@sveltejs/kit';
 import type { StorefrontTemplate } from '$lib/domain/templates';
 import type { StoreTheme } from '$lib/domain/theme';
 
+// App
 import { dev } from '$app/environment';
 
+// Dominio
 import { STOREFRONT_TEMPLATES } from '$lib/domain/templates';
 import { readTheme } from '$lib/domain/theme';
+
+// Utilidades
 import {
 	PREVIEW_EXIT,
 	PREVIEW_ONCE_PARAM,

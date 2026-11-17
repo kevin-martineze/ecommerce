@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-
+	// Tipos
 	import type { Category } from '$lib/domain/catalog';
 	import type { ProductFormValues } from '$lib/domain/product-form';
 
+	// Svelte
+	import { untrack } from 'svelte';
+
+	// App
 	import { enhance } from '$app/forms';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
@@ -13,6 +17,8 @@
 	import { Textarea } from '$lib/components/atoms/textarea';
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+
+	// Utilidades
 	import { slugify } from '$lib/utils/slug';
 
 	interface Props {

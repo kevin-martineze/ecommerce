@@ -1,4 +1,7 @@
+// Tipos
 import type { PageServerLoad } from './$types';
+
+// Servidor
 import { getDashboard, listOrders } from '$lib/server/api/panel-commerce';
 import { orFail, panelContext } from '$lib/server/context';
 

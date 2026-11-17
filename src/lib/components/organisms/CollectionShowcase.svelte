@@ -1,8 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { ProductCard } from '$lib/domain/catalog';
 
-	import { reveal } from '$lib/actions/reveal';
+	// Componentes
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
+
+	// Utilidades
+	import { reveal } from '$lib/actions/reveal';
 	import { formatMoney } from '$lib/utils/money';
 
 	/**

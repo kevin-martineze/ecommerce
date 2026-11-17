@@ -1,13 +1,19 @@
 <script lang="ts">
+	// Iconos
 	import Minus from '@lucide/svelte/icons/minus';
 	import Plus from '@lucide/svelte/icons/plus';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 	import X from '@lucide/svelte/icons/x';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Separator } from '$lib/components/atoms/separator';
 	import * as Sheet from '$lib/components/atoms/sheet';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 </script>
 

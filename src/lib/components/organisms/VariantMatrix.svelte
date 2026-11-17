@@ -1,12 +1,14 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	// Tipos
 	import type { AdminVariantRow, ProductOption } from '$lib/server/api/panel-catalog';
 
+	// Iconos
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import { Label } from '$lib/components/atoms/label';
@@ -14,6 +16,12 @@
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

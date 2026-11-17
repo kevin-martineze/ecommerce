@@ -1,7 +1,9 @@
 <script lang="ts">
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import Copy from '@lucide/svelte/icons/copy';
 
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

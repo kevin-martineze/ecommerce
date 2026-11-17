@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { error, fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { changePasswordSchema } from '$lib/schemas/account';
+// Servidor
 import { changePassword, me, switchStore } from '$lib/server/api/auth';
 import {
 	accountContext,
@@ -13,6 +16,9 @@ import {
 	storeUrl
 } from '$lib/server/context';
 import { toAdminSession, writeSession } from '$lib/server/session';
+
+// Dominio
+import { changePasswordSchema } from '$lib/schemas/account';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = panelContext(event);

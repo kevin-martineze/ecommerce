@@ -1,25 +1,33 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 
+	// Svelte
 	import { setContext } from 'svelte';
 
-	import type { LayoutData } from './$types';
+	// App
 	import { page } from '$app/state';
 
-	import PreviewFocus from '$lib/components/molecules/PreviewFocus.svelte';
+	// Componentes
 	import PreviewEditable from '$lib/components/molecules/PreviewEditable.svelte';
+	import PreviewFocus from '$lib/components/molecules/PreviewFocus.svelte';
 	import CartDrawer from '$lib/components/organisms/CartDrawer.svelte';
-	import SiteFooter from '$lib/components/organisms/SiteFooter.svelte';
 	import MegaMenuHeader from '$lib/components/organisms/MegaMenuHeader.svelte';
+	import SiteFooter from '$lib/components/organisms/SiteFooter.svelte';
 	import SiteHeader from '$lib/components/organisms/SiteHeader.svelte';
 	import StoreAssistant from '$lib/components/organisms/StoreAssistant.svelte';
 	import TemplatePreviewBar from '$lib/components/organisms/TemplatePreviewBar.svelte';
-	import { CARD_LOOK, cardLookOf } from '$lib/domain/card-look';
-	import { templateOf } from '$lib/domain/templates';
-	import { themeStyle } from '$lib/domain/theme';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
 	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
+
+	// Dominio
+	import { CARD_LOOK, cardLookOf } from '$lib/domain/card-look';
+	import { templateOf } from '$lib/domain/templates';
+	import { themeStyle } from '$lib/domain/theme';
 
 	interface Props {
 		data: LayoutData;

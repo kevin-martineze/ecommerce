@@ -1,22 +1,32 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	// Tipos
+	import type { StorefrontDraft } from '$lib/domain/preview';
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 
+	// Iconos
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
-	import type { StorefrontDraft } from '$lib/domain/preview';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import EditableRowCard from '$lib/components/organisms/EditableRowCard.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+
+	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
 	import { slugify } from '$lib/utils/slug';
 

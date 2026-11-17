@@ -1,7 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { ActionData, PageData } from './$types';
+
+	// Componentes
 	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 	import RegisterForm from '$lib/components/organisms/RegisterForm.svelte';
+
+	// Dominio
 	import { TRIAL_DAYS } from '$lib/domain/account';
 
 	interface Props {

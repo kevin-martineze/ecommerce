@@ -1,11 +1,17 @@
 <script lang="ts">
-	import AlertTriangle from '@lucide/svelte/icons/triangle-alert';
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
+	import AlertTriangle from '@lucide/svelte/icons/triangle-alert';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Label } from '$lib/components/atoms/label';
 	import { Textarea } from '$lib/components/atoms/textarea';
+
+	// Dominio
 	import { completeWompiKeys, mixedModes, parseWompiKeys, wompiMode } from '$lib/domain/wompi';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

@@ -1,7 +1,11 @@
 <script lang="ts">
+	// Tipos
+	import type { ActionData, PageData } from './$types';
+
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { ActionData, PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';

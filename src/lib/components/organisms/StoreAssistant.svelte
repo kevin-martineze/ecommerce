@@ -1,11 +1,15 @@
 <script lang="ts">
+	// Iconos
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 	import Send from '@lucide/svelte/icons/send';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import X from '@lucide/svelte/icons/x';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 	import { buildWhatsAppUrl } from '$lib/utils/whatsapp';
 

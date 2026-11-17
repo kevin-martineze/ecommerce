@@ -1,10 +1,15 @@
 <script lang="ts">
+	// Tipos
 	import type { PreviewZone } from '$lib/domain/preview';
 
+	// App
 	import { afterNavigate } from '$app/navigation';
 
-	import { PREVIEW_ZONE_LABEL } from '$lib/domain/preview';
+	// Estado
 	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
+
+	// Dominio
+	import { PREVIEW_ZONE_LABEL } from '$lib/domain/preview';
 
 	/**
 	 * Resalta la zona de la tienda que el módulo está editando.

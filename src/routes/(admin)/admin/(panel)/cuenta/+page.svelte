@@ -1,12 +1,19 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
+
+	// Dominio
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
 	import { PASSWORD_MIN } from '$lib/schemas/account';
 

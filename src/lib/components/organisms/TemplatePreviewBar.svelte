@@ -1,9 +1,17 @@
 <script lang="ts">
+	// Tipos
+	import type { StorefrontTemplate } from '$lib/domain/templates';
+
+	// Iconos
 	import Eye from '@lucide/svelte/icons/eye';
 
-	import type { StorefrontTemplate } from '$lib/domain/templates';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
+
+	// Dominio
 	import { templateOf } from '$lib/domain/templates';
+
+	// Utilidades
 	import { exitPreviewUrl } from '$lib/template-preview';
 
 	/**

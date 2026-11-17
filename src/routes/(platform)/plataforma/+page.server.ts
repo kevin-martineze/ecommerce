@@ -1,4 +1,7 @@
+// Tipos
 import type { Actions, PageServerLoad } from './$types';
+
+// Servidor
 import { getDashboard, reconcile } from '$lib/server/api/platform';
 import { accountContext, failWith, orFail } from '$lib/server/context';
 

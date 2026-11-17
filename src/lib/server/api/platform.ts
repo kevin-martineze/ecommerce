@@ -1,3 +1,6 @@
+// Tipos
+import type { ApiResult } from '$lib/server/api/client';
+import type { AccountContext } from '$lib/server/context';
 import type {
 	MonthPayments,
 	Plan,
@@ -8,12 +11,11 @@ import type {
 	PlatformStoreDetail,
 	StoreStatus
 } from '$lib/domain/account';
-import type { ApiResult } from '$lib/server/api/client';
-import type { AccountContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
-import { DOMAIN_STATUSES } from '$lib/domain/domain';
+// Servidor
 import { apiRequest } from '$lib/server/api/client';
 import { planSchema } from '$lib/server/api/panel-team';
 import {
@@ -21,6 +23,9 @@ import {
 	storeStatusSchema,
 	subscriptionStatusSchema
 } from '$lib/server/api/statuses';
+
+// Dominio
+import { DOMAIN_STATUSES } from '$lib/domain/domain';
 
 /** Consola de la plataforma: `/platform/*`. Solo para cuentas en `platform_admins`. */
 

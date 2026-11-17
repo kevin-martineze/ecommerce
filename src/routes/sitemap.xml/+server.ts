@@ -1,4 +1,7 @@
+// Tipos
 import type { RequestHandler } from './$types';
+
+// Servidor
 import { getSitemap, getStorefront } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
 

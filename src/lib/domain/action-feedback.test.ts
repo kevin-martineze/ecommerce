@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { actionFeedback } from '$lib/domain/action-feedback';
 
 describe('actionFeedback', () => {

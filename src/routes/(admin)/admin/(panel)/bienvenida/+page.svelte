@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { PageData } from './$types';
+
+	// Componentes
 	import TemplatePicker from '$lib/components/organisms/TemplatePicker.svelte';
 
 	interface Props {

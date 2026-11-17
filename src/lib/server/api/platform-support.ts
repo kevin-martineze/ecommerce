@@ -1,12 +1,14 @@
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { AccountContext } from '$lib/server/context';
-import type { PlatformSupportFilters } from '$lib/schemas/support';
 import type {
 	PlatformSupportList,
 	PlatformSupportThread,
 	SupportStatus
 } from '$lib/domain/support';
+import type { PlatformSupportFilters } from '$lib/schemas/support';
 
+// Servidor
 import { apiRequest, type ResponseSchema } from '$lib/server/api/client';
 import { segment } from '$lib/server/api/request';
 import { platformListSchema, platformThreadSchema } from '$lib/server/api/support-common';

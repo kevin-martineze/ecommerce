@@ -1,10 +1,16 @@
-import { fail } from '@sveltejs/kit';
-
+// Tipos
 import type { ZoneInput } from '$lib/server/api/panel-commerce';
 import type { Actions, PageServerLoad } from './$types';
-import { shippingZoneSchema } from '$lib/schemas/admin';
+
+// Svelte
+import { fail } from '@sveltejs/kit';
+
+// Servidor
 import { createZone, listZones, removeZone, updateZone } from '$lib/server/api/panel-commerce';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { shippingZoneSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	return { zones: orFail(await listZones(panelContext(event))) };

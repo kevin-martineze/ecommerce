@@ -1,9 +1,15 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { error, fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { restockSchema } from '$lib/schemas/checkout';
+// Servidor
 import { getProduct, listRelated, requestRestock } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
+
+// Dominio
+import { restockSchema } from '$lib/schemas/checkout';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = publicContext(event);

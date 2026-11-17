@@ -1,7 +1,9 @@
 <script lang="ts">
+	// Iconos
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 
+	// Componentes
 	import * as Alert from '$lib/components/atoms/alert';
 
 	interface Props {

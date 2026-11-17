@@ -1,10 +1,16 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { acceptExistingSchema, acceptNewSchema } from '$lib/schemas/account';
+// Servidor
 import { acceptInvitation, previewInvitation } from '$lib/server/api/auth';
 import { clientAddress, displayStatus } from '$lib/server/context';
 import { toAdminSession, writeSession } from '$lib/server/session';
+
+// Dominio
+import { acceptExistingSchema, acceptNewSchema } from '$lib/schemas/account';
 
 export const load: PageServerLoad = async (event) => {
 	const token = event.url.searchParams.get('token') ?? '';

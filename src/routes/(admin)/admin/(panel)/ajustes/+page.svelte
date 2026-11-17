@@ -1,15 +1,22 @@
 <script lang="ts">
+	// Tipos
+	import type { PreviewZone, StorefrontDraft } from '$lib/domain/preview';
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
-	import type { PreviewZone, StorefrontDraft } from '$lib/domain/preview';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+
+	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
 
 	interface Props {

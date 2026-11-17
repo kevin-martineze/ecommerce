@@ -1,3 +1,4 @@
+// Tipos
 import type { ActionResult } from '@sveltejs/kit';
 import type { WompiWidget } from '$lib/domain/wompi';
 

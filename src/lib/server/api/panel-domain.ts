@@ -1,11 +1,16 @@
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PanelContext } from '$lib/server/context';
 import type { DomainState, StoreDomain } from '$lib/domain/domain';
 
+// Librerías
 import { z } from 'zod';
 
-import { DOMAIN_STATUSES } from '$lib/domain/domain';
+// Servidor
 import { panelRequest } from '$lib/server/api/request';
+
+// Dominio
+import { DOMAIN_STATUSES } from '$lib/domain/domain';
 
 /** Dominio propio del panel (`/stores/:storeId/domain` de la API). Solo `OWNER`. */
 

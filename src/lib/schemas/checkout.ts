@@ -1,3 +1,4 @@
+// Librerías
 import { z } from 'zod';
 
 /** Teléfono colombiano escrito como sea: se normaliza antes de guardarlo. */

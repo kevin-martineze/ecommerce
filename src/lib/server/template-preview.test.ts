@@ -1,9 +1,16 @@
+// Tipos
 import type { StoreTheme } from '$lib/domain/theme';
 
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Servidor
 import { resolveTemplatePreview } from '$lib/server/template-preview';
+
+// Dominio
 import { EMPTY_THEME } from '$lib/domain/theme';
+
+// Utilidades
 import { exitPreviewUrl, previewUrl, themePreviewUrl } from '$lib/template-preview';
 
 /** Un frasco de cookies de mentira: lo justo que usa la vista previa. */

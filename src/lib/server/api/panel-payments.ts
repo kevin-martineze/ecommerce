@@ -1,8 +1,11 @@
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PanelContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { panelRequest } from '$lib/server/api/request';
 
 /**

@@ -1,5 +1,7 @@
+// Tipos
 import type { StorefrontDraft } from '$lib/domain/preview';
 
+// Dominio
 import { DRAFT_READY, DRAFT_UPDATE } from '$lib/domain/preview';
 import { readStorefrontDraftMessage } from '$lib/schemas/storefront-draft';
 

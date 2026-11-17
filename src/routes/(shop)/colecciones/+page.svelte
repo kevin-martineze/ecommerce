@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { PageData } from './$types';
+
+	// Utilidades
 	import { reveal } from '$lib/actions/reveal';
 
 	interface Props {

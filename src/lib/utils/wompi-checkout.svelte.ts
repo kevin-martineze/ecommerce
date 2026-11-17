@@ -1,6 +1,8 @@
+// Tipos
 import type { ActionResult } from '@sveltejs/kit';
 import type { WompiTransactionResult } from '$lib/utils/wompi-widget';
 
+// Utilidades
 import { openWompiWidget, pagoConWidget } from '$lib/utils/wompi-widget';
 
 /**

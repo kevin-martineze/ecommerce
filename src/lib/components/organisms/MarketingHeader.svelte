@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
 

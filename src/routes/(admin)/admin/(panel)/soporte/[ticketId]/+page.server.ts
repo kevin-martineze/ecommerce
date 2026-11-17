@@ -1,9 +1,15 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { supportReplySchema } from '$lib/schemas/support';
+// Servidor
 import { getSupportThread, replySupport } from '$lib/server/api/panel-support';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { supportReplySchema } from '$lib/schemas/support';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = panelContext(event);

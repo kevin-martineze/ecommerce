@@ -1,10 +1,15 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 
+	// App
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Sheet from '$lib/components/atoms/sheet';
 	import FilterPanel from '$lib/components/organisms/FilterPanel.svelte';

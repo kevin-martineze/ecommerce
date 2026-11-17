@@ -1,8 +1,13 @@
 <script lang="ts">
+	// Tipos
 	import type { EditableZoneName } from '$lib/domain/editable-zones';
 	import type { StorefrontDraft } from '$lib/storefront-draft';
-	import { draftMessage, isReadyMessage } from '$lib/storefront-draft';
+
+	// Dominio
 	import { readPreviewEdit } from '$lib/schemas/preview-edit';
+
+	// Utilidades
+	import { draftMessage, isReadyMessage } from '$lib/storefront-draft';
 	import { cn } from '$lib/utils';
 
 	/**

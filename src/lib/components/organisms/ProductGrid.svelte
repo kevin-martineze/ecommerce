@@ -1,7 +1,11 @@
 <script lang="ts">
+	// Tipos
 	import type { ProductCard } from '$lib/domain/catalog';
 
+	// Componentes
 	import ProductCardItem from '$lib/components/molecules/ProductCardItem.svelte';
+
+	// Utilidades
 	import { reveal } from '$lib/actions/reveal';
 	import { cn } from '$lib/utils';
 

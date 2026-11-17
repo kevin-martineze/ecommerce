@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

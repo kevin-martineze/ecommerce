@@ -1,3 +1,7 @@
+// Dominio
+import { shot } from '$lib/config/capturas';
+
+// Recursos
 import clientaNoche1376 from '$lib/assets/marketing/clienta-noche-1376.webp';
 import clientaNoche688 from '$lib/assets/marketing/clienta-noche-688.webp';
 import emprendedora464 from '$lib/assets/marketing/emprendedora-taller-464.webp';
@@ -14,7 +18,6 @@ import rubroLibros1024 from '$lib/assets/marketing/rubro-libros-1024.webp';
 import rubroLibros512 from '$lib/assets/marketing/rubro-libros-512.webp';
 import rubroRopa1024 from '$lib/assets/marketing/rubro-ropa-1024.webp';
 import rubroRopa512 from '$lib/assets/marketing/rubro-ropa-512.webp';
-import { shot } from '$lib/config/capturas';
 
 /**
  * Las fotos de ambiente del sitio comercial: productos, rubros y personas.

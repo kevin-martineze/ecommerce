@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Componentes
 	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
+
+	// Dominio
 	import { EMPRESA } from '$lib/config/empresa';
 </script>
 

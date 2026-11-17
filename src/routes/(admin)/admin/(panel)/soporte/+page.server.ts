@@ -1,9 +1,15 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { supportTicketSchema } from '$lib/schemas/support';
+// Servidor
 import { listSupportTickets, openSupportTicket } from '$lib/server/api/panel-support';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { supportTicketSchema } from '$lib/schemas/support';
 
 export const load: PageServerLoad = async (event) => {
 	return { support: orFail(await listSupportTickets(panelContext(event))) };

@@ -1,12 +1,19 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import CreditCard from '@lucide/svelte/icons/credit-card';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

@@ -1,9 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { ProductCard } from '$lib/domain/catalog';
 
+	// Iconos
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import ProductCardItem from '$lib/components/molecules/ProductCardItem.svelte';
 

@@ -1,17 +1,26 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Iconos
 	import Search from '@lucide/svelte/icons/search';
 
+	// App
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Checkbox } from '$lib/components/atoms/checkbox';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import StoreStatusBadge from '$lib/components/molecules/StoreStatusBadge.svelte';
+
+	// Dominio
 	import { STORE_STATUS_LABEL } from '$lib/domain/account';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

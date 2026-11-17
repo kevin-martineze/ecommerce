@@ -1,17 +1,23 @@
 <script lang="ts">
+	// Tipos
 	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { PageData } from './$types';
 
+	// Iconos
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import { Textarea } from '$lib/components/atoms/textarea';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+
+	// Dominio
 	import {
 		SUPPORT_CATEGORIES,
 		SUPPORT_CATEGORY_LABEL,

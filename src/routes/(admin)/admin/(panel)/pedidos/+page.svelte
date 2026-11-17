@@ -1,15 +1,24 @@
 <script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Svelte
 	import { untrack } from 'svelte';
 
+	// App
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
-	import type { PageData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import * as Table from '$lib/components/atoms/table';
+
+	// Dominio
 	import { ORDER_STATUSES, ORDER_STATUS_LABEL } from '$lib/domain/orders';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

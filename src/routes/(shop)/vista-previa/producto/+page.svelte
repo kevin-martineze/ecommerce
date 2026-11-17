@@ -1,16 +1,23 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-
+	// Tipos
 	import type { PublicProductImage } from '$lib/domain/catalog';
 	import type { DraftProduct } from '$lib/domain/preview';
-
 	import type { PageData } from './$types';
+
+	// Svelte
+	import { untrack } from 'svelte';
+
+	// Componentes
 	import * as Accordion from '$lib/components/atoms/accordion';
 	import PriceTag from '$lib/components/molecules/PriceTag.svelte';
 	import ProductGallery from '$lib/components/organisms/ProductGallery.svelte';
 	import VariantPicker from '$lib/components/organisms/VariantPicker.svelte';
+
+	// Estado
 	import { draftImageUrl } from '$lib/stores/draft-image.svelte';
 	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {

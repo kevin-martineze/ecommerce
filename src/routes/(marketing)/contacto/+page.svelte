@@ -1,9 +1,15 @@
 <script lang="ts">
+	// Iconos
 	import Mail from '@lucide/svelte/icons/mail';
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 
+	// Componentes
 	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
+
+	// Dominio
 	import { EMPRESA, hayContacto } from '$lib/config/empresa';
+
+	// Utilidades
 	import { buildWhatsAppUrl } from '$lib/utils/whatsapp';
 </script>
 

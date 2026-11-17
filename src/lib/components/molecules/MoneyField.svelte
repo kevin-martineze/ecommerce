@@ -1,7 +1,11 @@
 <script lang="ts">
+	// Tipos
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
+	// Componentes
 	import * as InputGroup from '$lib/components/atoms/input-group';
+
+	// Utilidades
 	import { formatAmount, typeAmount } from '$lib/utils/money';
 
 	/**

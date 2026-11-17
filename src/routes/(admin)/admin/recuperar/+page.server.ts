@@ -1,9 +1,15 @@
+// Tipos
+import type { Actions } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions } from './$types';
-import { forgotPasswordSchema } from '$lib/schemas/account';
+// Servidor
 import { forgotPassword } from '$lib/server/api/auth';
 import { clientAddress, displayStatus } from '$lib/server/context';
+
+// Dominio
+import { forgotPasswordSchema } from '$lib/schemas/account';
 
 export const actions: Actions = {
 	default: async (event) => {

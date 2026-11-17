@@ -1,6 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { error, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
+// Servidor
 import { approveSimulatedPayment } from '$lib/server/api/payments';
 import { clientAddress } from '$lib/server/context';
 

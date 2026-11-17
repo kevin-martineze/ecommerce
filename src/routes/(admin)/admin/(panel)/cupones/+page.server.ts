@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { couponSchema } from '$lib/schemas/admin';
+// Servidor
 import {
 	createCoupon,
 	listCoupons,
@@ -9,6 +12,9 @@ import {
 	setCouponActive
 } from '$lib/server/api/panel-commerce';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { couponSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	return { coupons: orFail(await listCoupons(panelContext(event))) };

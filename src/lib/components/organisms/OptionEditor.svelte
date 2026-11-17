@@ -1,18 +1,25 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-
+	// Tipos
 	import type { ProductOption } from '$lib/server/api/panel-catalog';
 
+	// Svelte
+	import { untrack } from 'svelte';
+
+	// Iconos
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import ColorField from '$lib/components/molecules/ColorField.svelte';
+
+	// Dominio
 	import { RUBROS } from '$lib/domain/rubros';
 
 	/**

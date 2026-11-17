@@ -1,3 +1,4 @@
+// Tipos
 import type { DomainStatus } from '$lib/domain/domain';
 
 /** Cuenta, equipo, plan y plataforma. Los estados van en minúsculas, como el resto del dominio. */

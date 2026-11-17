@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Servidor
 import { parseCartPayload } from '$lib/server/cart';
 
 // Los totales (cupón, envío, umbral de envío gratis) ya no se calculan aquí: los

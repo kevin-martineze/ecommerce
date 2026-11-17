@@ -1,3 +1,5 @@
+// Tipos
+import type { Category } from '$lib/domain/catalog';
 import type {
 	DraftCategories,
 	DraftContent,
@@ -8,11 +10,12 @@ import type {
 	PreviewZone,
 	StorefrontDraft
 } from '$lib/domain/preview';
-import type { Category } from '$lib/domain/catalog';
 import type { StoreSettings } from '$lib/domain/settings';
 
+// App
 import { browser } from '$app/environment';
 
+// Utilidades
 import { DRAFT_READY, readDraftMessage } from '$lib/storefront-draft';
 
 /**

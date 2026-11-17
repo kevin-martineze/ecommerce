@@ -1,9 +1,13 @@
 <script lang="ts">
+	// Tipos
+	import type { Snippet } from 'svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
+
+	// Iconos
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 
-	import type { Snippet } from 'svelte';
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	// Componentes
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 

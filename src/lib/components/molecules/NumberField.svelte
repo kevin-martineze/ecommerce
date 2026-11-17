@@ -1,9 +1,13 @@
 <script lang="ts">
+	// Iconos
 	import Minus from '@lucide/svelte/icons/minus';
 	import Plus from '@lucide/svelte/icons/plus';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

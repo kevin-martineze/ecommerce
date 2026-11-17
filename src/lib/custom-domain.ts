@@ -1,5 +1,7 @@
+// Tipos
 import type { DomainStatus } from '$lib/domain/domain';
 
+// Utilidades
 import { resolveHost, storefrontUrl } from '$lib/tenant';
 
 /**

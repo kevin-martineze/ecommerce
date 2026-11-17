@@ -1,4 +1,7 @@
+// Tipos
 import type { PageServerLoad } from './$types';
+
+// Servidor
 import { listPublicPlans } from '$lib/server/api/plans';
 import { clientAddress, storeUrl } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';

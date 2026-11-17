@@ -1,11 +1,16 @@
 <script lang="ts">
+	// Tipos
 	import type { Category } from '$lib/domain/catalog';
 	import type { StoreSettings } from '$lib/domain/settings';
 
+	// Iconos
 	import Camera from '@lucide/svelte/icons/camera';
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 
+	// Componentes
 	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
+
+	// Utilidades
 	import { buildWhatsAppUrl } from '$lib/utils/whatsapp';
 
 	interface Props {

@@ -1,23 +1,33 @@
 <script lang="ts">
+	// Tipos
 	import type { Category, CategoryNode } from '$lib/domain/catalog';
 	import type { Collection, StoreSettings } from '$lib/domain/settings';
 
+	// Svelte
+	import { SvelteMap } from 'svelte/reactivity';
+
+	// Iconos
 	import Heart from '@lucide/svelte/icons/heart';
 	import Menu from '@lucide/svelte/icons/menu';
 	import Search from '@lucide/svelte/icons/search';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 
+	// App
 	import { goto } from '$app/navigation';
-	import { SvelteMap } from 'svelte/reactivity';
 
+	// Componentes
 	import * as Accordion from '$lib/components/atoms/accordion';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import * as Sheet from '$lib/components/atoms/sheet';
-	import { buildCategoryTree } from '$lib/domain/catalog';
 	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
+
+	// Dominio
+	import { buildCategoryTree } from '$lib/domain/catalog';
 
 	interface Props {
 		settings: StoreSettings;

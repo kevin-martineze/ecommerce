@@ -1,17 +1,20 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 
+	// Iconos
 	import BellRing from '@lucide/svelte/icons/bell-ring';
 	import Boxes from '@lucide/svelte/icons/boxes';
 	import CreditCard from '@lucide/svelte/icons/credit-card';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import Globe from '@lucide/svelte/icons/globe';
 	import Images from '@lucide/svelte/icons/images';
-	import Paintbrush from '@lucide/svelte/icons/paintbrush';
 	import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 	import LifeBuoy from '@lucide/svelte/icons/life-buoy';
-	import Palette from '@lucide/svelte/icons/palette';
 	import LogOut from '@lucide/svelte/icons/log-out';
+	import Paintbrush from '@lucide/svelte/icons/paintbrush';
+	import Palette from '@lucide/svelte/icons/palette';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Receipt from '@lucide/svelte/icons/receipt';
 	import Settings from '@lucide/svelte/icons/settings';
@@ -23,15 +26,20 @@
 	import Users from '@lucide/svelte/icons/users';
 	import Wallet from '@lucide/svelte/icons/wallet';
 
+	// App
 	import { page } from '$app/state';
 
-	import type { LayoutData } from './$types';
+	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import ActionToasts from '$lib/components/molecules/ActionToasts.svelte';
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
 	import SubscriptionBanner from '$lib/components/molecules/SubscriptionBanner.svelte';
+
+	// Dominio
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {
