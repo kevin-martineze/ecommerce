@@ -192,7 +192,7 @@ Mapa del resto (fase 6):
 | Hoy                                                            | Nuevo                                                      |
 | -------------------------------------------------------------- | ---------------------------------------------------------- |
 | `(shop)/tienda`                                                | `shop`                                                     |
-| `(shop)/producto/[slug]`                                       | `product/[slug]`                                           |
+| `(shop)/tienda/[slug]`                                         | `shop/[slug]`                                              |
 | `(shop)/coleccion`, `(shop)/colecciones`                       | `collections` (unificar)                                   |
 | `(shop)/carrito`                                               | `cart`                                                     |
 | `(shop)/favoritos`                                             | `favorites`                                                |
@@ -287,6 +287,18 @@ React: Svelte no tiene hooks, tiene clases con runes.
 la regla también comprueba que cada import esté en la sección correcta y
 `pnpm lint:fix` escribe los encabezados. Se agregaron dos secciones más:
 `// Servidor` (`$lib/server/*`) y `// Recursos` (`$lib/assets/*`, CSS).
+
+## Estado (rama `refactor/panel`)
+
+| Fase                   | Estado                                                                                                                                                                                                   |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 · Preparación        | Hecha, salvo el puente de tokens: espera a `@glob-ui/svelte` publicado.                                                                                                                                  |
+| 1 · Nombres en inglés  | Hecha: rutas, URLs, actions, archivos e identificadores, con 308 en `legacy-routes.ts`. API: rama `refactor/english-routes`.                                                                             |
+| 2 · Cascarón del panel | Bloqueada: espera a `@glob-ui/svelte`.                                                                                                                                                                   |
+| 3 · Formularios        | Hecha: `parseForm`, `FormState`, `FormField`, `FormSection`. Quedan actions con preparación propia (productos, colecciones, diseño, ajustes, carrito) para cuando sus esquemas absorban esa preparación. |
+| 4 · Templates          | `AuthTemplate` hecho. El resto espera a GlobUI.                                                                                                                                                          |
+| 5 · ViewModels         | Hechos: `DesignEditor` (+ `HighlightsEditor`), `CouponDraft`, `CollectionDraft`, `ShippingEditor`, sobre `StorefrontPreview`. Productos no lo necesita (≤ 3 `$state`).                                   |
+| 6 · Resto              | Layouts locales `AuthLayout`, `CanvasLayout`, `SettingsLayout`. `SettingsLayout` se adopta con `SettingsTemplate` (fase 4).                                                                              |
 
 ## Fases
 
