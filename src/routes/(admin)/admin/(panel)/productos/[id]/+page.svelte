@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { untrack } from 'svelte';
 
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
@@ -103,6 +105,8 @@
 		return '';
 	}
 	let uploading = $state(false);
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -121,7 +125,12 @@
 		<h1 class="mt-1 text-3xl">{product.name}</h1>
 	</div>
 
-	<Button href="/tienda/{product.slug}" target="_blank" rel="noopener noreferrer" variant="outline">
+	<Button
+		href="{data.storeUrl}/tienda/{product.slug}"
+		target="_blank"
+		rel="noopener noreferrer"
+		variant="outline"
+	>
 		<ExternalLink class="mr-2 size-4" />
 		Ver en la tienda
 	</Button>
@@ -156,8 +165,25 @@
 				Si el producto ya salió en pedidos no se borra: se archiva para conservar el historial.
 			</p>
 
-			<form method="POST" action="?/eliminar" class="mt-4" use:enhance>
-				<Button type="submit" variant="destructive" size="sm">
+			<form
+				id="borrar-producto"
+				method="POST"
+				action="?/eliminar"
+				class="mt-4"
+				use:enhance={alBorrar}
+			>
+				<Button
+					type="button"
+					variant="destructive"
+					size="sm"
+					onclick={() =>
+						borrado.ask('borrar-producto', '¿Eliminar este producto?', {
+							description:
+								'Si ya salió en pedidos no se borra: se archiva para conservar el historial.',
+							confirmLabel: 'Eliminar',
+							pendingLabel: 'Eliminando…'
+						})}
+				>
 					<Trash2 class="mr-2 size-4" />
 					Eliminar
 				</Button>
@@ -248,9 +274,24 @@
 									</form>
 								{/if}
 
-								<form method="POST" action="?/borrarImagen" use:enhance>
+								<form
+									id="borrar-imagen-{image.id}"
+									method="POST"
+									action="?/borrarImagen"
+									use:enhance={alBorrar}
+								>
 									<input type="hidden" name="imageId" value={image.id} />
-									<Button type="submit" size="sm" variant="ghost" class="text-destructive">
+									<Button
+										type="button"
+										size="sm"
+										variant="ghost"
+										class="text-destructive"
+										aria-label="Borrar foto"
+										onclick={() =>
+											borrado.ask(`borrar-imagen-${image.id}`, '¿Borrar esta foto?', {
+												description: 'No se puede deshacer.'
+											})}
+									>
 										<Trash2 class="size-3" />
 									</Button>
 								</form>
@@ -280,3 +321,13 @@
 		</div>
 	</Tabs.Content>
 </Tabs.Root>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>

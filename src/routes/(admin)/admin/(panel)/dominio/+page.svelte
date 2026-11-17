@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { enhance } from '$app/forms';
 
 	import type { PageData } from './$types';
@@ -19,11 +21,12 @@
 
 	let host = $state('');
 	let enviando = $state(false);
-	let confirmando = $state(false);
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
 
 	const domain = $derived(data.domain);
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -31,20 +34,18 @@
 </svelte:head>
 
 {#snippet quitarDominio(texto: string)}
-	{#if confirmando}
-		<form method="POST" action="?/quitar" use:enhance class="space-y-3">
-			<p class="text-sm">{texto}</p>
-			<div class="flex gap-2">
-				<Button type="submit" variant="destructive" disabled={enviando}>Sí, quitar dominio</Button>
-				<Button type="button" variant="ghost" onclick={() => (confirmando = false)}>Cancelar</Button
-				>
-			</div>
-		</form>
-	{:else}
-		<Button type="button" variant="ghost" onclick={() => (confirmando = true)}>
-			Quitar dominio
-		</Button>
-	{/if}
+	<Button
+		type="button"
+		variant="ghost"
+		onclick={() =>
+			borrado.ask('quitar-dominio', '¿Quitar el dominio?', {
+				description: texto,
+				confirmLabel: 'Quitar',
+				pendingLabel: 'Quitando…'
+			})}
+	>
+		Quitar dominio
+	</Button>
 {/snippet}
 
 <header class="mb-6">
@@ -210,3 +211,17 @@
 		{/if}
 	</section>
 {/if}
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>
+
+<div hidden>
+	<form id="quitar-dominio" method="POST" action="?/quitar" use:enhance={alBorrar}></form>
+</div>

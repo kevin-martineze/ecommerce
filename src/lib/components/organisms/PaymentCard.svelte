@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { onMount } from 'svelte';
 
 	import CreditCard from '@lucide/svelte/icons/credit-card';
@@ -48,6 +50,8 @@
 	onMount(() => {
 		hidratado = true;
 	});
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <section class="border-border bg-card space-y-4 rounded-lg border p-6">
@@ -160,8 +164,17 @@
 				</Button>
 
 				{#if method.connected}
-					<form method="POST" action="?/quitarTarjeta" use:enhance>
-						<Button type="submit" variant="ghost">Quitarla</Button>
+					<form id="quitar-tarjeta" method="POST" action="?/quitarTarjeta" use:enhance={alBorrar}>
+						<Button
+							type="button"
+							variant="ghost"
+							onclick={() =>
+								borrado.ask('quitar-tarjeta', '¿Quitar la tarjeta?', {
+									description: 'Se quita la tarjeta guardada de la tienda.',
+									confirmLabel: 'Quitar',
+									pendingLabel: 'Quitando…'
+								})}>Quitarla</Button
+						>
 					</form>
 				{/if}
 			</div>
@@ -172,3 +185,13 @@
 		</p>
 	{/if}
 </section>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>

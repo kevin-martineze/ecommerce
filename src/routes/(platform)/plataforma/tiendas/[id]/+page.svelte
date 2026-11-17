@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { untrack } from 'svelte';
 
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
@@ -53,6 +55,8 @@
 	const currentPlan = $derived(data.plans.find((plan) => plan.code === store.plan_code));
 
 	let planCode = $state(untrack(() => data.store.plan_code ?? ''));
+	const borrado = new DeleteConfirm();
+	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -75,6 +79,8 @@
 		</h1>
 		<a
 			href={data.storeUrl}
+			target="_blank"
+			rel="noopener noreferrer"
 			class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"
 		>
 			{store.slug}
@@ -90,20 +96,21 @@
 		{/if}
 	</div>
 
-	<form method="POST" action="?/estado" use:enhance>
+	<form id="estado" method="POST" action="?/estado" use:enhance={alBorrar}>
 		{#if store.status === 'suspended'}
 			<input type="hidden" name="status" value="active" />
 			<Button type="submit">Reactivar tienda</Button>
 		{:else}
 			<input type="hidden" name="status" value="suspended" />
 			<Button
-				type="submit"
+				type="button"
 				variant="destructive"
-				onclick={(event) => {
-					if (!confirm(`¿Suspender ${store.name}? Su tienda dejará de verse en internet.`)) {
-						event.preventDefault();
-					}
-				}}
+				onclick={() =>
+					borrado.ask('estado', `¿Suspender ${store.name}?`, {
+						description: 'Su tienda dejará de verse en internet.',
+						confirmLabel: 'Suspender',
+						pendingLabel: 'Suspendiendo…'
+					})}
 			>
 				Suspender
 			</Button>
@@ -269,3 +276,13 @@
 		</Table.Root>
 	{/if}
 </section>
+
+<ConfirmDeleteDialog
+	bind:open={borrado.open}
+	title={borrado.target?.title ?? ''}
+	description={borrado.target?.description}
+	form={borrado.target?.formId ?? ''}
+	confirmLabel={borrado.target?.confirmLabel}
+	pendingLabel={borrado.target?.pendingLabel}
+	pending={borrado.pending}
+/>
