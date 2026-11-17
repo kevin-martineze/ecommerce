@@ -11,6 +11,7 @@
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
+	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import { themePreviewUrl } from '$lib/template-preview';
@@ -26,8 +27,8 @@
 
 	// Copia editable del cupón que se está creando, para la vista previa.
 	let code = $state('');
-	let value = $state<number | undefined>(undefined);
-	let minSubtotal = $state<number | undefined>(0);
+	let value = $state<number | null>(null);
+	let minSubtotal = $state<number | null>(0);
 	let active = $state(true);
 
 	const draft = $derived<StorefrontDraft>({
@@ -81,7 +82,7 @@
 					if (result.type === 'success') {
 						code = '';
 						type = 'percent';
-						value = undefined;
+						value = null;
 						minSubtotal = 0;
 						active = true;
 					}
@@ -115,27 +116,16 @@
 
 			<div class="space-y-2">
 				<Label for="value">{type === 'percent' ? 'Porcentaje (1-100)' : 'Monto en pesos'}</Label>
-				<Input
-					id="value"
-					name="value"
-					type="number"
-					min="1"
-					max={type === 'percent' ? 100 : undefined}
-					required
-					bind:value
-				/>
+				{#if type === 'percent'}
+					<Input id="value" name="value" type="number" min="1" max={100} required bind:value />
+				{:else}
+					<MoneyField id="value" name="value" required bind:value />
+				{/if}
 			</div>
 
 			<div class="space-y-2">
 				<Label for="minSubtotal">Mínimo de compra</Label>
-				<Input
-					id="minSubtotal"
-					name="minSubtotal"
-					type="number"
-					min="0"
-					step="1000"
-					bind:value={minSubtotal}
-				/>
+				<MoneyField id="minSubtotal" name="minSubtotal" bind:value={minSubtotal} />
 			</div>
 
 			<div class="space-y-2">

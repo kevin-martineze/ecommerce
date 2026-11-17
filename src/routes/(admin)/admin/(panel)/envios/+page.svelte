@@ -11,6 +11,7 @@
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
+	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import { themePreviewUrl } from '$lib/template-preview';
@@ -24,7 +25,7 @@
 
 	interface ZoneEdit {
 		name?: string;
-		cost?: number;
+		cost?: number | null;
 		etaDays?: number;
 		active?: boolean;
 	}
@@ -37,15 +38,22 @@
 
 	// La zona que se está creando también se ve, sin esperar a guardarla.
 	let newName = $state('');
-	let newCost = $state(0);
+	let newCost = $state<number | null>(0);
 	let newEtaDays = $state(2);
 	let newActive = $state(true);
+
+	/** El costo que la dueña escribió en la fila, o el guardado si no lo tocó. */
+	function costoDe(id: string, guardado: number): number | null {
+		const editado = zoneEdits[id]?.cost;
+
+		return editado === undefined ? guardado : editado;
+	}
 
 	const rows = $derived(
 		data.zones.map((zone) => ({
 			id: zone.id,
 			name: zoneEdits[zone.id]?.name ?? zone.name,
-			cost: zoneEdits[zone.id]?.cost ?? zone.cost,
+			cost: costoDe(zone.id, zone.cost),
 			etaDays: zoneEdits[zone.id]?.etaDays ?? zone.eta_days,
 			active: zoneEdits[zone.id]?.active ?? zone.active,
 			sortOrder: zone.sort_order
@@ -56,8 +64,8 @@
 		...rows.map((zone) => ({
 			id: zone.id,
 			name: zone.name,
-			// Un campo vacío llega como NaN: el borrador prefiere cero a romperse.
-			cost: Number.isFinite(zone.cost) ? zone.cost : 0,
+			// Un campo vacío llega como null: el borrador lo pinta en cero.
+			cost: zone.cost ?? 0,
 			etaDays: zone.etaDays,
 			active: zone.active
 		})),
@@ -66,7 +74,7 @@
 					{
 						id: 'nueva',
 						name: newName,
-						cost: Number.isFinite(newCost) ? newCost : 0,
+						cost: newCost ?? 0,
 						etaDays: Number.isFinite(newEtaDays) ? newEtaDays : null,
 						active: newActive
 					}
@@ -143,14 +151,7 @@
 
 				<div class="space-y-1.5">
 					<Label class="text-xs" for="cost">Costo</Label>
-					<NumberField
-						id="cost"
-						name="cost"
-						bind:value={newCost}
-						step={500}
-						max={9999999}
-						class="w-40"
-					/>
+					<MoneyField id="cost" name="cost" bind:value={newCost} class="w-40" />
 				</div>
 
 				<div class="space-y-1.5">
@@ -196,13 +197,11 @@
 							</Table.Cell>
 
 							<Table.Cell data-label="Costo">
-								<NumberField
+								<MoneyField
 									form="zona-{zone.id}"
 									name="cost"
 									value={zone.cost}
 									onchange={(value) => editZone(zone.id, { cost: value })}
-									step={500}
-									max={9999999}
 									aria-label="Costo"
 								/>
 							</Table.Cell>
@@ -230,7 +229,7 @@
 							</Table.Cell>
 
 							<Table.Cell data-label="En la tienda" class="text-muted-foreground text-xs">
-								{zone.cost === 0 ? 'Gratis' : formatMoney(zone.cost)}
+								{zone.cost === 0 ? 'Gratis' : formatMoney(zone.cost ?? 0)}
 								{zone.etaDays ? ` · ${zone.etaDays} días` : ''}
 							</Table.Cell>
 

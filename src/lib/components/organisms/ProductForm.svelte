@@ -11,6 +11,7 @@
 	import { Label } from '$lib/components/atoms/label';
 	import { Switch } from '$lib/components/atoms/switch';
 	import { Textarea } from '$lib/components/atoms/textarea';
+	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import { slugify } from '$lib/utils/slug';
 
@@ -95,27 +96,12 @@
 
 		<div class="space-y-2">
 			<Label for="basePrice">Precio</Label>
-			<Input
-				id="basePrice"
-				name="basePrice"
-				type="number"
-				min="0"
-				step="1000"
-				bind:value={form.basePrice}
-				required
-			/>
+			<MoneyField id="basePrice" name="basePrice" bind:value={form.basePrice} required />
 		</div>
 
 		<div class="space-y-2">
 			<Label for="compareAtPrice">Precio tachado (opcional)</Label>
-			<Input
-				id="compareAtPrice"
-				name="compareAtPrice"
-				type="number"
-				min="0"
-				step="1000"
-				bind:value={form.compareAtPrice}
-			/>
+			<MoneyField id="compareAtPrice" name="compareAtPrice" bind:value={form.compareAtPrice} />
 		</div>
 
 		<div class="space-y-2">

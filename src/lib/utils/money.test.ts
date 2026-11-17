@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { discountPercent, formatAmount, formatMoney, parseAmount } from '$lib/utils/money';
+import {
+	discountPercent,
+	formatAmount,
+	formatMoney,
+	parseAmount,
+	typeAmount
+} from '$lib/utils/money';
 
 describe('formatMoney', () => {
 	it('formatea pesos colombianos sin decimales', () => {
@@ -33,6 +39,36 @@ describe('parseAmount', () => {
 describe('formatAmount', () => {
 	it('formatea sin símbolo para inputs del panel', () => {
 		expect(formatAmount(89900)).toBe('89.900');
+	});
+});
+
+describe('typeAmount', () => {
+	it('pone los puntos de miles mientras se escribe', () => {
+		expect(typeAmount('23000', 5)).toEqual({ text: '23.000', value: 23000, caret: 6 });
+		expect(typeAmount('1250000', 7)).toEqual({ text: '1.250.000', value: 1250000, caret: 9 });
+	});
+
+	it('deja el cursor junto al mismo dígito al editar en medio', () => {
+		// "23.000" con un 5 escrito después del 2: "253.000" → "253.000", cursor tras el 5.
+		expect(typeAmount('253.000', 2)).toEqual({ text: '253.000', value: 253000, caret: 2 });
+		// Borrar el 3 de "23.000" deja "2.000" → "2.000", cursor tras el 2.
+		expect(typeAmount('2.000', 1)).toEqual({ text: '2.000', value: 2000, caret: 1 });
+	});
+
+	it('ignora letras y símbolos', () => {
+		expect(typeAmount('$89a900', 7)).toEqual({ text: '89.900', value: 89900, caret: 6 });
+	});
+
+	it('quita los ceros a la izquierda sin perder el cursor', () => {
+		expect(typeAmount('05', 2)).toEqual({ text: '5', value: 5, caret: 1 });
+	});
+
+	it('deja el campo vacío cuando no hay dígitos', () => {
+		expect(typeAmount('', 0)).toEqual({ text: '', value: null, caret: 0 });
+	});
+
+	it('no deja escribir más de 12 dígitos', () => {
+		expect(typeAmount('1234567890123', 13).value).toBe(123456789012);
 	});
 });
 
