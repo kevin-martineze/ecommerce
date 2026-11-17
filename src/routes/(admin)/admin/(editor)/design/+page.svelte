@@ -5,26 +5,31 @@
 	// Svelte
 	import { tick } from 'svelte';
 
+	// Iconos
+	import ExternalLink from '@lucide/svelte/icons/external-link';
+
 	// App
 	import { enhance } from '$app/forms';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 
 	// Componentes
-	import CanvasLayout from '$lib/components/layouts/CanvasLayout.svelte';
+	import { Button } from '$lib/components/atoms/button';
 	import ActionToasts from '$lib/components/molecules/ActionToasts.svelte';
 	import ChangeList from '$lib/components/molecules/ChangeList.svelte';
 	import ConfirmDialog from '$lib/components/molecules/ConfirmDialog.svelte';
+	import DeviceToggle from '$lib/components/molecules/DeviceToggle.svelte';
 	import DraftPreview from '$lib/components/molecules/DraftPreview.svelte';
+	import SegmentedControl from '$lib/components/molecules/SegmentedControl.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+	import EditorTemplate from '$lib/components/templates/EditorTemplate.svelte';
 	import BrandSection from './BrandSection.svelte';
 	import CoverSection from './CoverSection.svelte';
-	import DesignHeader from './DesignHeader.svelte';
 	import StyleSection from './StyleSection.svelte';
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
-	import { countChanges, DesignEditor } from './design-editor.svelte';
+	import { countChanges, DesignEditor, PREVIEW_PAGES } from './design-editor.svelte';
 
 	// Dominio
 	import { type Section, sectionFrom } from '$lib/domain/design';
@@ -97,9 +102,39 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<CanvasLayout class="admin-shell">
-	{#snippet toolbar()}
-		<DesignHeader {editor} storeName={data.settings.store_name} storeUrl={data.storeUrl} />
+<EditorTemplate title="Diseño de tu tienda" exitHref="/admin">
+	{#snippet subtitle()}
+		{data.settings.store_name}
+		{#if editor.changed}· <span class="text-foreground">Cambios sin guardar</span>{/if}
+	{/snippet}
+
+	{#snippet tools()}
+		<SegmentedControl options={PREVIEW_PAGES} bind:value={editor.path} label="Página que ves" />
+		<DeviceToggle bind:value={editor.device} />
+	{/snippet}
+
+	{#snippet actions()}
+		<Button href={data.storeUrl} target="_blank" rel="noopener" variant="ghost" size="sm">
+			Ver mi tienda
+			<ExternalLink />
+		</Button>
+		<Button
+			type="button"
+			variant="outline"
+			size="sm"
+			disabled={!editor.changed || editor.saving}
+			onclick={() => (editor.discardDialogOpen = true)}
+		>
+			Descartar
+		</Button>
+		<Button
+			type="button"
+			size="sm"
+			disabled={!editor.changed || editor.invalid || editor.saving}
+			onclick={() => (editor.saveDialogOpen = true)}
+		>
+			{editor.saving ? 'Guardando…' : 'Guardar'}
+		</Button>
 	{/snippet}
 
 	{#snippet panel()}
@@ -137,7 +172,7 @@
 		title="Vista previa de tu tienda"
 		onedit={editZone}
 	/>
-</CanvasLayout>
+</EditorTemplate>
 
 <ConfirmDialog
 	bind:open={editor.saveDialogOpen}

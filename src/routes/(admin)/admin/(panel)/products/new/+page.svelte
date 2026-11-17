@@ -4,12 +4,9 @@
 	import type { ProductFormValues } from '$lib/domain/product-form';
 	import type { ActionData, PageData } from './$types';
 
-	// Iconos
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-
 	// Componentes
-	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import ProductForm from '$lib/components/organisms/ProductForm.svelte';
+	import PreviewTemplate from '$lib/components/templates/PreviewTemplate.svelte';
 
 	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
@@ -63,21 +60,14 @@
 	<title>Nuevo producto — Globerce</title>
 </svelte:head>
 
-<header class="mb-6">
-	<a
-		href="/admin/products"
-		class="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
-	>
-		<ArrowLeft class="size-3" />
-		Productos
-	</a>
-	<h1 class="mt-1 text-3xl">Nuevo producto</h1>
-	<p class="text-muted-foreground text-sm">
-		Al guardar podrás subir fotos y crear las variaciones con su inventario.
-	</p>
-</header>
-
-<LivePreviewLayout src={previewSrc} {draft} title="Así se ve tu producto">
+<PreviewTemplate
+	title="Nuevo producto"
+	description="Al guardar podrás subir fotos y crear las variaciones con su inventario."
+	back={{ href: '/admin/products', label: 'Productos' }}
+	src={previewSrc}
+	{draft}
+	previewTitle="Así se ve tu producto"
+>
 	<div class="border-border bg-card rounded-lg border p-6">
 		<ProductForm
 			categories={data.categories}
@@ -87,4 +77,4 @@
 			onvalues={(values) => (live = { ...values })}
 		/>
 	</div>
-</LivePreviewLayout>
+</PreviewTemplate>

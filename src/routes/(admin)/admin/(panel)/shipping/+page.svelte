@@ -18,7 +18,7 @@
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import EditableRowCard from '$lib/components/organisms/EditableRowCard.svelte';
-	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+	import PreviewTemplate from '$lib/components/templates/PreviewTemplate.svelte';
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
@@ -46,14 +46,13 @@
 	<title>Envíos — Globerce</title>
 </svelte:head>
 
-<header class="mb-6 space-y-1">
-	<h1 class="text-3xl">Zonas de envío</h1>
-	<p class="text-muted-foreground text-sm">
-		El cliente elige una en el carrito y su costo entra en el total del pedido.
-	</p>
-</header>
-
-<LivePreviewLayout src={editor.src} draft={editor.draft} title="Así se ve tu envío">
+<PreviewTemplate
+	title="Zonas de envío"
+	description="El cliente elige una en el carrito y su costo entra en el total del pedido."
+	src={editor.src}
+	draft={editor.draft}
+	previewTitle="Así se ve tu envío"
+>
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>Zonas</Card.Title>
@@ -190,7 +189,7 @@
 			</div>
 		</Card.Content>
 	</Card.Root>
-</LivePreviewLayout>
+</PreviewTemplate>
 
 <!-- El HTML no admite <form> dentro de <tbody>: viven aquí y se referencian por id. -->
 <div hidden>

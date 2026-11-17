@@ -12,6 +12,7 @@
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
+	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
@@ -34,83 +35,81 @@
 	<title>Mi cuenta — Globerce</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-3xl">Mi cuenta</h1>
-	<p class="text-muted-foreground text-sm">
-		{data.user.full_name ?? data.user.email} · {data.user.email}
-	</p>
-</header>
+<PageTemplate
+	title="Mi cuenta"
+	description="{data.user.full_name ?? data.user.email} · {data.user.email}"
+>
+	<div class="grid gap-6 lg:grid-cols-2">
+		<section class="border-border bg-card rounded-lg border p-6">
+			<h2 class="mb-4 text-lg">Cambiar contraseña</h2>
 
-<div class="grid gap-6 lg:grid-cols-2">
-	<section class="border-border bg-card rounded-lg border p-6">
-		<h2 class="mb-4 text-lg">Cambiar contraseña</h2>
+			<form
+				bind:this={passwordForm}
+				method="POST"
+				action="?/password"
+				class="space-y-4"
+				use:enhance={submission.submit({ reset: false, onSuccess: () => passwordForm?.reset() })}
+			>
+				<PasswordField
+					name="currentPassword"
+					label="Contraseña actual"
+					required
+					autocomplete="current-password"
+				/>
 
-		<form
-			bind:this={passwordForm}
-			method="POST"
-			action="?/password"
-			class="space-y-4"
-			use:enhance={submission.submit({ reset: false, onSuccess: () => passwordForm?.reset() })}
-		>
-			<PasswordField
-				name="currentPassword"
-				label="Contraseña actual"
-				required
-				autocomplete="current-password"
-			/>
+				<PasswordField
+					name="password"
+					label="Contraseña nueva"
+					hint={`Mínimo ${PASSWORD_MIN} caracteres.`}
+					required
+					minlength={PASSWORD_MIN}
+				/>
 
-			<PasswordField
-				name="password"
-				label="Contraseña nueva"
-				hint={`Mínimo ${PASSWORD_MIN} caracteres.`}
-				required
-				minlength={PASSWORD_MIN}
-			/>
+				<PasswordField name="confirm" label="Repítela" required />
 
-			<PasswordField name="confirm" label="Repítela" required />
+				<Button type="submit" disabled={submission.pending}>
+					{submission.pending ? 'Guardando…' : 'Cambiar contraseña'}
+				</Button>
+			</form>
+		</section>
 
-			<Button type="submit" disabled={submission.pending}>
-				{submission.pending ? 'Guardando…' : 'Cambiar contraseña'}
-			</Button>
-		</form>
-	</section>
+		<section class="border-border bg-card rounded-lg border p-6">
+			<h2 class="mb-4 text-lg">Tus tiendas</h2>
 
-	<section class="border-border bg-card rounded-lg border p-6">
-		<h2 class="mb-4 text-lg">Tus tiendas</h2>
+			<ul class="divide-border divide-y">
+				{#each data.stores as store (store.id)}
+					<li class="flex items-center justify-between gap-4 py-3">
+						<div class="min-w-0">
+							<p class="flex items-center gap-2 truncate">
+								{store.name}
+								{#if store.id === data.activeStoreId}
+									<Badge>Abierta</Badge>
+								{/if}
+							</p>
+							<a
+								href={store.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+							>
+								{MEMBER_ROLE_LABEL[store.role]} · ver tienda
+								<ExternalLink class="size-3" />
+							</a>
+						</div>
 
-		<ul class="divide-border divide-y">
-			{#each data.stores as store (store.id)}
-				<li class="flex items-center justify-between gap-4 py-3">
-					<div class="min-w-0">
-						<p class="flex items-center gap-2 truncate">
-							{store.name}
-							{#if store.id === data.activeStoreId}
-								<Badge>Abierta</Badge>
-							{/if}
-						</p>
-						<a
-							href={store.url}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
-						>
-							{MEMBER_ROLE_LABEL[store.role]} · ver tienda
-							<ExternalLink class="size-3" />
-						</a>
-					</div>
+						{#if store.id !== data.activeStoreId}
+							<form method="POST" action="?/switchStore" use:enhance>
+								<input type="hidden" name="storeId" value={store.id} />
+								<Button type="submit" variant="outline" size="sm">Administrar</Button>
+							</form>
+						{/if}
+					</li>
+				{/each}
+			</ul>
 
-					{#if store.id !== data.activeStoreId}
-						<form method="POST" action="?/switchStore" use:enhance>
-							<input type="hidden" name="storeId" value={store.id} />
-							<Button type="submit" variant="outline" size="sm">Administrar</Button>
-						</form>
-					{/if}
-				</li>
-			{/each}
-		</ul>
-
-		<p class="text-muted-foreground mt-4 text-xs">
-			¿Otra tienda? <a href="/signup" class="underline">Crea una nueva</a>.
-		</p>
-	</section>
-</div>
+			<p class="text-muted-foreground mt-4 text-xs">
+				¿Otra tienda? <a href="/signup" class="underline">Crea una nueva</a>.
+			</p>
+		</section>
+	</div>
+</PageTemplate>

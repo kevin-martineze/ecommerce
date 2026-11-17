@@ -22,7 +22,7 @@
 {#if notice}
 	<Alert.Root
 		variant={notice.tone === 'danger' ? 'destructive' : 'default'}
-		class={cn('mb-6', notice.tone === 'warning' && 'border-sale text-sale')}
+		class={cn(notice.tone === 'warning' && 'border-sale text-sale')}
 	>
 		{#if notice.tone === 'info'}
 			<Info class="size-4" />

@@ -21,7 +21,7 @@
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+	import PreviewTemplate from '$lib/components/templates/PreviewTemplate.svelte';
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
@@ -52,17 +52,12 @@
 	<title>Colecciones — Globerce</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-3xl">Colecciones</h1>
-	<p class="text-muted-foreground text-sm">
-		Páginas editoriales con una foto grande y productos etiquetadas encima.
-	</p>
-</header>
-
-<LivePreviewLayout
+<PreviewTemplate
+	title="Colecciones"
+	description="Páginas editoriales con una foto grande y productos etiquetadas encima."
 	src={newCollection.src}
 	draft={newCollection.draft}
-	title="Así se ve tu colección"
+	previewTitle="Así se ve tu colección"
 >
 	<Card.Root class="mb-8">
 		<Card.Header>
@@ -140,7 +135,7 @@
 			</form>
 		</Card.Content>
 	</Card.Root>
-</LivePreviewLayout>
+</PreviewTemplate>
 
 {#if data.collections.length === 0}
 	<p

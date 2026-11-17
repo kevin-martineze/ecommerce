@@ -21,7 +21,7 @@
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import EditableRowCard from '$lib/components/organisms/EditableRowCard.svelte';
-	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+	import PreviewTemplate from '$lib/components/templates/PreviewTemplate.svelte';
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
@@ -113,20 +113,19 @@
 	<title>Categorías — Globerce</title>
 </svelte:head>
 
-<header class="mb-6 space-y-1">
-	<h1 class="text-3xl">Categorías</h1>
-	<p class="text-muted-foreground text-sm">
-		Cómo agrupas tus productos en la tienda. Lo que ya esté en uso no se borra: se oculta, y los
-		pedidos viejos lo siguen mostrando.
-	</p>
-	<p class="text-muted-foreground text-sm">
-		Las variaciones, los colores y cualquier otra variación se declaran en cada producto, porque no
-		todos se dividen igual: una camisa por variación, un café por molienda y peso, un libro por
-		nada.
-	</p>
-</header>
+<PreviewTemplate title="Categorías" src={previewSrc} {draft} previewTitle="Así se ve tu menú">
+	{#snippet intro()}
+		<p>
+			Cómo agrupas tus productos en la tienda. Lo que ya esté en uso no se borra: se oculta, y los
+			pedidos viejos lo siguen mostrando.
+		</p>
+		<p>
+			Las variaciones, los colores y cualquier otra variación se declaran en cada producto, porque
+			no todos se dividen igual: una camisa por variación, un café por molienda y peso, un libro por
+			nada.
+		</p>
+	{/snippet}
 
-<LivePreviewLayout src={previewSrc} {draft} title="Así se ve tu menú">
 	<div class="space-y-8">
 		<Card.Root>
 			<Card.Header>
@@ -250,7 +249,7 @@
 			</Card.Content>
 		</Card.Root>
 	</div>
-</LivePreviewLayout>
+</PreviewTemplate>
 
 <!--
 	Los formularios de cada fila viven fuera de la lista, en un bloque oculto:

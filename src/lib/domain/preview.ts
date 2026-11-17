@@ -193,3 +193,6 @@ export interface StorefrontDraft {
 	content: DraftContent | null;
 	focus: PreviewZone | null;
 }
+
+/** La pantalla en la que se ve la vista previa. */
+export type PreviewDevice = 'desktop' | 'mobile';

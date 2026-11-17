@@ -19,7 +19,7 @@
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import FormSection from '$lib/components/organisms/FormSection.svelte';
-	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+	import PreviewTemplate from '$lib/components/templates/PreviewTemplate.svelte';
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
@@ -45,14 +45,13 @@
 	<title>Cupones — Globerce</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-3xl">Cupones</h1>
-	<p class="text-muted-foreground text-sm">
-		El código se valida en el carrito y el descuento lo recalcula el servidor.
-	</p>
-</header>
-
-<LivePreviewLayout src={newCoupon.src} draft={newCoupon.draft} title="Así se ve tu cupón">
+<PreviewTemplate
+	title="Cupones"
+	description="El código se valida en el carrito y el descuento lo recalcula el servidor."
+	src={newCoupon.src}
+	draft={newCoupon.draft}
+	previewTitle="Así se ve tu cupón"
+>
 	<FormSection title="Nuevo cupón" class="mb-8">
 		<form
 			method="POST"
@@ -228,7 +227,7 @@
 			</Table.Root>
 		</div>
 	{/if}
-</LivePreviewLayout>
+</PreviewTemplate>
 
 <ConfirmDeleteDialog
 	bind:open={deletion.open}

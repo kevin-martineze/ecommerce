@@ -14,7 +14,7 @@
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
-	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
+	import PreviewTemplate from '$lib/components/templates/PreviewTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
@@ -68,21 +68,22 @@
 	<title>Ajustes — Globerce</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-3xl">Ajustes</h1>
-	<p class="text-muted-foreground text-sm">
-		Tu WhatsApp, tu Instagram y el envío gratis. Arman el mensaje de WhatsApp y los datos de la
-		tienda.
-	</p>
-	<p class="text-muted-foreground text-sm">
-		El logo, el nombre y la barra de anuncio están en
-		<a href="/admin/design?section=brand" class="text-foreground underline underline-offset-4">
-			Diseño › Marca
-		</a>.
-	</p>
-</header>
+<PreviewTemplate title="Ajustes" src={previewSrc} {draft} previewTitle="Así se ven tus ajustes">
+	{#snippet intro()}
+		<p>
+			Tu WhatsApp, tu Instagram y el envío gratis. Arman el mensaje de WhatsApp y los datos de la
+			tienda.
+		</p>
+		<p>
+			El logo, el nombre y la barra de anuncio están en <a
+				href="/admin/design?section=brand"
+				class="text-foreground underline underline-offset-4"
+			>
+				Diseño › Marca
+			</a>.
+		</p>
+	{/snippet}
 
-<LivePreviewLayout src={previewSrc} {draft} title="Así se ven tus ajustes">
 	<div class="border-border bg-card rounded-lg border p-6">
 		<form
 			method="POST"
@@ -133,4 +134,4 @@
 			>
 		</form>
 	</div>
-</LivePreviewLayout>
+</PreviewTemplate>

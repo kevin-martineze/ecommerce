@@ -1,7 +1,7 @@
 // Tipos
 import type { Section } from '$lib/domain/design';
 import type { DesignChange, DesignSnapshot } from '$lib/domain/design-changes';
-import type { StorefrontDraft } from '$lib/domain/preview';
+import type { PreviewDevice, StorefrontDraft } from '$lib/domain/preview';
 import type { Collection, HomeHighlight, StoreSettings } from '$lib/domain/settings';
 
 // Estado
@@ -24,12 +24,10 @@ export interface DesignData {
 	previewUrl: string;
 }
 
-export type Device = 'desktop' | 'mobile';
-
 /** Las páginas de la tienda que se pueden ver en la vista previa. */
 export const PREVIEW_PAGES = [
-	{ path: '/', label: 'Portada' },
-	{ path: '/shop', label: 'Catálogo' }
+	{ value: '/', label: 'Portada' },
+	{ value: '/shop', label: 'Catálogo' }
 ];
 
 /** Lo escalar de una tienda guardada, en la forma del borrador. */
@@ -64,7 +62,7 @@ export class DesignEditor {
 	/** El borrador: arranca con lo guardado y la dueña lo edita. */
 	values: DesignSnapshot;
 
-	device = $state<Device>('desktop');
+	device = $state<PreviewDevice>('desktop');
 	path = $state('/');
 	/** Cuando la dueña entra a la lista de mensajes, la vista previa resalta esa zona. */
 	inMessages = $state(false);
