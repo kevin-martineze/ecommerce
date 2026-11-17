@@ -58,9 +58,9 @@
 	</dl>
 
 	<form method="POST" action="?/approve" class="mt-6 space-y-3" use:enhance={submission.submit()}>
-		<input type="hidden" name="referencia" value={data.reference} />
-		<input type="hidden" name="monto" value={data.amount} />
-		<input type="hidden" name="volver" value={data.returnTo} />
+		<input type="hidden" name="reference" value={data.reference} />
+		<input type="hidden" name="amount" value={data.amount} />
+		<input type="hidden" name="returnTo" value={data.returnTo} />
 
 		<Button type="submit" class="w-full" disabled={submission.pending}>
 			<CreditCard class="mr-2 size-4" />

@@ -39,9 +39,9 @@ export const load: PageServerLoad = ({ url }) => {
 export const actions: Actions = {
 	approve: async (event) => {
 		const formData = await event.request.formData();
-		const reference = String(formData.get('referencia') ?? '');
-		const amount = Number(formData.get('monto') ?? '0');
-		const returnTo = String(formData.get('volver') ?? '/admin/plan');
+		const reference = String(formData.get('reference') ?? '');
+		const amount = Number(formData.get('amount') ?? '0');
+		const returnTo = String(formData.get('returnTo') ?? '/admin/plan');
 
 		if (!reference || !Number.isFinite(amount)) error(400, 'Este cobro no es válido.');
 
