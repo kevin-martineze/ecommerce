@@ -161,7 +161,7 @@ const variantSchema = z
 		label: variant.label,
 		values: variant.values,
 		/** Los ids de sus valores, para casar la selección con la variante. */
-		value_ids: variant.values.map((valor) => valor.id)
+		value_ids: variant.values.map((attributeValue) => attributeValue.id)
 	}));
 
 const detailSchema = z

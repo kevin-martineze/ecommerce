@@ -12,14 +12,14 @@
 	 */
 
 	/** La zona editable más interna bajo `target`, o null si no hay ninguna. */
-	function zonaEditableDe(target: EventTarget | null): HTMLElement | null {
+	function editableZoneFor(target: EventTarget | null): HTMLElement | null {
 		if (!(target instanceof Element)) return null;
 
 		// La más interna: si dentro de una zona editable hay otra que no lo es
 		// (el menú dentro de la cabecera), no se resalta nada.
-		const zona = target.closest<HTMLElement>('[data-preview-zone]');
+		const zoneElement = target.closest<HTMLElement>('[data-preview-zone]');
 
-		return isEditableZone(zona?.dataset.previewZone) ? zona : null;
+		return isEditableZone(zoneElement?.dataset.previewZone) ? zoneElement : null;
 	}
 
 	$effect(() => {
@@ -27,7 +27,7 @@
 
 		let hovered: HTMLElement | null = null;
 
-		function marcar(next: HTMLElement | null) {
+		function mark(next: HTMLElement | null) {
 			if (next === hovered) return;
 
 			if (hovered) {
@@ -37,45 +37,45 @@
 
 			hovered = next;
 
-			const nombre = next?.dataset.previewZone;
+			const name = next?.dataset.previewZone;
 
-			if (next && isEditableZone(nombre)) {
+			if (next && isEditableZone(name)) {
 				next.dataset.editing = '';
-				next.dataset.editLabel = EDITABLE_ZONES[nombre].etiqueta;
+				next.dataset.editLabel = EDITABLE_ZONES[name].tagLabel;
 			}
 		}
 
 		function onMove(event: PointerEvent) {
-			marcar(zonaEditableDe(event.target));
+			mark(editableZoneFor(event.target));
 		}
 
-		function onSalir() {
-			marcar(null);
+		function onExit() {
+			mark(null);
 		}
 
 		function onClick(event: MouseEvent) {
-			const zona = zonaEditableDe(event.target);
-			const nombre = zona?.dataset.previewZone;
+			const zoneElement = editableZoneFor(event.target);
+			const name = zoneElement?.dataset.previewZone;
 
-			if (!isEditableZone(nombre)) return;
+			if (!isEditableZone(name)) return;
 
 			// Capturado en el documento: el link del hero o del logo no llega a navegar.
 			event.preventDefault();
 			event.stopPropagation();
 
 			// El mensaje solo lleva el nombre de la zona; no hay datos de la tienda.
-			window.parent.postMessage({ type: PREVIEW_EDIT_MESSAGE, zone: nombre }, '*');
+			window.parent.postMessage({ type: PREVIEW_EDIT_MESSAGE, zone: name }, '*');
 		}
 
 		document.addEventListener('pointermove', onMove);
-		document.documentElement.addEventListener('pointerleave', onSalir);
+		document.documentElement.addEventListener('pointerleave', onExit);
 		document.addEventListener('click', onClick, true);
 
 		return () => {
 			document.removeEventListener('pointermove', onMove);
-			document.documentElement.removeEventListener('pointerleave', onSalir);
+			document.documentElement.removeEventListener('pointerleave', onExit);
 			document.removeEventListener('click', onClick, true);
-			marcar(null);
+			mark(null);
 		};
 	});
 </script>

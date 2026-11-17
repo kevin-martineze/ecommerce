@@ -10,20 +10,20 @@ import { readTheme } from '$lib/domain/theme';
  * el estilo (plantilla, color, letras, esquinas, portada en plantilla), la
  * marca (nombre, logo, anuncio) y la portada (imagen de arriba y mensajes).
  */
-export const SECCIONES = ['estilo', 'marca', 'portada'] as const;
+export const SECTIONS = ['estilo', 'marca', 'portada'] as const;
 
-export type Seccion = (typeof SECCIONES)[number];
+export type Section = (typeof SECTIONS)[number];
 
 /** La sección que se ve, leída de `?section=`. Si falta o no existe: estilo. */
-export function seccionDe(search: string): Seccion {
-	const valor = new URLSearchParams(search).get('section');
+export function sectionFrom(search: string): Section {
+	const value = new URLSearchParams(search).get('section');
 
-	return SECCIONES.find((seccion) => seccion === valor) ?? 'estilo';
+	return SECTIONS.find((section) => section === value) ?? 'estilo';
 }
 
 /** La zona que la vista previa resalta al entrar en cada sección. */
-export function focoDe(seccion: Seccion): PreviewZone | null {
-	switch (seccion) {
+export function focusFor(section: Section): PreviewZone | null {
+	switch (section) {
 		case 'estilo':
 			return null;
 		case 'marca':
@@ -34,7 +34,7 @@ export function focoDe(seccion: Seccion): PreviewZone | null {
 }
 
 /** Todo lo que el editor muestra en vivo: un solo borrador para la vista previa. */
-export interface BorradorDiseno {
+export interface DesignDraft {
 	template: StorefrontTemplate;
 	accent: string;
 	fonts: string;
@@ -46,31 +46,31 @@ export interface BorradorDiseno {
 	heroTitle: string;
 	heroSubtitle: string;
 	highlights: DraftHighlight[];
-	foco: PreviewZone | null;
+	focusZone: PreviewZone | null;
 }
 
 /**
  * Arma el borrador que la tienda pinta. Va en un solo `content` de tipo `home`,
  * que lleva también el nombre y el anuncio: así la vista previa muestra todo junto.
  */
-export function armarBorrador(borrador: BorradorDiseno): StorefrontDraft {
+export function buildDraft(draft: DesignDraft): StorefrontDraft {
 	return {
-		template: borrador.template,
+		template: draft.template,
 		theme: readTheme({
-			accent: borrador.accent,
-			fonts: borrador.fonts,
-			corners: borrador.corners,
-			hero: borrador.hero
+			accent: draft.accent,
+			fonts: draft.fonts,
+			corners: draft.corners,
+			hero: draft.hero
 		}),
 		content: {
 			kind: 'home',
-			heroCollectionId: borrador.heroCollectionId || null,
-			heroTitle: borrador.heroTitle,
-			heroSubtitle: borrador.heroSubtitle,
-			highlights: borrador.highlights,
-			storeName: borrador.storeName,
-			announcement: borrador.announcement
+			heroCollectionId: draft.heroCollectionId || null,
+			heroTitle: draft.heroTitle,
+			heroSubtitle: draft.heroSubtitle,
+			highlights: draft.highlights,
+			storeName: draft.storeName,
+			announcement: draft.announcement
 		},
-		focus: borrador.foco
+		focus: draft.focusZone
 	};
 }

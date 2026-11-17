@@ -73,30 +73,30 @@ export function resolveTemplatePreview(
 	url: URL,
 	cookies: Pick<Cookies, 'get' | 'set' | 'delete'>
 ): TemplatePreview {
-	const pedida = url.searchParams.get(PREVIEW_PARAM);
+	const requested = url.searchParams.get(PREVIEW_PARAM);
 
-	if (pedida === PREVIEW_EXIT) {
+	if (requested === PREVIEW_EXIT) {
 		cookies.delete(PREVIEW_COOKIE, cookieOptions());
 
 		return { template: null, announce: false, theme: null };
 	}
 
-	if (isTemplate(pedida)) {
+	if (isTemplate(requested)) {
 		if (url.searchParams.get(PREVIEW_ONCE_PARAM) === '1') {
-			return { template: pedida, announce: false, theme: themeFromUrl(url) };
+			return { template: requested, announce: false, theme: themeFromUrl(url) };
 		}
 
-		cookies.set(PREVIEW_COOKIE, pedida, {
+		cookies.set(PREVIEW_COOKIE, requested, {
 			...cookieOptions(),
 			maxAge: PREVIEW_MAX_AGE_SECONDS
 		});
 
-		return { template: pedida, announce: true, theme: null };
+		return { template: requested, announce: true, theme: null };
 	}
 
-	const guardada = cookies.get(PREVIEW_COOKIE) ?? null;
+	const isSaved = cookies.get(PREVIEW_COOKIE) ?? null;
 
-	if (isTemplate(guardada)) return { template: guardada, announce: true, theme: null };
+	if (isTemplate(isSaved)) return { template: isSaved, announce: true, theme: null };
 
 	return { template: null, announce: false, theme: null };
 }

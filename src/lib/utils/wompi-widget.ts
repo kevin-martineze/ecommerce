@@ -18,20 +18,20 @@ export interface WompiTransactionResult {
 }
 
 /** Lo que devuelve una action que cobra: el widget y la URL de respaldo. */
-export interface PagoConWidget {
+export interface WidgetPayment {
 	widget: WompiWidget;
 	url: string;
 }
 
 /** La carga se comparte: sin esto, dos clics meten dos `<script>` de Wompi. */
-let cargando: Promise<void> | null = null;
+let loading: Promise<void> | null = null;
 
 /** Mete el script de Wompi una sola vez. Si falla, se puede volver a intentar. */
 export function loadWompiWidget(): Promise<void> {
 	if (window.WidgetCheckout) return Promise.resolve();
 
-	if (!cargando) {
-		cargando = new Promise<void>((resolve, reject) => {
+	if (!loading) {
+		loading = new Promise<void>((resolve, reject) => {
 			const script = document.createElement('script');
 
 			script.src = WIDGET_SRC;
@@ -39,7 +39,7 @@ export function loadWompiWidget(): Promise<void> {
 			script.onload = () => resolve();
 			script.onerror = () => {
 				script.remove();
-				cargando = null;
+				loading = null;
 				reject(new Error('No se pudo cargar el pago de Wompi.'));
 			};
 
@@ -47,7 +47,7 @@ export function loadWompiWidget(): Promise<void> {
 		});
 	}
 
-	return cargando;
+	return loading;
 }
 
 /**
@@ -58,7 +58,7 @@ export function loadWompiWidget(): Promise<void> {
  */
 export async function openWompiWidget(
 	widget: WompiWidget,
-	onResult: (transaccion: WompiTransactionResult | null) => void
+	onResult: (transactionData: WompiTransactionResult | null) => void
 ): Promise<void> {
 	await loadWompiWidget();
 
@@ -79,22 +79,22 @@ export async function openWompiWidget(
 	checkout.open((result) => onResult(result.transaction ?? null));
 }
 
-function esRegistro(valor: unknown): valor is Record<string, unknown> {
-	return typeof valor === 'object' && valor !== null;
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null;
 }
 
 /** Lee el widget que devuelve la action, campo a campo, sin confiar en la forma. */
-export function esWidget(valor: unknown): valor is WompiWidget {
-	if (!esRegistro(valor)) return false;
+export function isWidget(value: unknown): value is WompiWidget {
+	if (!isRecord(value)) return false;
 
 	return (
-		typeof valor.public_key === 'string' &&
-		valor.currency === 'COP' &&
-		typeof valor.amount_in_cents === 'number' &&
-		typeof valor.reference === 'string' &&
-		typeof valor.integrity_signature === 'string' &&
-		typeof valor.redirect_url === 'string' &&
-		(valor.customer_email === null || typeof valor.customer_email === 'string')
+		typeof value.public_key === 'string' &&
+		value.currency === 'COP' &&
+		typeof value.amount_in_cents === 'number' &&
+		typeof value.reference === 'string' &&
+		typeof value.integrity_signature === 'string' &&
+		typeof value.redirect_url === 'string' &&
+		(value.customer_email === null || typeof value.customer_email === 'string')
 	);
 }
 
@@ -102,14 +102,14 @@ export function esWidget(valor: unknown): valor is WompiWidget {
  * Solo hay pago con widget si la action trajo el widget y la URL de respaldo.
  * Cualquier otra cosa (error, redirección, API vieja) devuelve null.
  */
-export function pagoConWidget(result: ActionResult): PagoConWidget | null {
+export function widgetPayment(result: ActionResult): WidgetPayment | null {
 	if (result.type !== 'success') return null;
 
-	const datos: unknown = result.data;
+	const details: unknown = result.data;
 
-	if (!esRegistro(datos) || typeof datos.url !== 'string' || !esWidget(datos.widget)) {
+	if (!isRecord(details) || typeof details.url !== 'string' || !isWidget(details.widget)) {
 		return null;
 	}
 
-	return { widget: datos.widget, url: datos.url };
+	return { widget: details.widget, url: details.url };
 }

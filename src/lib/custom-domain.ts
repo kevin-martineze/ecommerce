@@ -91,7 +91,7 @@ export function redirectToCustomDomain({
  * moviera, el borrador se mandaría a un origen que el panel no espera y el
  * navegador lo descartaría en silencio.
  */
-export function esVistaPrevia({
+export function isPreview({
 	secFetchDest,
 	pathname,
 	preview

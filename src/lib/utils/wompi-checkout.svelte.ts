@@ -3,7 +3,7 @@ import type { ActionResult } from '@sveltejs/kit';
 import type { WompiTransactionResult } from '$lib/utils/wompi-widget';
 
 // Utilidades
-import { openWompiWidget, pagoConWidget } from '$lib/utils/wompi-widget';
+import { openWompiWidget, widgetPayment } from '$lib/utils/wompi-widget';
 
 /**
  * El flujo de cobro con el widget de Wompi, compartido por el pedido y el plan.
@@ -16,109 +16,109 @@ import { openWompiWidget, pagoConWidget } from '$lib/utils/wompi-widget';
  */
 
 /** Cada cuánto se vuelve a leer la página mientras Wompi confirma. */
-const INTERVALO_MS = 3_000;
+const INTERVAL_MS = 3_000;
 /** Pasado este tiempo se deja de preguntar: el pago puede seguir en proceso. */
-const TIEMPO_MAX_MS = 60_000;
+const MAX_TIME_MS = 60_000;
 
-export interface CobroWompiOpciones {
+export interface WompiChargeOptions {
 	/** Si el cobro ya se refleja en los datos de la página. */
-	pagado: () => boolean;
+	paid: () => boolean;
 	/** Vuelve a leer los datos del `load`. */
-	recargar: () => Promise<void>;
+	reload: () => Promise<void>;
 }
 
-export interface CobroWompi {
+export interface WompiCharge {
 	/** Desde que se pide el enlace hasta que el widget está abierto o se redirige. */
-	readonly abriendo: boolean;
+	readonly opening: boolean;
 	/** Wompi aprobó o dejó pendiente el pago; se espera el evento que lo confirma. */
-	readonly confirmando: boolean;
+	readonly confirming: boolean;
 	/** Pasaron los 60 s sin confirmación: el pago puede seguir en proceso. */
-	readonly expirado: boolean;
+	readonly isExpired: boolean;
 	/** Wompi no aprobó el pago. El botón vuelve a estar disponible. */
-	readonly rechazado: boolean;
+	readonly rejected: boolean;
 	/** Se llama antes de enviar el formulario de cobro. */
-	iniciar(): void;
+	start(): void;
 	/**
 	 * Con el resultado de la action: abre el widget si lo hay. Si no, llama a
 	 * `update` para que SvelteKit siga como siempre.
 	 */
-	procesar(result: ActionResult, update: () => Promise<void>): Promise<void>;
+	process(result: ActionResult, update: () => Promise<void>): Promise<void>;
 }
 
-export function cobroWompi(opciones: CobroWompiOpciones): CobroWompi {
-	let abriendo = $state(false);
-	let confirmando = $state(false);
-	let expirado = $state(false);
-	let rechazado = $state(false);
+export function wompiCharge(options: WompiChargeOptions): WompiCharge {
+	let opening = $state(false);
+	let confirming = $state(false);
+	let isExpired = $state(false);
+	let rejected = $state(false);
 
 	// Mientras Wompi confirma, se vuelve a leer la página hasta que llegue el evento.
 	$effect(() => {
-		if (!confirmando) return;
+		if (!confirming) return;
 
-		const inicio = Date.now();
+		const startAt = Date.now();
 		const timer = setInterval(() => {
-			if (opciones.pagado()) {
-				confirmando = false;
+			if (options.paid()) {
+				confirming = false;
 				clearInterval(timer);
 
 				return;
 			}
 
-			if (Date.now() - inicio >= TIEMPO_MAX_MS) {
-				confirmando = false;
-				expirado = true;
+			if (Date.now() - startAt >= MAX_TIME_MS) {
+				confirming = false;
+				isExpired = true;
 				clearInterval(timer);
 
 				return;
 			}
 
-			void opciones.recargar();
-		}, INTERVALO_MS);
+			void options.reload();
+		}, INTERVAL_MS);
 
 		return () => clearInterval(timer);
 	});
 
 	/** Según la transacción que devuelve Wompi, espera la confirmación o avisa del rechazo. */
-	function resultadoDelPago(transaccion: WompiTransactionResult | null) {
-		if (!transaccion) return;
+	function paymentOutcome(transaction: WompiTransactionResult | null) {
+		if (!transaction) return;
 
-		if (transaccion.status === 'APPROVED' || transaccion.status === 'PENDING') {
-			expirado = false;
-			confirmando = true;
+		if (transaction.status === 'APPROVED' || transaction.status === 'PENDING') {
+			isExpired = false;
+			confirming = true;
 
 			return;
 		}
 
 		// DECLINED, ERROR, VOIDED y cualquier otro estado que no sea de éxito.
-		rechazado = true;
+		rejected = true;
 	}
 
 	return {
-		get abriendo() {
-			return abriendo;
+		get opening() {
+			return opening;
 		},
-		get confirmando() {
-			return confirmando;
+		get confirming() {
+			return confirming;
 		},
-		get expirado() {
-			return expirado;
+		get isExpired() {
+			return isExpired;
 		},
-		get rechazado() {
-			return rechazado;
-		},
-
-		iniciar() {
-			abriendo = true;
-			rechazado = false;
-			expirado = false;
+		get rejected() {
+			return rejected;
 		},
 
-		async procesar(result, update) {
-			const pago = pagoConWidget(result);
+		start() {
+			opening = true;
+			rejected = false;
+			isExpired = false;
+		},
 
-			if (!pago) {
+		async process(result, update) {
+			const payment = widgetPayment(result);
+
+			if (!payment) {
 				await update();
-				abriendo = false;
+				opening = false;
 
 				return;
 			}
@@ -126,15 +126,15 @@ export function cobroWompi(opciones: CobroWompiOpciones): CobroWompi {
 			// Apenas el widget está abierto se reactiva el botón: el widget tapa la
 			// página, y si la clienta lo cierra sin pagar, el botón ya está listo.
 			try {
-				await openWompiWidget(pago.widget, resultadoDelPago);
+				await openWompiWidget(payment.widget, paymentOutcome);
 			} catch {
 				// Si el script de Wompi no carga, la URL de respaldo lleva a la pasarela.
-				window.location.href = pago.url;
+				window.location.href = payment.url;
 
 				return;
 			}
 
-			abriendo = false;
+			opening = false;
 		}
 	};
 }

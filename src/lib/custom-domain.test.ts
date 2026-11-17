@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 
 // Utilidades
-import { customDomainRedirect, esVistaPrevia, redirectToCustomDomain } from '$lib/custom-domain';
+import { customDomainRedirect, isPreview, redirectToCustomDomain } from '$lib/custom-domain';
 
 const base = {
 	slug: 'boutique',
@@ -85,25 +85,25 @@ describe('redirectToCustomDomain', () => {
 });
 
 describe('esVistaPrevia', () => {
-	const sinPreview = { secFetchDest: null, pathname: '/shop', preview: false };
+	const withoutPreview = { secFetchDest: null, pathname: '/shop', preview: false };
 
 	it('una visita normal no es vista previa', () => {
-		expect(esVistaPrevia(sinPreview)).toBe(false);
+		expect(isPreview(withoutPreview)).toBe(false);
 	});
 
 	it('un iframe es vista previa, aunque la ruta sea de la tienda', () => {
-		expect(esVistaPrevia({ ...sinPreview, secFetchDest: 'iframe' })).toBe(true);
-		expect(esVistaPrevia({ ...sinPreview, secFetchDest: 'document' })).toBe(false);
+		expect(isPreview({ ...withoutPreview, secFetchDest: 'iframe' })).toBe(true);
+		expect(isPreview({ ...withoutPreview, secFetchDest: 'document' })).toBe(false);
 	});
 
 	it('las rutas /preview son vista previa', () => {
-		expect(esVistaPrevia({ ...sinPreview, pathname: '/preview' })).toBe(true);
-		expect(esVistaPrevia({ ...sinPreview, pathname: '/preview/cart' })).toBe(true);
-		expect(esVistaPrevia({ ...sinPreview, pathname: '/vista-previas' })).toBe(false);
+		expect(isPreview({ ...withoutPreview, pathname: '/preview' })).toBe(true);
+		expect(isPreview({ ...withoutPreview, pathname: '/preview/cart' })).toBe(true);
+		expect(isPreview({ ...withoutPreview, pathname: '/vista-previas' })).toBe(false);
 	});
 
 	it('una plantilla o tema en prueba es vista previa', () => {
-		expect(esVistaPrevia({ ...sinPreview, preview: true })).toBe(true);
+		expect(isPreview({ ...withoutPreview, preview: true })).toBe(true);
 	});
 });
 

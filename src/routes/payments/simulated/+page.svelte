@@ -42,15 +42,15 @@
 	<dl class="border-border space-y-2 border p-4 text-sm">
 		<div class="flex justify-between gap-4">
 			<dt class="text-muted-foreground">Concepto</dt>
-			<dd class="text-right">{data.concepto}</dd>
+			<dd class="text-right">{data.concept}</dd>
 		</div>
 		<div class="flex justify-between gap-4">
 			<dt class="text-muted-foreground">Total</dt>
-			<dd class="text-lg font-semibold tabular-nums">{formatMoney(data.monto)}</dd>
+			<dd class="text-lg font-semibold tabular-nums">{formatMoney(data.amount)}</dd>
 		</div>
 		<div class="flex justify-between gap-4">
 			<dt class="text-muted-foreground">Referencia</dt>
-			<dd class="text-muted-foreground truncate text-right text-xs">{data.referencia}</dd>
+			<dd class="text-muted-foreground truncate text-right text-xs">{data.reference}</dd>
 		</div>
 	</dl>
 
@@ -67,15 +67,15 @@
 			};
 		}}
 	>
-		<input type="hidden" name="referencia" value={data.referencia} />
-		<input type="hidden" name="monto" value={data.monto} />
-		<input type="hidden" name="volver" value={data.volver} />
+		<input type="hidden" name="referencia" value={data.reference} />
+		<input type="hidden" name="monto" value={data.amount} />
+		<input type="hidden" name="volver" value={data.returnTo} />
 
 		<Button type="submit" class="w-full" disabled={submitting}>
 			<CreditCard class="mr-2 size-4" />
 			{submitting ? 'Confirmando…' : 'Aprobar el pago'}
 		</Button>
 
-		<Button href={data.volver} variant="outline" class="w-full">Cancelar</Button>
+		<Button href={data.returnTo} variant="outline" class="w-full">Cancelar</Button>
 	</form>
 </AuthCard>

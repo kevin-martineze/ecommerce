@@ -106,17 +106,17 @@ export const actions: Actions = {
 		const ctx = panelContext(event);
 		const formData = await event.request.formData();
 
-		let crudo: unknown;
+		let raw: unknown;
 
 		try {
-			crudo = JSON.parse(String(formData.get('options') ?? '[]'));
+			raw = JSON.parse(String(formData.get('options') ?? '[]'));
 		} catch {
 			return fail(400, { error: 'No se entendieron los ejes. Vuelve a intentarlo.' });
 		}
 
 		const parsed = productOptionsSchema.safeParse({
 			productId: event.params.id,
-			options: crudo
+			options: raw
 		});
 
 		if (!parsed.success) {
@@ -134,17 +134,17 @@ export const actions: Actions = {
 		const ctx = panelContext(event);
 		const formData = await event.request.formData();
 
-		let crudo: unknown;
+		let raw: unknown;
 
 		try {
-			crudo = JSON.parse(String(formData.get('attributes') ?? '[]'));
+			raw = JSON.parse(String(formData.get('attributes') ?? '[]'));
 		} catch {
 			return fail(400, { error: 'No se entendieron los datos. Vuelve a intentarlo.' });
 		}
 
 		const parsed = productAttributesSchema.safeParse({
 			productId: event.params.id,
-			attributes: crudo
+			attributes: raw
 		});
 
 		if (!parsed.success) {

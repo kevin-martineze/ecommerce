@@ -102,7 +102,7 @@ export interface PlatformSupportThread {
  *
  * `now` se pasa para que la función sea pura y se pueda probar con fechas fijas.
  */
-export function esperaDesde(iso: string, now: Date = new Date()): string {
+export function waitingSince(iso: string, now: Date = new Date()): string {
 	const minutes = Math.max(0, Math.floor((now.getTime() - new Date(iso).getTime()) / 60_000));
 
 	if (minutes < 60) return `hace ${minutes} min`;

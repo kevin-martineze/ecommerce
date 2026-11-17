@@ -9,7 +9,7 @@ import { getSettings, updateSettings } from '$lib/server/api/panel-content';
 import { failWith, orFail, panelContext } from '$lib/server/context';
 
 // Dominio
-import { ajustesSchema } from '$lib/schemas/admin';
+import { adjustmentsSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	return { current: orFail(await getSettings(panelContext(event))) };
@@ -24,7 +24,7 @@ export const actions: Actions = {
 		const ctx = panelContext(event);
 		const formData = await event.request.formData();
 
-		const parsed = ajustesSchema.safeParse({
+		const parsed = adjustmentsSchema.safeParse({
 			whatsappPhone: String(formData.get('whatsappPhone') ?? '').replace(/\D/g, ''),
 			instagramUrl: formData.get('instagramUrl') ?? '',
 			freeShippingThreshold: String(formData.get('freeShippingThreshold') ?? '') || null

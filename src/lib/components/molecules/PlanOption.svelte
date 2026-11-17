@@ -29,25 +29,25 @@
 	 */
 	interface Props {
 		plan: Plan;
-		seleccionado: boolean;
+		isSelected: boolean;
 		/** El plan que se recomienda: el mismo que destaca la página de precios. */
-		recomendado?: boolean;
-		onseleccionar: () => void;
+		recommended?: boolean;
+		onselect: () => void;
 	}
 
-	let { plan, seleccionado, recomendado = false, onseleccionar }: Props = $props();
+	let { plan, isSelected, recommended = false, onselect }: Props = $props();
 
-	const conAsistente = $derived(plan.ai_replies_per_month > 0);
-	const caracteristicas = $derived(planFeatures(plan));
+	const withAssistant = $derived(plan.ai_replies_per_month > 0);
+	const features = $derived(planFeatures(plan));
 </script>
 
-<label class={cn('block h-full rounded-lg', conAsistente && 'ai-aurora ai-aurora-sutil')}>
+<label class={cn('block h-full rounded-lg', withAssistant && 'ai-aurora ai-aurora-sutil')}>
 	<input
 		type="radio"
 		name="planCode"
 		value={plan.code}
-		checked={seleccionado}
-		onchange={onseleccionar}
+		checked={isSelected}
+		onchange={onselect}
 		class="peer sr-only"
 	/>
 
@@ -55,15 +55,15 @@
 		class={cn(
 			'border-border bg-background flex h-full cursor-pointer flex-col rounded-lg border p-5 transition-colors',
 			'peer-focus-visible:ring-ring peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2',
-			seleccionado ? 'border-foreground bg-muted/40' : 'hover:border-foreground/40',
+			isSelected ? 'border-foreground bg-muted/40' : 'hover:border-foreground/40',
 			// Con aurora el borde lo dibuja el envoltorio: el propio estorba.
-			conAsistente && 'border-transparent'
+			withAssistant && 'border-transparent'
 		)}
 	>
 		<span class="flex items-start justify-between gap-2">
 			<span class="flex flex-wrap items-center gap-2 font-medium">
 				{plan.name}
-				{#if recomendado}
+				{#if recommended}
 					<Badge variant="secondary">Recomendado</Badge>
 				{/if}
 			</span>
@@ -71,10 +71,10 @@
 			<span
 				class={cn(
 					'flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors',
-					seleccionado ? 'border-foreground bg-foreground text-background' : 'border-border'
+					isSelected ? 'border-foreground bg-foreground text-background' : 'border-border'
 				)}
 			>
-				{#if seleccionado}
+				{#if isSelected}
 					<Check class="size-3" />
 				{/if}
 			</span>
@@ -86,18 +86,18 @@
 			>
 		</span>
 
-		{#if conAsistente}
+		{#if withAssistant}
 			<span class="mt-3 flex items-center gap-1.5 text-xs font-medium">
 				<Sparkles class="size-3.5 flex-none" />
 				Con asistente
 			</span>
 		{/if}
 
-		<ul class={cn('text-muted-foreground space-y-2 text-xs', conAsistente ? 'mt-3' : 'mt-5')}>
-			{#each caracteristicas as caracteristica (caracteristica)}
+		<ul class={cn('text-muted-foreground space-y-2 text-xs', withAssistant ? 'mt-3' : 'mt-5')}>
+			{#each features as feature (feature)}
 				<li class="flex gap-1.5">
 					<Check class="mt-0.5 size-3 shrink-0" />
-					<span>{caracteristica}</span>
+					<span>{feature}</span>
 				</li>
 			{/each}
 		</ul>

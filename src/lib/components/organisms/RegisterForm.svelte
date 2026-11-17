@@ -21,7 +21,7 @@
 	import TextField from '$lib/components/molecules/TextField.svelte';
 
 	// Dominio
-	import { TIENDA_MAQUETA } from '$lib/config/maqueta';
+	import { MOCKUP_STORE } from '$lib/config/mockup';
 	import { TRIAL_DAYS } from '$lib/domain/account';
 	import { joinPhone, splitPhone } from '$lib/domain/phone';
 	import { PASSWORD_MIN, registerSchema, storeFieldsSchema } from '$lib/schemas/account';
@@ -66,27 +66,27 @@
 	let { signedIn, addressSuffix, plans, selectedPlan, result }: Props = $props();
 
 	/** Lo tecleado vuelve del servidor para no perderlo cuando algo falla. */
-	const enviado = untrack(() => result?.values ?? {});
+	const sent = untrack(() => result?.values ?? {});
 
 	// Lo que se guarda es un solo número con indicativo; el formulario lo
 	// muestra partido en dos, así que al volver del servidor se reparte.
-	const telefono = untrack(() => splitPhone(enviado.whatsappPhone ?? ''));
+	const phone = untrack(() => splitPhone(sent.whatsappPhone ?? ''));
 
-	let storeName = $state(enviado.storeName ?? '');
-	let whatsappCountry = $state(telefono.code);
-	let whatsappPhone = $state(telefono.number);
-	let fullName = $state(enviado.fullName ?? '');
-	let email = $state(enviado.email ?? '');
+	let storeName = $state(sent.storeName ?? '');
+	let whatsappCountry = $state(phone.code);
+	let whatsappPhone = $state(phone.number);
+	let fullName = $state(sent.fullName ?? '');
+	let email = $state(sent.email ?? '');
 	let password = $state('');
 	let confirm = $state('');
-	let planElegido = $state<string | null>(enviado.planCode ?? null);
+	let chosenPlan = $state<string | null>(sent.planCode ?? null);
 
 	/** Mientras la dueña no la toque, la dirección sigue al nombre. */
-	let slugEdited = $state(Boolean(enviado.storeSlug));
-	let customSlug = $state(enviado.storeSlug ?? '');
+	let slugEdited = $state(Boolean(sent.storeSlug));
+	let customSlug = $state(sent.storeSlug ?? '');
 
 	const storeSlug = $derived(slugEdited ? customSlug : slugify(storeName).slice(0, 40));
-	const planCode = $derived(planElegido ?? selectedPlan ?? '');
+	const planCode = $derived(chosenPlan ?? selectedPlan ?? '');
 
 	/**
 	 * La tarjeta vive solo acá y no sale de este navegador: al enviar se cambia
@@ -98,19 +98,19 @@
 	/** Campos que se volvieron a tocar: su error del servidor ya no aplica. */
 	let touched = $state<Record<string, boolean>>({});
 
-	let formulario = $state<HTMLFormElement | null>(null);
+	let formElement = $state<HTMLFormElement | null>(null);
 
 	/**
 	 * Sin JavaScript no hay pasos: todo se ve de una vez y se envía de una vez.
 	 * El servidor renderiza así, y solo al hidratar se reparte en pasos.
 	 */
-	let hidratado = $state(false);
-	let pasoActual = $state(0);
+	let hydrated = $state(false);
+	let currentStep = $state(0);
 
 	// `onMount` y no `$effect`: no se reacciona a nada, se constata que hay
 	// JavaScript corriendo.
 	onMount(() => {
-		hidratado = true;
+		hydrated = true;
 	});
 
 	const values = $derived({
@@ -141,35 +141,35 @@
 	 * Los pasos se arman con los que de verdad se piden: con sesión no se pide
 	 * la cuenta, y sin precios no hay plan que elegir.
 	 */
-	const pasos = $derived(
+	const steps = $derived(
 		[
-			plans.length > 0 ? { id: 'plan', titulo: 'Plan', campos: [] as Campo[] } : null,
+			plans.length > 0 ? { id: 'plan', title: 'Plan', fields: [] as Campo[] } : null,
 			{
 				id: 'tienda',
-				titulo: 'Tu tienda',
-				campos: ['storeName', 'whatsappPhone', 'storeSlug'] as Campo[]
+				title: 'Tu tienda',
+				fields: ['storeName', 'whatsappPhone', 'storeSlug'] as Campo[]
 			},
 			signedIn
 				? null
 				: {
 						id: 'cuenta',
-						titulo: 'Tu cuenta',
-						campos: ['fullName', 'email', 'password', 'confirm'] as Campo[]
+						title: 'Tu cuenta',
+						fields: ['fullName', 'email', 'password', 'confirm'] as Campo[]
 					}
 			// No hay paso de pago: los primeros días son gratis, y la tarjeta se
 			// pone después desde el panel, en Plan.
-		].filter((paso) => paso !== null)
+		].filter((step) => step !== null)
 	);
 
-	const titulos = $derived(pasos.map((paso) => paso.titulo));
-	const enElUltimo = $derived(pasoActual >= pasos.length - 1);
+	const titles = $derived(steps.map((step) => step.title));
+	const enElUltimo = $derived(currentStep >= steps.length - 1);
 
 	/** Se validan solo los campos que se piden: con sesión, los de la cuenta ni se pintan. */
-	const campos = $derived(pasos.flatMap((paso) => paso.campos));
+	const fields = $derived(steps.flatMap((step) => step.fields));
 
 	/** Antes de hidratar se ve todo; después, solo el paso en curso. */
-	function oculto(id: string): boolean {
-		return hidratado && pasos[pasoActual]?.id !== id;
+	function hidden(id: string): boolean {
+		return hydrated && steps[currentStep]?.id !== id;
 	}
 
 	function setError(field: string, message: string | null) {
@@ -203,13 +203,13 @@
 	}
 
 	/** El paso donde vive un campo, para no dejar un error en una pantalla que no se ve. */
-	function pasoDe(campo: string): number {
-		return pasos.findIndex((paso) => paso.campos.some((suyo) => suyo === campo));
+	function stepOf(fieldName: string): number {
+		return steps.findIndex((step) => step.fields.some((own) => own === fieldName));
 	}
 
-	async function enfocar(campo: string) {
+	async function focusOn(fieldName: string) {
 		await tick();
-		formulario?.querySelector<HTMLInputElement>(`[name="${campo}"]`)?.focus();
+		formElement?.querySelector<HTMLInputElement>(`[name="${fieldName}"]`)?.focus();
 	}
 
 	/**
@@ -217,34 +217,34 @@
 	 * esté. Un error en un paso oculto es un formulario que no se deja enviar
 	 * sin decir por qué.
 	 */
-	async function irAlPrimerError(fallos: FieldErrors) {
-		const primero = campos.find((campo) => campo in fallos);
+	async function irAlPrimerError(failures: FieldErrors) {
+		const firstOne = fields.find((fieldName) => fieldName in failures);
 
-		if (!primero) return;
+		if (!firstOne) return;
 
-		const indice = pasoDe(primero);
+		const index = stepOf(firstOne);
 
-		if (indice >= 0) pasoActual = indice;
+		if (index >= 0) currentStep = index;
 
-		await enfocar(primero);
+		await focusOn(firstOne);
 	}
 
 	/** Avanza solo si lo de este paso está bien: así el error se corrige donde se escribió. */
-	function siguiente() {
-		const actual = pasos[pasoActual];
+	function nextStep() {
+		const actual = steps[currentStep];
 
 		if (!actual) return;
 
-		for (const campo of actual.campos) check(campo);
+		for (const fieldName of actual.fields) check(fieldName);
 
-		const fallo = actual.campos.find((campo) => campo in clientErrors);
+		const failure = actual.fields.find((fieldName) => fieldName in clientErrors);
 
-		if (fallo) {
-			void enfocar(fallo);
+		if (failure) {
+			void focusOn(failure);
 			return;
 		}
 
-		pasoActual = Math.min(pasoActual + 1, pasos.length - 1);
+		currentStep = Math.min(currentStep + 1, steps.length - 1);
 	}
 </script>
 
@@ -257,14 +257,14 @@
 <form
 	method="POST"
 	novalidate
-	bind:this={formulario}
+	bind:this={formElement}
 	class="space-y-8"
 	use:enhance={async ({ cancel }) => {
 		// Enter dentro de un campo envía el formulario. Si aún faltan pasos, eso
 		// no es "quiero registrarme": es "quiero seguir".
-		if (hidratado && !enElUltimo) {
+		if (hydrated && !enElUltimo) {
 			cancel();
-			siguiente();
+			nextStep();
 
 			return;
 		}
@@ -272,11 +272,11 @@
 		const parsed = schema.safeParse(values);
 
 		if (!parsed.success) {
-			const fallos = fieldErrors(parsed.error);
+			const failures = fieldErrors(parsed.error);
 
-			clientErrors = fallos;
+			clientErrors = failures;
 			cancel();
-			void irAlPrimerError(fallos);
+			void irAlPrimerError(failures);
 
 			return;
 		}
@@ -289,31 +289,31 @@
 
 			// Lo que solo sabe el servidor —una dirección ya tomada, un correo
 			// repetido— llega después del envío, y puede caer en un paso atrás.
-			const devueltos = result?.errors;
+			const returned = result?.errors;
 
-			if (devueltos) await irAlPrimerError(devueltos);
+			if (returned) await irAlPrimerError(returned);
 		};
 	}}
 >
-	{#if hidratado && pasos.length > 1}
-		<Stepper pasos={titulos} actual={pasoActual} onir={(indice) => (pasoActual = indice)} />
+	{#if hydrated && steps.length > 1}
+		<Stepper steps={titles} actual={currentStep} ongo={(index) => (currentStep = index)} />
 	{/if}
 
-	{#if !hidratado}
+	{#if !hydrated}
 		<p class="text-muted-foreground text-xs">Todos los campos son obligatorios.</p>
 	{/if}
 
 	{#if plans.length > 0}
-		<fieldset class="space-y-4" hidden={oculto('plan')}>
+		<fieldset class="space-y-4" hidden={hidden('plan')}>
 			<legend class="mb-3 text-sm font-medium">Elige tu plan</legend>
 
 			<div class="grid gap-3 sm:grid-cols-3">
-				{#each plans as plan, indice (plan.code)}
+				{#each plans as plan, index (plan.code)}
 					<PlanOption
 						{plan}
-						seleccionado={planCode === plan.code}
-						recomendado={indice === plans.length - 1}
-						onseleccionar={() => (planElegido = plan.code)}
+						isSelected={planCode === plan.code}
+						recommended={index === plans.length - 1}
+						onselect={() => (chosenPlan = plan.code)}
 					/>
 				{/each}
 			</div>
@@ -329,7 +329,7 @@
 		</fieldset>
 	{/if}
 
-	<fieldset class="space-y-4" hidden={oculto('tienda')}>
+	<fieldset class="space-y-4" hidden={hidden('tienda')}>
 		<legend class="mb-3 text-sm font-medium">Tu tienda</legend>
 
 		<div class="grid gap-4 sm:grid-cols-2">
@@ -340,7 +340,7 @@
 				error={errors.storeName}
 				required
 				maxlength={80}
-				placeholder={TIENDA_MAQUETA.nombre}
+				placeholder={MOCKUP_STORE.name}
 				oninput={() => clear('storeName')}
 				onblur={() => check('storeName')}
 			/>
@@ -379,7 +379,7 @@
 	</fieldset>
 
 	{#if !signedIn}
-		<fieldset class="space-y-4" hidden={oculto('cuenta')}>
+		<fieldset class="space-y-4" hidden={hidden('cuenta')}>
 			<legend class="mb-3 text-sm font-medium">Tu cuenta</legend>
 
 			<div class="grid gap-4 sm:grid-cols-2">
@@ -441,13 +441,13 @@
 	{/if}
 
 	<div class="space-y-3">
-		{#if hidratado && plans.length > 0 && pasos[pasoActual]?.id !== 'plan'}
+		{#if hydrated && plans.length > 0 && steps[currentStep]?.id !== 'plan'}
 			<!-- Lo que se está comprando no desaparece al pasar de paso: decidir el
 			     plan y luego no verlo más es la forma fácil de dudar al final. -->
-			{@const elegido = plans.find((plan) => plan.code === planCode)}
-			{#if elegido}
+			{@const chosen = plans.find((plan) => plan.code === planCode)}
+			{#if chosen}
 				<p class="text-muted-foreground text-xs">
-					Plan {elegido.name} · {formatMoney(elegido.price_cop)} / mes, gratis los primeros {TRIAL_DAYS}
+					Plan {chosen.name} · {formatMoney(chosen.price_cop)} / mes, gratis los primeros {TRIAL_DAYS}
 					días.
 				</p>
 			{/if}
@@ -458,15 +458,15 @@
 		     paso no es la decisión más importante de la página. `Atrás` se empuja
 		     al otro extremo para que no compita con ella. -->
 		<div class="flex items-center justify-end gap-3">
-			{#if hidratado && pasoActual > 0}
-				<Button type="button" variant="outline" class="mr-auto" onclick={() => (pasoActual -= 1)}>
+			{#if hydrated && currentStep > 0}
+				<Button type="button" variant="outline" class="mr-auto" onclick={() => (currentStep -= 1)}>
 					<ArrowLeft class="size-4" />
 					Atrás
 				</Button>
 			{/if}
 
-			{#if hidratado && !enElUltimo}
-				<Button type="button" onclick={siguiente}>Continuar</Button>
+			{#if hydrated && !enElUltimo}
+				<Button type="button" onclick={nextStep}>Continuar</Button>
 			{:else}
 				<Button type="submit" disabled={submitting}>
 					{submitting ? 'Creando tu tienda…' : 'Crear mi tienda'}

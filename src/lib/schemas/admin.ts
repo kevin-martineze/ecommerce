@@ -13,20 +13,20 @@ import { parseAmount } from '$lib/utils/money';
  * un monto (signo, decimal, letra) no pasa: el esquema lo rechaza. Así "-5" no
  * se vuelve 5 y "8.9" no se vuelve 89.
  */
-const MONTO_ESCRITO = /^\s*\$?\s*(\d+|\d{1,3}([.\s]\d{3})+)\s*$/;
+const TYPED_AMOUNT = /^\s*\$?\s*(\d+|\d{1,3}([.\s]\d{3})+)\s*$/;
 
 /** Lo que llega del formulario: un monto escrito se lee; cualquier otra cosa pasa tal cual. */
-function leerMonto(value: unknown): unknown {
+function readAmount(value: unknown): unknown {
 	if (typeof value !== 'string') return value;
 	if (value.trim() === '') return undefined;
-	if (!MONTO_ESCRITO.test(value)) return value;
+	if (!TYPED_AMOUNT.test(value)) return value;
 
 	return parseAmount(value) ?? undefined;
 }
 
 /** Precios en pesos enteros: la administradora los escribe con o sin puntos. */
 const price = z.preprocess(
-	leerMonto,
+	readAmount,
 	z
 		.number({
 			required_error: 'Escribe un precio.',
@@ -134,7 +134,7 @@ export const couponSchema = z
 			.regex(/^[A-Z0-9]{3,40}$/, 'Solo letras y números, entre 3 y 40 caracteres.'),
 		type: z.enum(['percent', 'fixed']),
 		value: z.preprocess(
-			leerMonto,
+			readAmount,
 			z
 				.number({
 					required_error: 'Escribe el valor del cupón.',
@@ -163,13 +163,13 @@ export const shippingZoneSchema = z.object({
 });
 
 /** La marca que se edita en Diseño: el nombre y la barra de anuncio. */
-export const tiendaSchema = z.object({
+export const storeSchema = z.object({
 	storeName: z.string().trim().min(2, 'Escribe el nombre de la tienda.').max(80),
 	announcement: z.string().trim().max(160, 'Máximo 160 caracteres.').optional().default('')
 });
 
 /** Lo de Ajustes: WhatsApp, Instagram y el envío gratis. No es diseño. */
-export const ajustesSchema = z.object({
+export const adjustmentsSchema = z.object({
 	whatsappPhone: z
 		.string()
 		.trim()
@@ -193,8 +193,8 @@ export const collectionSchema = z.object({
 export type ProductInput = z.infer<typeof productSchema>;
 export type CouponInput = z.infer<typeof couponSchema>;
 export type ShippingZoneInput = z.infer<typeof shippingZoneSchema>;
-export type TiendaInput = z.infer<typeof tiendaSchema>;
-export type AjustesInput = z.infer<typeof ajustesSchema>;
+export type StoreInput = z.infer<typeof storeSchema>;
+export type AdjustmentsInput = z.infer<typeof adjustmentsSchema>;
 export type CollectionInput = z.infer<typeof collectionSchema>;
 
 /** Categorías: cómo agrupa la tienda sus productos. */

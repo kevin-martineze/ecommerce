@@ -51,10 +51,10 @@ describe('subscriptionNotice', () => {
 	});
 
 	it('el aviso dice cómo pagar según haya pasarela o no', () => {
-		const vencida = { store_status: 'past_due', days_left: -2 } as const;
+		const overdue = { store_status: 'past_due', days_left: -2 } as const;
 
-		expect(subscriptionNotice(summary(vencida))?.text).toContain('Escríbenos');
-		expect(subscriptionNotice(summary({ ...vencida, self_service_billing: true }))?.text).toContain(
+		expect(subscriptionNotice(summary(overdue))?.text).toContain('Escríbenos');
+		expect(subscriptionNotice(summary({ ...overdue, self_service_billing: true }))?.text).toContain(
 			'Tu plan'
 		);
 	});
@@ -86,7 +86,7 @@ describe('usagePercent', () => {
 });
 
 describe('planFeatures', () => {
-	const basico: Plan = {
+	const basic: Plan = {
 		code: 'basico',
 		name: 'Básico',
 		price_cop: 49000,
@@ -99,32 +99,32 @@ describe('planFeatures', () => {
 	};
 
 	it('un límite se cuenta y se concuerda en plural', () => {
-		expect(planFeatures(basico)).toContain('Hasta 100 productos');
-		expect(planFeatures({ ...basico, max_products: 1 })).toContain('Hasta 1 producto');
+		expect(planFeatures(basic)).toContain('Hasta 100 productos');
+		expect(planFeatures({ ...basic, max_products: 1 })).toContain('Hasta 1 producto');
 	});
 
 	it('el pago en línea va en todos los planes: no depende del plan', () => {
-		for (const plan of [basico, { ...basico, max_products: null, custom_domain: true }]) {
+		for (const plan of [basic, { ...basic, max_products: null, custom_domain: true }]) {
 			expect(planFeatures(plan).some((f) => f.startsWith('Pagos en línea'))).toBe(true);
 		}
 	});
 
 	it('sin límite no dice "null"', () => {
-		const features = planFeatures({ ...basico, max_products: null, max_orders_per_month: null });
+		const features = planFeatures({ ...basic, max_products: null, max_orders_per_month: null });
 
 		expect(features).toContain('Productos sin límite');
 		expect(features.join(' ')).not.toContain('null');
 	});
 
 	it('el dominio propio solo se promete si el plan lo incluye', () => {
-		expect(planFeatures({ ...basico, custom_domain: true })).toContain('Tu propio dominio');
-		expect(planFeatures(basico).some((f) => f.includes('globerce.store'))).toBe(true);
+		expect(planFeatures({ ...basic, custom_domain: true })).toContain('Tu propio dominio');
+		expect(planFeatures(basic).some((f) => f.includes('globerce.store'))).toBe(true);
 	});
 
 	it('el asistente se anuncia con su cuota, y solo donde va incluido', () => {
-		const conAsistente = planFeatures({ ...basico, ai_replies_per_month: 500 });
+		const withAssistant = planFeatures({ ...basic, ai_replies_per_month: 500 });
 
-		expect(conAsistente.some((f) => f.includes('Asistente') && f.includes('500'))).toBe(true);
-		expect(planFeatures(basico).some((f) => f.includes('Asistente'))).toBe(false);
+		expect(withAssistant.some((f) => f.includes('Asistente') && f.includes('500'))).toBe(true);
+		expect(planFeatures(basic).some((f) => f.includes('Asistente'))).toBe(false);
 	});
 });

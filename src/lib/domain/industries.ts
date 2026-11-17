@@ -10,7 +10,7 @@
  * entre diecinueve que no sirven, que es justo el problema que tenía el modelo
  * anterior con sus dos ejes fijos.
  */
-export interface Rubro {
+export interface Industry {
 	id: string;
 	/** Cómo se llama en el botón. */
 	label: string;
@@ -24,7 +24,7 @@ const NEGRO = '#141414';
 const BLANCO = '#FFFFFF';
 const BEIGE = '#D8C3A5';
 
-export const RUBROS: readonly Rubro[] = [
+export const INDUSTRIES: readonly Industry[] = [
 	{
 		id: 'ropa',
 		label: 'Ropa',

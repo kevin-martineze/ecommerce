@@ -41,9 +41,9 @@
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 
 	// Dominio
+	import { buildDraft, focusFor, type Section, sectionFrom } from '$lib/domain/design';
 	import { describeDesignChanges, type DesignSnapshot } from '$lib/domain/design-changes';
-	import { armarBorrador, focoDe, type Seccion, seccionDe } from '$lib/domain/diseno';
-	import { destinoDeZona, type EditableZoneName } from '$lib/domain/editable-zones';
+	import { zoneTarget, type EditableZoneName } from '$lib/domain/editable-zones';
 	import { accentProblem, isEmptyTheme } from '$lib/domain/theme';
 
 	// Utilidades
@@ -56,14 +56,14 @@
 
 	let { data }: Props = $props();
 
-	const SECCIONES_TABS: { id: Seccion; label: string }[] = [
+	const SECTION_TABS: { id: Section; label: string }[] = [
 		{ id: 'estilo', label: 'Estilo' },
 		{ id: 'marca', label: 'Marca' },
 		{ id: 'portada', label: 'Portada' }
 	];
 
 	/** La sección que se ve sale de la URL: así se puede volver a ella y compartirla. */
-	const seccion = $derived(seccionDe(page.url.search));
+	const section = $derived(sectionFrom(page.url.search));
 
 	// Copia editable de lo guardado. Un solo Guardar envía todo lo escalar junto.
 	let template = $state(untrack(() => data.settings.template));
@@ -78,7 +78,7 @@
 	let heroSubtitle = $state(untrack(() => data.settings.hero_subtitle ?? ''));
 
 	/** Cuando la dueña entra a la lista de mensajes, la vista previa resalta esa zona. */
-	let enMensajes = $state(false);
+	let inMessages = $state(false);
 
 	let device = $state<'desktop' | 'mobile'>('desktop');
 	let path = $state('/');
@@ -143,8 +143,8 @@
 	}
 
 	/** El bloque que se quiere borrar; el diálogo dice cuál es antes de enviar. */
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 
 	const collectionOptions = $derived([
 		{ value: '', label: 'Ninguna: usar mi propio título' },
@@ -157,7 +157,7 @@
 
 	/** Lo que la vista previa muestra: un solo borrador con todo, y la zona de la sección. */
 	const draft = $derived(
-		armarBorrador({
+		buildDraft({
 			template,
 			accent,
 			fonts,
@@ -169,13 +169,13 @@
 			heroTitle,
 			heroSubtitle,
 			highlights: draftHighlights,
-			foco: enMensajes && seccion === 'portada' ? 'highlights' : focoDe(seccion)
+			focusZone: inMessages && section === 'portada' ? 'highlights' : focusFor(section)
 		})
 	);
 
 	const saved = $derived(data.settings);
 
-	const guardadoSnap = $derived<DesignSnapshot>({
+	const savedSnapshot = $derived<DesignSnapshot>({
 		template: saved.template,
 		accent: saved.theme.accent ?? '',
 		fonts: saved.theme.fonts ?? '',
@@ -188,7 +188,7 @@
 		heroSubtitle: saved.hero_subtitle ?? ''
 	});
 
-	const borradorSnap = $derived<DesignSnapshot>({
+	const draftSnapshot = $derived<DesignSnapshot>({
 		template,
 		accent,
 		fonts,
@@ -202,16 +202,16 @@
 	});
 
 	/** Los diálogos de Guardar y Descartar. */
-	let guardarAbierto = $state(false);
-	let descartarAbierto = $state(false);
+	let saveDialogOpen = $state(false);
+	let discardDialogOpen = $state(false);
 
 	const plural = (n: number) => (n === 1 ? 'cambio' : 'cambios');
 
 	/** Las diferencias con lo guardado, en el orden de las secciones. */
-	const cambios = $derived(describeDesignChanges(guardadoSnap, borradorSnap, data.collections));
+	const changes = $derived(describeDesignChanges(savedSnapshot, draftSnapshot, data.collections));
 
 	/** Hay cambios escalares sin guardar. Los mensajes y el logo no cuentan: se guardan solos. */
-	const changed = $derived(cambios.length > 0);
+	const changed = $derived(changes.length > 0);
 
 	const invalid = $derived(accentProblem(template, accent) !== null);
 
@@ -227,24 +227,24 @@
 	 * Un clic en una zona editable de la vista previa: abre la sección de Diseño
 	 * que la edita, sin tocar el borrador, y enfoca el campo con un pulso breve.
 	 */
-	async function editarZona(zona: EditableZoneName) {
-		const destino = destinoDeZona(zona);
+	async function editZone(zone: EditableZoneName) {
+		const destinationZone = zoneTarget(zone);
 
-		await goto(destino.url, { replaceState: true, keepFocus: true, noScroll: true });
+		await goto(destinationZone.url, { replaceState: true, keepFocus: true, noScroll: true });
 		await tick();
 
-		if (!destino.campo) return;
+		if (!destinationZone.field) return;
 
-		const campo = document.getElementById(destino.campo);
+		const field = document.getElementById(destinationZone.field);
 
-		if (!campo) return;
+		if (!field) return;
 
 		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		campo.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
-		campo.focus({ preventScroll: true });
-		campo.classList.add('pulso-edicion');
-		window.setTimeout(() => campo.classList.remove('pulso-edicion'), 1000);
+		field.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+		field.focus({ preventScroll: true });
+		field.classList.add('pulso-edicion');
+		window.setTimeout(() => field.classList.remove('pulso-edicion'), 1000);
 	}
 
 	function discard() {
@@ -271,7 +271,7 @@
 	 * El Guardar envía todo lo escalar desde el estado, no desde los campos: así
 	 * una sección cerrada no pierde lo que la dueña escribió en ella.
 	 */
-	const alGuardar: SubmitFunction = ({ formData }) => {
+	const onSave: SubmitFunction = ({ formData }) => {
 		formData.set('template', template);
 		formData.set('accent', accent);
 		formData.set('fonts', fonts);
@@ -288,7 +288,7 @@
 		return async ({ update }) => {
 			await update({ reset: false });
 			saving = false;
-			guardarAbierto = false;
+			saveDialogOpen = false;
 		};
 	};
 
@@ -301,7 +301,7 @@
 			changed &&
 			!saving &&
 			!confirm(
-				`Tienes ${cambios.length} ${plural(cambios.length)} sin guardar. ¿Salir sin guardarlos?`
+				`Tienes ${changes.length} ${plural(changes.length)} sin guardar. ¿Salir sin guardarlos?`
 			)
 		) {
 			cancel();
@@ -394,7 +394,7 @@
 				variant="outline"
 				size="sm"
 				disabled={!changed || saving}
-				onclick={() => (descartarAbierto = true)}
+				onclick={() => (discardDialogOpen = true)}
 			>
 				Descartar
 			</Button>
@@ -402,7 +402,7 @@
 				type="button"
 				size="sm"
 				disabled={!changed || invalid || saving}
-				onclick={() => (guardarAbierto = true)}
+				onclick={() => (saveDialogOpen = true)}
 			>
 				{saving ? 'Guardando…' : 'Guardar'}
 			</Button>
@@ -412,24 +412,24 @@
 	<div class="grid min-h-0 flex-1 lg:grid-cols-[22rem_minmax(0,1fr)]">
 		<aside class="border-border min-h-0 overflow-y-auto border-b lg:border-r lg:border-b-0">
 			<nav class="border-border flex gap-1 border-b p-2" aria-label="Secciones de Diseño">
-				{#each SECCIONES_TABS as tab (tab.id)}
+				{#each SECTION_TABS as tab (tab.id)}
 					<a
 						href="?section={tab.id}"
-						aria-current={seccion === tab.id ? 'page' : undefined}
+						aria-current={section === tab.id ? 'page' : undefined}
 						class={cn(
 							'flex-1 rounded-md px-2 py-1.5 text-center text-sm transition-colors',
-							seccion === tab.id
+							section === tab.id
 								? 'bg-muted text-foreground font-medium'
 								: 'text-muted-foreground hover:text-foreground'
 						)}
-						onclick={() => (enMensajes = false)}
+						onclick={() => (inMessages = false)}
 					>
 						{tab.label}
 					</a>
 				{/each}
 			</nav>
 
-			{#if seccion === 'estilo'}
+			{#if section === 'estilo'}
 				<ThemeControls bind:template bind:accent bind:fonts bind:corners bind:hero />
 
 				<div class="border-border border-t p-5">
@@ -448,7 +448,7 @@
 						Deja la plantilla como viene. Se aplica al guardar.
 					</p>
 				</div>
-			{:else if seccion === 'marca'}
+			{:else if section === 'marca'}
 				<div class="space-y-6 p-5">
 					<div class="space-y-2">
 						<Label for="storeName">Nombre de la tienda</Label>
@@ -519,7 +519,7 @@
 								size="sm"
 								class="text-destructive"
 								onclick={() =>
-									borrado.ask('quitar-logo', '¿Quitar el logo?', {
+									deletion.ask('quitar-logo', '¿Quitar el logo?', {
 										description: 'La tienda vuelve a mostrar el nombre.',
 										confirmLabel: 'Quitar',
 										pendingLabel: 'Quitando…'
@@ -598,7 +598,7 @@
 						id="mensajes-de-abajo"
 						role="group"
 						aria-label="Mensajes de abajo"
-						onfocusin={() => (enMensajes = true)}
+						onfocusin={() => (inMessages = true)}
 					>
 						<div class="flex items-center justify-between gap-2">
 							<h2 class="text-sm font-semibold">Mensajes de abajo</h2>
@@ -743,7 +743,7 @@
 											</div>
 										</div>
 
-										{#snippet acciones()}
+										{#snippet actionList()}
 											<Button
 												type="submit"
 												form="bloque-{highlight.id}"
@@ -760,7 +760,7 @@
 												class="text-destructive"
 												aria-label="Borrar mensaje"
 												onclick={() =>
-													borrado.ask(
+													deletion.ask(
 														`borrar-bloque-${highlight.id}`,
 														`¿Borrar el mensaje «${highlight.title}»?`,
 														{
@@ -787,42 +787,42 @@
 				{draft}
 				{device}
 				title="Vista previa de tu tienda"
-				onedit={editarZona}
+				onedit={editZone}
 			/>
 		</section>
 	</div>
 </div>
 
 <ConfirmDialog
-	bind:open={guardarAbierto}
-	title="¿Guardar {cambios.length} {plural(cambios.length)} en tu tienda?"
+	bind:open={saveDialogOpen}
+	title="¿Guardar {changes.length} {plural(changes.length)} en tu tienda?"
 	confirmLabel="Guardar cambios"
 	pendingLabel="Guardando…"
 	form="diseno"
 	pending={saving}
 >
-	<ChangeList {cambios} />
+	<ChangeList {changes} />
 	<p class="text-muted-foreground text-xs">Se publica en tu tienda al guardar.</p>
 </ConfirmDialog>
 
 <ConfirmDialog
-	bind:open={descartarAbierto}
-	title="¿Descartar {cambios.length} {plural(cambios.length)} sin guardar?"
+	bind:open={discardDialogOpen}
+	title="¿Descartar {changes.length} {plural(changes.length)} sin guardar?"
 	confirmLabel="Descartar"
 	cancelLabel="Seguir editando"
 	variant="destructive"
 	onconfirm={() => {
 		discard();
-		descartarAbierto = false;
+		discardDialogOpen = false;
 	}}
 >
-	<ChangeList {cambios} modo="descartar" />
+	<ChangeList {changes} mode="descartar" />
 </ConfirmDialog>
 
 <ActionToasts />
 
 <!-- Lo escalar se guarda con un solo Guardar: el botón del encabezado envía este form. -->
-<form id="diseno" method="POST" action="?/save" use:enhance={alGuardar} hidden></form>
+<form id="diseno" method="POST" action="?/save" use:enhance={onSave} hidden></form>
 
 <!-- Los bloques de abajo: cada uno tiene su form, referenciado por id desde sus botones. -->
 <div hidden>
@@ -835,21 +835,21 @@
 			id="borrar-bloque-{highlight.id}"
 			method="POST"
 			action="?/deleteBlock"
-			use:enhance={alBorrar}
+			use:enhance={onDelete}
 		>
 			<input type="hidden" name="id" value={highlight.id} />
 		</form>
 	{/each}
 
-	<form id="quitar-logo" method="POST" action="?/removeLogo" use:enhance={alBorrar}></form>
+	<form id="quitar-logo" method="POST" action="?/removeLogo" use:enhance={onDelete}></form>
 </div>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

@@ -3,7 +3,7 @@
 	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
 
 	// Dominio
-	import { EMPRESA } from '$lib/config/empresa';
+	import { COMPANY } from '$lib/config/company';
 	import { TRIAL_DAYS } from '$lib/domain/account';
 </script>
 
@@ -14,14 +14,14 @@
 
 <LegalPage
 	title="Términos del servicio"
-	summary="Las condiciones con las que {EMPRESA.marca} le presta el servicio a tu tienda."
+	summary="Las condiciones con las que {COMPANY.brand} le presta el servicio a tu tienda."
 >
 	<section>
 		<h2>1. Qué es este servicio</h2>
 		<p>
-			{EMPRESA.marca} es un servicio por suscripción para que una marca de ropa publique su catálogo en
+			{COMPANY.brand} es un servicio por suscripción para que una marca de ropa publique su catálogo en
 			internet, lleve su inventario y reciba pedidos. Los pedidos se cierran por WhatsApp, entre la tienda
-			y su cliente: {EMPRESA.marca} no cobra las ventas, no procesa pagos de las compras ni interviene
+			y su cliente: {COMPANY.brand} no cobra las ventas, no procesa pagos de las compras ni interviene
 			en el envío.
 		</p>
 	</section>
@@ -49,7 +49,7 @@
 		<p>
 			A cambio, respondes por tener derecho a publicarlos y por cumplir la ley que le aplique a lo
 			que vendes: descripciones ciertas, precios claros, derecho de retracto y garantías de tus
-			clientes. No se puede usar {EMPRESA.marca} para vender lo que la ley prohíbe.
+			clientes. No se puede usar {COMPANY.brand} para vender lo que la ley prohíbe.
 		</p>
 	</section>
 
@@ -124,7 +124,7 @@
 		<p>
 			Si cambiamos estos términos te avisamos por correo antes de que rijan. Seguir usando el
 			servicio después de esa fecha significa aceptarlos. Estos términos se rigen por las leyes de
-			{EMPRESA.pais}.
+			{COMPANY.pais}.
 		</p>
 		<p>
 			¿Dudas? Escríbenos desde <a href="/contact">la página de contacto</a>.

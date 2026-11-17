@@ -66,8 +66,8 @@
 	);
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -221,7 +221,7 @@
 										id="borrar-cupon-{coupon.id}"
 										method="POST"
 										action="?/delete"
-										use:enhance={alBorrar}
+										use:enhance={onDelete}
 									>
 										<input type="hidden" name="id" value={coupon.id} />
 										<Button
@@ -231,7 +231,7 @@
 											class="text-destructive"
 											aria-label="Borrar cupón {coupon.code}"
 											onclick={() =>
-												borrado.ask(
+												deletion.ask(
 													`borrar-cupon-${coupon.id}`,
 													`¿Borrar el cupón ${coupon.code}?`,
 													{ description: 'Si ya se usó, se desactiva en vez de borrarse.' }
@@ -251,11 +251,11 @@
 </LivePreviewLayout>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

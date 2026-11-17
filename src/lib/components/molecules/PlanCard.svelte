@@ -20,30 +20,30 @@
 	interface Props {
 		plan: Plan;
 		/** El plan superior se pinta con más peso: es el que se recomienda. */
-		destacado?: boolean;
+		featured?: boolean;
 	}
 
-	let { plan, destacado = false }: Props = $props();
+	let { plan, featured = false }: Props = $props();
 
-	const caracteristicas = $derived(planFeatures(plan));
+	const features = $derived(planFeatures(plan));
 	/** Los planes con asistente se enmarcan con la aurora: es lo que los distingue. */
-	const conAsistente = $derived(plan.ai_replies_per_month > 0);
+	const withAssistant = $derived(plan.ai_replies_per_month > 0);
 </script>
 
-<div class={cn('h-full rounded-lg', conAsistente && 'ai-aurora')}>
+<div class={cn('h-full rounded-lg', withAssistant && 'ai-aurora')}>
 	<div
 		class={cn(
 			'border-border bg-background flex h-full flex-col rounded-lg border p-8',
 			// El plan recomendado se lee primero: fondo oscuro, no un borde más
 			// grueso, que a dos metros de la pantalla no se distingue.
-			destacado && 'bg-foreground text-background border-foreground shadow-xl',
+			featured && 'bg-foreground text-background border-foreground shadow-xl',
 			// Con aurora el borde lo dibuja el envoltorio: el propio estorba.
-			conAsistente && 'border-transparent'
+			withAssistant && 'border-transparent'
 		)}
 	>
 		<div class="flex items-center justify-between gap-3">
 			<h3 class="text-xl font-medium">{plan.name}</h3>
-			{#if destacado}
+			{#if featured}
 				<Badge variant="secondary">Recomendado</Badge>
 			{/if}
 		</div>
@@ -53,18 +53,18 @@
 			{formatMoney(plan.price_cop)}<span
 				class={cn(
 					'text-base font-normal',
-					destacado ? 'text-background/70' : 'text-muted-foreground'
+					featured ? 'text-background/70' : 'text-muted-foreground'
 				)}
 			>
 				/ mes</span
 			>
 		</p>
 
-		{#if conAsistente}
+		{#if withAssistant}
 			<p
 				class={cn(
 					'mt-5 flex items-center gap-2 text-sm font-medium',
-					destacado ? 'text-background' : 'text-foreground'
+					featured ? 'text-background' : 'text-foreground'
 				)}
 			>
 				<Sparkles class="size-4 flex-none" />
@@ -72,11 +72,11 @@
 			</p>
 		{/if}
 
-		<ul class={cn('mb-8 space-y-3 text-sm', conAsistente ? 'mt-4' : 'mt-7')}>
-			{#each caracteristicas as caracteristica (caracteristica)}
+		<ul class={cn('mb-8 space-y-3 text-sm', withAssistant ? 'mt-4' : 'mt-7')}>
+			{#each features as feature (feature)}
 				<li class="flex items-start gap-2.5">
-					<Check class={cn('mt-0.5 size-4 flex-none', destacado && 'text-background/80')} />
-					<span class={destacado ? 'text-background/90' : undefined}>{caracteristica}</span>
+					<Check class={cn('mt-0.5 size-4 flex-none', featured && 'text-background/80')} />
+					<span class={featured ? 'text-background/90' : undefined}>{feature}</span>
 				</li>
 			{/each}
 		</ul>
@@ -89,14 +89,14 @@
 				// y no quede espacio libre que repartir. Con `mt-8` no bastaba:
 				// `mt-auto` lo pisa y el botón quedaba pegado al último ítem.
 				'mt-auto w-full',
-				destacado
+				featured
 					? 'bg-background text-foreground hover:bg-background/90'
 					: // El contorneado por defecto casi no se ve sobre la tarjeta
 						// blanca: el borde se refuerza y al pasar por encima se
 						// invierte, que es lo que lo hace parecer un botón.
 						'border-foreground hover:bg-foreground hover:text-background'
 			)}
-			variant={destacado ? 'default' : 'outline'}
+			variant={featured ? 'default' : 'outline'}
 		>
 			Empezar con {plan.name}
 		</Button>

@@ -9,7 +9,7 @@
  * vitrina:
  *
  *   pnpm dev                                   (en otra terminal)
- *   node scripts/capturas-marketing.mjs http://casa-oliva.localhost:5173
+ *   node scripts/marketing-screenshots.mjs http://casa-oliva.localhost:5173
  *
  * La tienda tiene que tener productos con fotos y una colección en portada.
  * Todo se hace con Playwright, que ya es dependencia: las fotos se pasan a
@@ -28,7 +28,7 @@ const STORE = process.argv[2];
 
 if (!STORE) {
 	console.error(
-		'Falta la dirección de la tienda. Ej: node scripts/capturas-marketing.mjs http://casa-oliva.localhost:5173'
+		'Falta la dirección de la tienda. Ej: node scripts/marketing-screenshots.mjs http://casa-oliva.localhost:5173'
 	);
 	process.exit(1);
 }
@@ -136,11 +136,11 @@ await settle(m);
 const producto = await m.screenshot();
 
 console.log('Capturas en WebP:');
-await toWebp(d, portada, 'tienda-portada', [960, 1920]);
+await toWebp(d, portada, 'store-cover', [960, 1920]);
 // Solo la franja de destacados: título y la fila de productos con su precio.
-await toWebp(d, destacados, 'tienda-destacados', [960, 1920], { top: 0.19, bottom: 0.92 });
-await toWebp(d, catalogo, 'tienda-catalogo-celular', [300, 600]);
-await toWebp(d, producto, 'tienda-producto-celular', [300, 600]);
+await toWebp(d, destacados, 'store-highlights', [960, 1920], { top: 0.19, bottom: 0.92 });
+await toWebp(d, catalogo, 'store-catalog-mobile', [300, 600]);
+await toWebp(d, producto, 'store-product-mobile', [300, 600]);
 
 // La tarjeta social: la de siempre, con la tienda de verdad a la derecha.
 const fonts = pathToFileURL(join(ROOT, 'node_modules/@fontsource-variable')).href;

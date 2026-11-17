@@ -19,7 +19,7 @@
 
 	// Dominio
 	import {
-		esperaDesde,
+		waitingSince,
 		SUPPORT_CATEGORY_LABEL,
 		SUPPORT_STATUS_LABEL,
 		type SupportStatus
@@ -33,7 +33,7 @@
 
 	const PAGE_PATH = '/platform/support';
 
-	let estado = $state(untrack(() => data.filters.status ?? ''));
+	let statusFilter = $state(untrack(() => data.filters.status ?? ''));
 	let q = $state(untrack(() => data.filters.q ?? ''));
 
 	const estadoOptions: { value: string; label: string }[] = [
@@ -86,7 +86,7 @@
 >
 	<div class="space-y-2">
 		<Label for="estado">Estado</Label>
-		<SelectField id="status" name="status" bind:value={estado} options={estadoOptions} />
+		<SelectField id="status" name="status" bind:value={statusFilter} options={estadoOptions} />
 	</div>
 
 	<div class="space-y-2">
@@ -144,7 +144,7 @@
 						</Table.Cell>
 
 						<Table.Cell data-label="Espera" class="text-muted-foreground text-sm">
-							{ticket.waiting_since ? esperaDesde(ticket.waiting_since) : '—'}
+							{ticket.waiting_since ? waitingSince(ticket.waiting_since) : '—'}
 						</Table.Cell>
 
 						<Table.Cell data-label="Sin leer" class="tabular-nums">

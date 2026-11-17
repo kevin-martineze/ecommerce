@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Tipos
-	import type { Rubro } from '$lib/components/molecules/VariantDemo.svelte';
+	import type { Industry } from '$lib/components/molecules/VariantDemo.svelte';
 	import type { PageData } from './$types';
 
 	// Iconos
@@ -29,8 +29,8 @@
 	import SmoothScroll from '$lib/components/organisms/SmoothScroll.svelte';
 
 	// Dominio
-	import { CAPTURA_DESTACADOS, CAPTURA_PRODUCTO_CELULAR } from '$lib/config/capturas';
-	import { FOTO_CLIENTA_NOCHE, FOTO_EMPRENDEDORA, FOTO_RUBRO } from '$lib/config/fotos';
+	import { PHOTO_CUSTOMER_NIGHT, PHOTO_FOUNDER, PHOTO_INDUSTRY } from '$lib/config/photos';
+	import { SHOT_HIGHLIGHTS, SHOT_PRODUCT_MOBILE } from '$lib/config/screenshots';
 	import { TRIAL_DAYS } from '$lib/domain/account';
 
 	// Utilidades
@@ -47,26 +47,26 @@
 	 * Los demás —cupones, colecciones, avisos, equipo— se nombran en una
 	 * línea: cuatro fichas y una cifra caben de un vistazo; ocho, no.
 	 */
-	const modulos: { modulo: ModuleName; titulo: string; detalle: string }[] = [
+	const modulos: { modulo: ModuleName; title: string; detail: string }[] = [
 		{
 			modulo: 'catalogo',
-			titulo: 'Catálogo',
-			detalle: 'Cada producto se divide por lo que tú decidas: talla, color, peso, formato.'
+			title: 'Catálogo',
+			detail: 'Cada producto se divide por lo que tú decidas: talla, color, peso, formato.'
 		},
 		{
 			modulo: 'inventario',
-			titulo: 'Inventario',
-			detalle: 'Existencias por variación, con aviso cuando queda poco.'
+			title: 'Inventario',
+			detail: 'Existencias por variación, con aviso cuando queda poco.'
 		},
 		{
 			modulo: 'pedidos',
-			titulo: 'Pedidos',
-			detalle: 'Pagados en línea o por WhatsApp, cada uno con su estado.'
+			title: 'Pedidos',
+			detail: 'Pagados en línea o por WhatsApp, cada uno con su estado.'
 		},
 		{
 			modulo: 'envios',
-			titulo: 'Envíos',
-			detalle: 'Zonas con su costo y envío gratis desde un monto.'
+			title: 'Envíos',
+			detail: 'Zonas con su costo y envío gratis desde un monto.'
 		}
 	];
 
@@ -74,94 +74,94 @@
 	 * Tres rubros que se dividen distinto. Decir «sirve para cualquier
 	 * producto» no convence a nadie; ver la ficha cambiar, sí.
 	 */
-	const rubros: {
-		id: Rubro;
-		icono: typeof Shirt;
-		nombre: string;
-		eje: string;
-		titulo: string;
-		detalle: string;
+	const industries: {
+		id: Industry;
+		icon: typeof Shirt;
+		displayName: string;
+		axis: string;
+		title: string;
+		detail: string;
 	}[] = [
 		{
-			id: 'ropa',
-			icono: Shirt,
-			nombre: 'Ropa y calzado',
-			eje: 'Talla y color',
-			titulo: 'Una blusa se vende por talla y color',
-			detalle:
+			id: 'clothing',
+			icon: Shirt,
+			displayName: 'Ropa y calzado',
+			axis: 'Talla y color',
+			title: 'Una blusa se vende por talla y color',
+			detail:
 				'Cada combinación con su existencia. Cuando se acaba la M verde, la tienda lo dice sola y sigue vendiendo las demás.'
 		},
 		{
-			id: 'cafe',
-			icono: Coffee,
-			nombre: 'Café y alimentos',
-			eje: 'Molienda y peso',
-			titulo: 'Un café, por molienda y por peso',
-			detalle:
+			id: 'coffee',
+			icon: Coffee,
+			displayName: 'Café y alimentos',
+			axis: 'Molienda y peso',
+			title: 'Un café, por molienda y por peso',
+			detail:
 				'Tú declaras los ejes que uses y el precio de cada presentación. La tienda arma las opciones; tú no repites productos.'
 		},
 		{
-			id: 'unico',
-			icono: BookOpen,
-			nombre: 'Libros y piezas únicas',
-			eje: 'Sin variaciones',
-			titulo: 'Un libro no se divide en nada',
-			detalle:
+			id: 'single',
+			icon: BookOpen,
+			displayName: 'Libros y piezas únicas',
+			axis: 'Sin variaciones',
+			title: 'Un libro no se divide en nada',
+			detail:
 				'Productos de una sola existencia, sin talla ni color. Se venden una vez y salen de la vitrina solos.'
 		}
 	];
 
 	/** Lo que de verdad pide el registro para tener la tienda andando. */
-	const pasos = ['Nombras tu tienda', 'Subes fotos y precios', 'Compartes el enlace'];
+	const steps = ['Nombras tu tienda', 'Subes fotos y precios', 'Compartes el enlace'];
 
-	let rubroActivo = $state(0);
-	const rubro = $derived(rubros[rubroActivo]);
+	let activeIndustry = $state(0);
+	const industry = $derived(industries[activeIndustry]);
 
-	const garantias = [
+	const guarantees = [
 		{
-			titulo: 'Tus datos son tuyos',
-			detalle:
+			title: 'Tus datos son tuyos',
+			detail:
 				'Productos, pedidos y clientes. Pides una copia cuando quieras y no se mezclan con los de ninguna otra tienda.'
 		},
 		{
-			titulo: 'Sin comisión por venta',
-			detalle: 'Pagas la mensualidad y nada más. Lo que vendas es tuyo, venda lo que venda.'
+			title: 'Sin comisión por venta',
+			detail: 'Pagas la mensualidad y nada más. Lo que vendas es tuyo, venda lo que venda.'
 		},
 		{
-			titulo: 'Cancelas cuando quieras',
-			detalle: 'Si no renuevas, la tienda se pausa: nada se borra y vuelve tal cual al reactivarla.'
+			title: 'Cancelas cuando quieras',
+			detail: 'Si no renuevas, la tienda se pausa: nada se borra y vuelve tal cual al reactivarla.'
 		}
 	];
 
-	const preguntas = [
+	const questions = [
 		{
-			pregunta: '¿Sirve si no vendo ropa?',
-			respuesta:
+			question: '¿Sirve si no vendo ropa?',
+			reply:
 				'Sí. Cada producto declara cómo se divide: talla y color, molienda y peso, presentación, o nada si no se divide. Globerce empezó con tiendas de ropa y hoy sirve igual para café, libros, cosmética o artesanías.'
 		},
 		{
-			pregunta: '¿Cómo me pagan mis clientes?',
-			respuesta:
+			question: '¿Cómo me pagan mis clientes?',
+			reply:
 				'En línea, con tarjeta, transferencia o billetera: conectas tu cuenta de Wompi desde el panel y la plata llega directo a ti, sin pasar por nosotros. Quien prefiera escribirte por WhatsApp también puede, y el pedido le llega escrito con el total.'
 		},
 		{
-			pregunta: '¿Necesito saber de tecnología?',
-			respuesta:
+			question: '¿Necesito saber de tecnología?',
+			reply:
 				'No. Si sabes publicar en Instagram, sabes usar Globerce. Todo se maneja desde el celular.'
 		},
 		{
-			pregunta: '¿Puedo usar mi propio dominio?',
-			respuesta:
+			question: '¿Puedo usar mi propio dominio?',
+			reply:
 				'Tu tienda queda en una dirección propia desde el primer día. Conectar un dominio que ya tengas viene en el plan Pro.'
 		},
 		{
-			pregunta: '¿Qué pasa si dejo de pagar?',
-			respuesta:
+			question: '¿Qué pasa si dejo de pagar?',
+			reply:
 				'Te avisamos antes. Tu tienda sigue en línea unos días y, si no se renueva, se pausa: nada se borra y vuelve tal cual al reactivarla.'
 		},
 		{
-			pregunta: '¿La información es mía?',
-			respuesta:
+			question: '¿La información es mía?',
+			reply:
 				'Sí: tus productos, tus pedidos y tus clientes. Puedes pedir una copia cuando quieras, y los datos de tu tienda no se mezclan con los de ninguna otra.'
 		}
 	];
@@ -199,7 +199,7 @@
 			     Al bajar, lo que se promete: el titular dice para qué sirve, el
 			     subtítulo cómo se hace y los tres pasos lo confirman. -->
 			<section class="marketing-dark">
-				<HeroCommercial siguiente="empieza" />
+				<HeroCommercial next="empieza" />
 			</section>
 
 			<section id="empieza" class="marketing-dark bg-background text-foreground py-16 md:py-24">
@@ -241,15 +241,15 @@
 					<ol
 						class="text-muted-foreground mt-10 flex flex-col items-center justify-center gap-3 text-sm sm:flex-row sm:gap-4"
 					>
-						{#each pasos as paso, indice (paso)}
+						{#each steps as step, index (step)}
 							<li class="flex items-center gap-2.5">
 								<span
 									class="bg-secondary text-foreground flex size-7 flex-none items-center justify-center rounded-full text-xs font-semibold tabular-nums"
 								>
-									{indice + 1}
+									{index + 1}
 								</span>
-								{paso}
-								{#if indice < pasos.length - 1}
+								{step}
+								{#if index < steps.length - 1}
 									<ChevronRight class="hidden size-4 opacity-50 sm:block" aria-hidden="true" />
 								{/if}
 							</li>
@@ -269,8 +269,8 @@
 					</h2>
 
 					<ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5" data-reveal-group>
-						{#each modulos as item, indice (item.modulo)}
-							{#if indice === 2}
+						{#each modulos as item, index (item.modulo)}
+							{#if index === 2}
 								<li
 									class="bg-primary text-primary-foreground flex flex-col justify-between gap-8 rounded-lg p-6 sm:col-span-2 lg:col-span-1"
 								>
@@ -284,8 +284,8 @@
 									class="size-10 rounded-[calc(var(--radius)-8px)] [&_svg]:size-10"
 								/>
 								<div>
-									<h3 class="text-lg font-semibold">{item.titulo}</h3>
-									<p class="text-muted-foreground mt-1.5 text-sm text-pretty">{item.detalle}</p>
+									<h3 class="text-lg font-semibold">{item.title}</h3>
+									<p class="text-muted-foreground mt-1.5 text-sm text-pretty">{item.detail}</p>
 								</div>
 							</li>
 						{/each}
@@ -332,7 +332,7 @@
 							{/if}
 						</div>
 						<div class="lg:pl-4">
-							<StoreShowcase desktop={CAPTURA_DESTACADOS} mobile={CAPTURA_PRODUCTO_CELULAR} />
+							<StoreShowcase desktop={SHOT_HIGHLIGHTS} mobile={SHOT_PRODUCT_MOBILE} />
 						</div>
 					</div>
 
@@ -400,12 +400,12 @@
 
 					<div class="relative sm:pb-10" data-reveal>
 						<img
-							src={FOTO_EMPRENDEDORA.src}
-							srcset={FOTO_EMPRENDEDORA.srcset}
+							src={PHOTO_FOUNDER.src}
+							srcset={PHOTO_FOUNDER.srcset}
 							sizes="(min-width: 768px) 28rem, 90vw"
-							width={FOTO_EMPRENDEDORA.width}
-							height={FOTO_EMPRENDEDORA.height}
-							alt={FOTO_EMPRENDEDORA.alt}
+							width={PHOTO_FOUNDER.width}
+							height={PHOTO_FOUNDER.height}
+							alt={PHOTO_FOUNDER.alt}
 							loading="lazy"
 							decoding="async"
 							class="aspect-[4/5] w-full rounded-lg object-cover sm:ml-auto sm:w-10/12"
@@ -427,22 +427,22 @@
 						role="tablist"
 						data-reveal
 					>
-						{#each rubros as item, indice (item.id)}
+						{#each industries as item, index (item.id)}
 							<button
 								type="button"
 								role="tab"
-								aria-selected={indice === rubroActivo}
+								aria-selected={index === activeIndustry}
 								aria-controls="rubro-panel"
-								onclick={() => (rubroActivo = indice)}
+								onclick={() => (activeIndustry = index)}
 								class={cn(
 									'flex items-center gap-3 rounded-[calc(var(--radius)-4px)] px-4 py-3 text-left text-sm font-medium transition-colors',
-									indice === rubroActivo
+									index === activeIndustry
 										? 'bg-background text-foreground shadow-sm'
 										: 'text-muted-foreground hover:bg-background/60'
 								)}
 							>
-								<item.icono class="size-5 flex-none" aria-hidden="true" />
-								{item.nombre}
+								<item.icon class="size-5 flex-none" aria-hidden="true" />
+								{item.displayName}
 							</button>
 						{/each}
 					</div>
@@ -452,11 +452,11 @@
 						role="tabpanel"
 						class="mt-10 grid gap-10 md:grid-cols-[1fr_1.4fr] md:items-center"
 					>
-						{#key rubro.id}
+						{#key industry.id}
 							<div class="fade-up">
-								<SectionTag label={rubro.eje} />
-								<h2 class="mt-3 text-3xl md:text-4xl">{rubro.titulo}</h2>
-								<p class="text-muted-foreground mt-4 text-lg text-pretty">{rubro.detalle}</p>
+								<SectionTag label={industry.axis} />
+								<h2 class="mt-3 text-3xl md:text-4xl">{industry.title}</h2>
+								<p class="text-muted-foreground mt-4 text-lg text-pretty">{industry.detail}</p>
 								<Button href="/signup" size="lg" class="mt-8 h-12 px-7 text-base">
 									Empieza gratis
 									<ArrowRight class="size-4" />
@@ -470,26 +470,26 @@
 						<div
 							class="bg-secondary relative isolate flex items-center justify-center overflow-hidden rounded-lg p-6 md:min-h-[460px] md:p-10"
 						>
-							{#each rubros as item, indice (item.id)}
+							{#each industries as item, index (item.id)}
 								<img
-									src={FOTO_RUBRO[item.id].src}
-									srcset={FOTO_RUBRO[item.id].srcset}
+									src={PHOTO_INDUSTRY[item.id].src}
+									srcset={PHOTO_INDUSTRY[item.id].srcset}
 									sizes="(min-width: 768px) 36rem, 100vw"
-									width={FOTO_RUBRO[item.id].width}
-									height={FOTO_RUBRO[item.id].height}
-									alt={FOTO_RUBRO[item.id].alt}
+									width={PHOTO_INDUSTRY[item.id].width}
+									height={PHOTO_INDUSTRY[item.id].height}
+									alt={PHOTO_INDUSTRY[item.id].alt}
 									loading="lazy"
 									decoding="async"
 									class={cn(
 										'absolute inset-0 -z-10 size-full object-cover transition-opacity duration-500',
-										indice === rubroActivo ? 'opacity-100' : 'opacity-0'
+										index === activeIndustry ? 'opacity-100' : 'opacity-0'
 									)}
 								/>
 							{/each}
 							<div class="bg-foreground/20 absolute inset-0 -z-10" aria-hidden="true"></div>
 
-							{#key rubro.id}
-								<VariantDemo rubro={rubro.id} class="fade-up" />
+							{#key industry.id}
+								<VariantDemo industry={industry.id} class="fade-up" />
 							{/key}
 						</div>
 					</div>
@@ -515,8 +515,8 @@
 						</p>
 					{:else}
 						<div class="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3" data-reveal-group>
-							{#each data.plans as plan, indice (plan.code)}
-								<PlanCard {plan} destacado={indice === data.plans.length - 1} />
+							{#each data.plans as plan, index (plan.code)}
+								<PlanCard {plan} featured={index === data.plans.length - 1} />
 							{/each}
 						</div>
 					{/if}
@@ -542,10 +542,10 @@
 					</div>
 
 					<ul class="mt-10 grid gap-4 md:grid-cols-3" data-reveal-group>
-						{#each garantias as garantia (garantia.titulo)}
+						{#each guarantees as guarantee (guarantee.title)}
 							<li class="bg-secondary flex flex-col justify-between gap-16 rounded-lg p-7">
-								<h3 class="max-w-[12ch] text-xl md:text-2xl">{garantia.titulo}</h3>
-								<p class="text-muted-foreground text-pretty">{garantia.detalle}</p>
+								<h3 class="max-w-[12ch] text-xl md:text-2xl">{guarantee.title}</h3>
+								<p class="text-muted-foreground text-pretty">{guarantee.detail}</p>
 							</li>
 						{/each}
 					</ul>
@@ -584,13 +584,13 @@
 					</div>
 
 					<Accordion.Root type="single" class="border-border border-t" data-reveal>
-						{#each preguntas as item (item.pregunta)}
-							<Accordion.Item value={item.pregunta}>
+						{#each questions as item (item.question)}
+							<Accordion.Item value={item.question}>
 								<Accordion.Trigger class="py-5 text-base font-medium hover:no-underline">
-									{item.pregunta}
+									{item.question}
 								</Accordion.Trigger>
 								<Accordion.Content class="text-muted-foreground pb-5 text-base text-pretty">
-									{item.respuesta}
+									{item.reply}
 								</Accordion.Content>
 							</Accordion.Item>
 						{/each}
@@ -605,12 +605,12 @@
 				class="marketing-dark bg-background text-foreground relative isolate overflow-hidden py-24 md:py-36"
 			>
 				<img
-					src={FOTO_CLIENTA_NOCHE.src}
-					srcset={FOTO_CLIENTA_NOCHE.srcset}
+					src={PHOTO_CUSTOMER_NIGHT.src}
+					srcset={PHOTO_CUSTOMER_NIGHT.srcset}
 					sizes="100vw"
-					width={FOTO_CLIENTA_NOCHE.width}
-					height={FOTO_CLIENTA_NOCHE.height}
-					alt={FOTO_CLIENTA_NOCHE.alt}
+					width={PHOTO_CUSTOMER_NIGHT.width}
+					height={PHOTO_CUSTOMER_NIGHT.height}
+					alt={PHOTO_CUSTOMER_NIGHT.alt}
 					loading="lazy"
 					decoding="async"
 					class="absolute inset-0 -z-10 size-full object-cover object-[70%_center]"

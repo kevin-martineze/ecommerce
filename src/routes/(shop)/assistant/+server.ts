@@ -21,12 +21,12 @@ import { publicContext } from '$lib/server/context';
  * una frase y se ofrece WhatsApp: un chat que se queda mudo es peor que uno
  * que no existe.
  */
-const MAX_TURNOS = 12;
+const MAX_TURNS = 12;
 const MAX_LARGO = 500;
 
 export const POST: RequestHandler = async (event) => {
-	const cuerpo: unknown = await event.request.json().catch(() => null);
-	const messages = leerTurnos(cuerpo);
+	const body: unknown = await event.request.json().catch(() => null);
+	const messages = readTurns(body);
 
 	if (messages.length === 0) {
 		return json({ reply: '¿En qué te ayudo?', handoff: false });
@@ -35,36 +35,36 @@ export const POST: RequestHandler = async (event) => {
 	const result = await askAssistant(publicContext(event), messages);
 
 	if (!result.ok) {
-		return json({ reply: excusa(result.code), handoff: true });
+		return json({ reply: excuse(result.code), handoff: true });
 	}
 
 	return json(result.data);
 };
 
-function leerTurnos(cuerpo: unknown): { role: 'user' | 'assistant'; content: string }[] {
-	if (typeof cuerpo !== 'object' || cuerpo === null) return [];
+function readTurns(body: unknown): { role: 'user' | 'assistant'; content: string }[] {
+	if (typeof body !== 'object' || body === null) return [];
 
-	const lista = (cuerpo as { messages?: unknown }).messages;
+	const list = (body as { messages?: unknown }).messages;
 
-	if (!Array.isArray(lista)) return [];
+	if (!Array.isArray(list)) return [];
 
-	return lista
+	return list
 		.filter(
-			(turno): turno is { role: 'user' | 'assistant'; content: string } =>
-				typeof turno === 'object' &&
-				turno !== null &&
-				(turno as { role?: unknown }).role !== undefined &&
-				typeof (turno as { content?: unknown }).content === 'string'
+			(turn): turn is { role: 'user' | 'assistant'; content: string } =>
+				typeof turn === 'object' &&
+				turn !== null &&
+				(turn as { role?: unknown }).role !== undefined &&
+				typeof (turn as { content?: unknown }).content === 'string'
 		)
-		.map((turno) => ({
-			role: turno.role === 'assistant' ? ('assistant' as const) : ('user' as const),
-			content: turno.content.slice(0, MAX_LARGO)
+		.map((turn) => ({
+			role: turn.role === 'assistant' ? ('assistant' as const) : ('user' as const),
+			content: turn.content.slice(0, MAX_LARGO)
 		}))
-		.slice(-MAX_TURNOS);
+		.slice(-MAX_TURNS);
 }
 
 /** Qué se dice cuando no hay respuesta. Nunca el error técnico. */
-function excusa(code: string): string {
+function excuse(code: string): string {
 	if (code === 'plan_limit') {
 		return 'Por hoy no puedo seguir respondiendo por acá. Escríbenos por WhatsApp y te atendemos.';
 	}

@@ -54,17 +54,17 @@
 	let newActive = $state(true);
 
 	/** El costo que la dueña escribió en la fila, o el guardado si no lo tocó. */
-	function costoDe(id: string, guardado: number): number | null {
-		const editado = zoneEdits[id]?.cost;
+	function costOf(id: string, saved: number): number | null {
+		const edited = zoneEdits[id]?.cost;
 
-		return editado === undefined ? guardado : editado;
+		return edited === undefined ? saved : edited;
 	}
 
 	const rows = $derived(
 		data.zones.map((zone) => ({
 			id: zone.id,
 			name: zoneEdits[zone.id]?.name ?? zone.name,
-			cost: costoDe(zone.id, zone.cost),
+			cost: costOf(zone.id, zone.cost),
 			etaDays: zoneEdits[zone.id]?.etaDays ?? zone.eta_days,
 			active: zoneEdits[zone.id]?.active ?? zone.active,
 			sortOrder: zone.sort_order
@@ -111,8 +111,8 @@
 	function editZone(id: string, patch: ZoneEdit) {
 		zoneEdits[id] = { ...zoneEdits[id], ...patch };
 	}
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -242,7 +242,7 @@
 							</p>
 						</div>
 
-						{#snippet acciones()}
+						{#snippet actionList()}
 							<Button type="submit" form="zona-{zone.id}" size="sm" variant="outline">
 								Guardar
 							</Button>
@@ -250,7 +250,7 @@
 							<Button
 								type="button"
 								onclick={() =>
-									borrado.ask(`borrar-zona-${zone.id}`, `¿Borrar ${zone.name}?`, {
+									deletion.ask(`borrar-zona-${zone.id}`, `¿Borrar ${zone.name}?`, {
 										description: 'Si ya se usó en pedidos, se desactiva en vez de borrarse.'
 									})}
 								size="sm"
@@ -289,18 +289,18 @@
 			<input type="hidden" name="sortOrder" value={zone.sort_order} />
 		</form>
 
-		<form id="borrar-zona-{zone.id}" method="POST" action="?/delete" use:enhance={alBorrar}>
+		<form id="borrar-zona-{zone.id}" method="POST" action="?/delete" use:enhance={onDelete}>
 			<input type="hidden" name="id" value={zone.id} />
 		</form>
 	{/each}
 </div>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

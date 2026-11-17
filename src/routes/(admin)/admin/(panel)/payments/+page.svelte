@@ -24,35 +24,39 @@
 
 	let submitting = $state(false);
 	/** Abierto cuando la dueña quiere reemplazar las llaves de una cuenta ya conectada. */
-	let cambiando = $state(false);
-	let copiado = $state(false);
+	let changing = $state(false);
+	let copied = $state(false);
 
-	const cuenta = $derived(data.account);
-	const conectada = $derived(cuenta.connected);
-	const conAviso = $derived(conectada && cuenta.last_event_at !== null);
+	const paymentAccount = $derived(data.account);
+	const isConnected = $derived(paymentAccount.connected);
+	const conAviso = $derived(isConnected && paymentAccount.last_event_at !== null);
 	/** Con la cuenta conectada y avisando, la página es un resumen; si no, los tres pasos. */
-	const resumen = $derived(conAviso && !cambiando);
+	const summary = $derived(conAviso && !changing);
 
-	const fechaHora = new Intl.DateTimeFormat('es-CO', {
+	const dateTime = new Intl.DateTimeFormat('es-CO', {
 		dateStyle: 'medium',
 		timeStyle: 'short',
 		timeZone: 'America/Bogota'
 	});
 
-	function formatear(iso: string | null): string {
-		return iso ? fechaHora.format(new Date(iso)) : 'Todavía no';
+	function formatValue(iso: string | null): string {
+		return iso ? dateTime.format(new Date(iso)) : 'Todavía no';
 	}
 
-	const modoLabel = $derived(
-		cuenta.mode === 'test' ? 'Pruebas' : cuenta.mode === 'prod' ? 'Producción' : 'Sin reconocer'
+	const modeLabel = $derived(
+		paymentAccount.mode === 'test'
+			? 'Pruebas'
+			: paymentAccount.mode === 'prod'
+				? 'Producción'
+				: 'Sin reconocer'
 	);
 
-	async function copiar() {
-		if (!cuenta.events_url) return;
+	async function copy() {
+		if (!paymentAccount.events_url) return;
 
-		await navigator.clipboard.writeText(cuenta.events_url);
-		copiado = true;
-		setTimeout(() => (copiado = false), 2000);
+		await navigator.clipboard.writeText(paymentAccount.events_url);
+		copied = true;
+		setTimeout(() => (copied = false), 2000);
 	}
 </script>
 
@@ -75,7 +79,7 @@
 	</p>
 {:else}
 	<section class="border-border bg-card rounded-lg space-y-8 border p-6">
-		{#if resumen}
+		{#if summary}
 			<div class="space-y-5">
 				<div class="flex items-center gap-2">
 					<CreditCard class="size-5" />
@@ -85,30 +89,30 @@
 				<dl class="grid gap-4 text-sm sm:grid-cols-2">
 					<div>
 						<dt class="text-muted-foreground">Comercio en Wompi</dt>
-						<dd>{cuenta.merchant_name ?? '—'}</dd>
+						<dd>{paymentAccount.merchant_name ?? '—'}</dd>
 					</div>
 					<div>
 						<dt class="text-muted-foreground">Modo</dt>
-						<dd>{modoLabel}</dd>
+						<dd>{modeLabel}</dd>
 					</div>
 					<div>
 						<dt class="text-muted-foreground">Último pago avisado</dt>
-						<dd>{formatear(cuenta.last_event_at)}</dd>
+						<dd>{formatValue(paymentAccount.last_event_at)}</dd>
 					</div>
 					<div>
 						<dt class="text-muted-foreground">Llave pública</dt>
 						<dd class="font-mono text-xs">
-							{cuenta.public_key ? `${cuenta.public_key.slice(0, 12)}…` : '—'}
+							{paymentAccount.public_key ? `${paymentAccount.public_key.slice(0, 12)}…` : '—'}
 						</dd>
 					</div>
 					<div>
 						<dt class="text-muted-foreground">Conectada desde</dt>
-						<dd>{formatear(cuenta.updated_at)}</dd>
+						<dd>{formatValue(paymentAccount.updated_at)}</dd>
 					</div>
 				</dl>
 
 				<div>
-					<Button type="button" variant="outline" onclick={() => (cambiando = true)}>
+					<Button type="button" variant="outline" onclick={() => (changing = true)}>
 						Cambiar llaves
 					</Button>
 				</div>
@@ -116,9 +120,11 @@
 				<details class="text-sm">
 					<summary class="text-muted-foreground cursor-pointer">Ver la URL de eventos</summary>
 					<div class="border-border mt-3 flex items-center gap-2 border p-2">
-						<code class="text-muted-foreground flex-1 truncate text-xs">{cuenta.events_url}</code>
-						<Button type="button" variant="outline" size="sm" onclick={copiar}>
-							{copiado ? 'Copiado' : 'Copiar'}
+						<code class="text-muted-foreground flex-1 truncate text-xs"
+							>{paymentAccount.events_url}</code
+						>
+						<Button type="button" variant="outline" size="sm" onclick={copy}>
+							{copied ? 'Copiado' : 'Copiar'}
 						</Button>
 					</div>
 				</details>
@@ -130,7 +136,7 @@
 					<span
 						class="border-border grid size-8 flex-none place-items-center rounded-full border text-sm"
 					>
-						{#if conectada}<Check class="size-4" />{:else}1{/if}
+						{#if isConnected}<Check class="size-4" />{:else}1{/if}
 					</span>
 					<div class="min-w-0 flex-1 space-y-2">
 						<h2 class="text-lg">Ten tu cuenta en Wompi</h2>
@@ -155,14 +161,14 @@
 					<span
 						class="border-border grid size-8 flex-none place-items-center rounded-full border text-sm"
 					>
-						{#if conectada}<Check class="size-4" />{:else}2{/if}
+						{#if isConnected}<Check class="size-4" />{:else}2{/if}
 					</span>
 					<div class="min-w-0 flex-1 space-y-3">
 						<h2 class="text-lg">Copia tus llaves y pégalas aquí</h2>
 
-						{#if conectada && !cambiando}
+						{#if isConnected && !changing}
 							<p class="text-muted-foreground text-sm">Tus llaves ya están conectadas.</p>
-							<Button type="button" variant="outline" size="sm" onclick={() => (cambiando = true)}>
+							<Button type="button" variant="outline" size="sm" onclick={() => (changing = true)}>
 								Cambiar llaves
 							</Button>
 						{:else}
@@ -183,17 +189,17 @@
 										await update();
 										submitting = false;
 
-										if (result.type === 'success') cambiando = false;
+										if (result.type === 'success') changing = false;
 									};
 								}}
 							>
 								<WompiKeysPaste
 									{submitting}
-									submitLabel={conectada ? 'Reemplazar llaves' : 'Conectar'}
+									submitLabel={isConnected ? 'Reemplazar llaves' : 'Conectar'}
 								/>
 
-								{#if cambiando}
-									<Button type="button" variant="ghost" onclick={() => (cambiando = false)}>
+								{#if changing}
+									<Button type="button" variant="ghost" onclick={() => (changing = false)}>
 										Cancelar
 									</Button>
 								{/if}
@@ -203,7 +209,7 @@
 				</li>
 
 				<!-- Paso 3: el aviso de cada pago. Se activa cuando la cuenta está conectada. -->
-				<li class={cn('flex gap-4', !conectada && 'opacity-60')}>
+				<li class={cn('flex gap-4', !isConnected && 'opacity-60')}>
 					<span
 						class="border-border grid size-8 flex-none place-items-center rounded-full border text-sm"
 					>
@@ -212,7 +218,7 @@
 					<div class="min-w-0 flex-1 space-y-3">
 						<h2 class="text-lg">Pide a Wompi que te avise de cada pago</h2>
 
-						{#if !conectada}
+						{#if !isConnected}
 							<p class="text-muted-foreground text-sm">Se activa cuando conectes tu cuenta.</p>
 						{:else}
 							<p class="text-muted-foreground text-sm">
@@ -223,14 +229,14 @@
 
 							<div class="border-border flex items-center gap-2 border p-2">
 								<code class="text-muted-foreground flex-1 truncate text-xs">
-									{cuenta.events_url}
+									{paymentAccount.events_url}
 								</code>
-								<Button type="button" variant="outline" size="sm" onclick={copiar}>
-									{copiado ? 'Copiado' : 'Copiar'}
+								<Button type="button" variant="outline" size="sm" onclick={copy}>
+									{copied ? 'Copiado' : 'Copiar'}
 								</Button>
 							</div>
 
-							{#if cuenta.last_event_at === null}
+							{#if paymentAccount.last_event_at === null}
 								<p class="text-caution text-sm">Esperando el primer aviso de Wompi.</p>
 							{/if}
 
@@ -244,7 +250,7 @@
 			</ol>
 		{/if}
 
-		{#if conectada}
+		{#if isConnected}
 			<form
 				method="POST"
 				action="?/disconnect"

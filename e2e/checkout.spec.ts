@@ -21,11 +21,11 @@ test('una prenda llega al carrito y el carrito sobrevive al recargue', async ({ 
 	// El clic vuelve en cuanto la navegación arranca, así que el título que se
 	// lee abajo puede ser todavía el del listado. Esperar al botón de comprar
 	// —que solo existe en la ficha— es lo que asegura que ya estamos en ella.
-	const comprar = page.getByRole('button', { name: /^(Agregar|Elige talla)/ }).first();
+	const buy = page.getByRole('button', { name: /^(Agregar|Elige talla)/ }).first();
 
-	await expect(comprar).toBeVisible();
+	await expect(buy).toBeVisible();
 
-	const nombre = (await page.getByRole('heading', { level: 1 }).first().innerText()).trim();
+	const productName = (await page.getByRole('heading', { level: 1 }).first().innerText()).trim();
 
 	// Color primero: las tallas disponibles dependen de él.
 	const colores = page.locator('section', { hasText: 'Color' }).locator('button[aria-label]');
@@ -34,23 +34,23 @@ test('una prenda llega al carrito y el carrito sobrevive al recargue', async ({ 
 
 	// El botón solo dice «Agregar» cuando la variante elegida tiene stock; si la
 	// talla está agotada se prueba la siguiente.
-	const agregar = page.getByRole('button', { name: /^Agregar/ }).first();
-	const tallas = page.locator('section', { hasText: 'Talla' }).locator('button[aria-pressed]');
+	const add = page.getByRole('button', { name: /^Agregar/ }).first();
+	const sizes = page.locator('section', { hasText: 'Talla' }).locator('button[aria-pressed]');
 
-	for (const talla of await tallas.all()) {
-		await talla.click();
-		if (await agregar.isVisible()) break;
+	for (const size of await sizes.all()) {
+		await size.click();
+		if (await add.isVisible()) break;
 	}
 
-	await expect(agregar).toBeVisible();
-	await agregar.click();
+	await expect(add).toBeVisible();
+	await add.click();
 
 	await page.goto('/cart');
-	await expect(page.getByText(nombre, { exact: false }).first()).toBeVisible();
+	await expect(page.getByText(productName, { exact: false }).first()).toBeVisible();
 
 	// El carrito vive en el navegador: si no sobrevive a esto, no sirve de nada.
 	await page.reload();
-	await expect(page.getByText(nombre, { exact: false }).first()).toBeVisible();
+	await expect(page.getByText(productName, { exact: false }).first()).toBeVisible();
 });
 
 test('la portada lleva a la tienda y muestra prendas', async ({ page }) => {

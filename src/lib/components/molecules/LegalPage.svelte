@@ -3,7 +3,7 @@
 	import type { Snippet } from 'svelte';
 
 	// Dominio
-	import { EMPRESA, VIGENCIA_LEGAL } from '$lib/config/empresa';
+	import { COMPANY, LEGAL_EFFECTIVE_DATE } from '$lib/config/company';
 
 	/**
 	 * El marco de las páginas legales: mismo ancho de lectura, misma cabecera y
@@ -21,7 +21,7 @@
 <div class="marketing bg-background min-h-screen">
 	<header class="border-border border-b">
 		<div class="mx-auto flex max-w-3xl items-center justify-between gap-6 px-4 py-4 sm:px-6">
-			<a href="/" class="font-display text-xl tracking-tight">{EMPRESA.marca}</a>
+			<a href="/" class="font-display text-xl tracking-tight">{COMPANY.brand}</a>
 			<a href="/" class="text-muted-foreground hover:text-foreground text-sm">Volver al inicio</a>
 		</div>
 	</header>
@@ -29,7 +29,7 @@
 	<main class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
 		<h1 class="text-4xl">{title}</h1>
 		<p class="text-muted-foreground mt-3">{summary}</p>
-		<p class="text-muted-foreground mt-1 text-sm">En vigor desde el {VIGENCIA_LEGAL}.</p>
+		<p class="text-muted-foreground mt-1 text-sm">En vigor desde el {LEGAL_EFFECTIVE_DATE}.</p>
 
 		<div class="legal mt-10 space-y-8">
 			{@render children()}

@@ -353,8 +353,8 @@ export function parseFilters(url: URL): ProductFilters {
 		options: url.searchParams
 			.getAll('option')
 			.slice(0, 20)
-			.map((entrada) => entrada.slice(0, 120))
-			.filter((entrada) => /^[^:]+:[^:]+$/.test(entrada)),
+			.map((entry) => entry.slice(0, 120))
+			.filter((entry) => /^[^:]+:[^:]+$/.test(entry)),
 		minPrice: Number.isFinite(min) && min > 0 ? Math.min(min, MAX_PRICE) : null,
 		maxPrice: Number.isFinite(max) && max > 0 ? Math.min(max, MAX_PRICE) : null,
 		sort: isProductSort(sortParam) ? sortParam : 'nuevo',
@@ -390,7 +390,7 @@ export function searchProducts(
 	const params = new URLSearchParams();
 
 	if (filters.category) params.set('category', filters.category);
-	for (const opcion of filters.options) params.append('options', opcion);
+	for (const option of filters.options) params.append('options', option);
 	if (filters.minPrice !== null) params.set('minPrice', String(filters.minPrice));
 	if (filters.maxPrice !== null) params.set('maxPrice', String(filters.maxPrice));
 	if (filters.q) params.set('q', filters.q);

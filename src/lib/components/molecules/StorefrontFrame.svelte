@@ -23,20 +23,20 @@
 	let { src, title, class: className }: Props = $props();
 
 	/** El ancho al que se pinta la vitrina antes de encogerla. */
-	const ANCHO_REAL = 1280;
+	const REAL_WIDTH = 1280;
 
-	let ancho = $state(0);
-	const escala = $derived(ancho > 0 ? ancho / ANCHO_REAL : 0);
+	let width = $state(0);
+	const scale = $derived(width > 0 ? width / REAL_WIDTH : 0);
 </script>
 
 <div
-	bind:clientWidth={ancho}
+	bind:clientWidth={width}
 	class={cn(
 		'bg-muted border-border relative aspect-[4/3] w-full overflow-hidden rounded-lg border',
 		className
 	)}
 >
-	{#if escala > 0}
+	{#if scale > 0}
 		<iframe
 			{src}
 			{title}
@@ -44,7 +44,7 @@
 			tabindex="-1"
 			aria-hidden="true"
 			class="pointer-events-none absolute top-0 left-0 origin-top-left border-0"
-			style="width: {ANCHO_REAL}px; height: {(ANCHO_REAL * 3) / 4}px; transform: scale({escala});"
+			style="width: {REAL_WIDTH}px; height: {(REAL_WIDTH * 3) / 4}px; transform: scale({scale});"
 		></iframe>
 	{/if}
 </div>

@@ -75,8 +75,8 @@
 	function linksOf(collectionId: string) {
 		return data.links.filter((link) => link.collection_id === collectionId);
 	}
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -217,13 +217,13 @@
 							id="borrar-coleccion-{collection.id}"
 							method="POST"
 							action="?/delete"
-							use:enhance={alBorrar}
+							use:enhance={onDelete}
 						>
 							<input type="hidden" name="id" value={collection.id} />
 							<Button
 								type="button"
 								onclick={() =>
-									borrado.ask(
+									deletion.ask(
 										`borrar-coleccion-${collection.id}`,
 										`¿Borrar la colección ${collection.name}?`,
 										{
@@ -275,7 +275,7 @@
 											<Button
 												type="button"
 												onclick={() =>
-													borrado.ask(
+													deletion.ask(
 														`quitar-${collection.id}-${link.product_id}`,
 														'¿Quitar este producto de la colección?',
 														{
@@ -351,7 +351,7 @@
 						id="quitar-{collection.id}-{link.product_id}"
 						method="POST"
 						action="?/removeProduct"
-						use:enhance={alBorrar}
+						use:enhance={onDelete}
 					>
 						<input type="hidden" name="collectionId" value={collection.id} />
 						<input type="hidden" name="productId" value={link.product_id} />
@@ -363,11 +363,11 @@
 {/if}
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

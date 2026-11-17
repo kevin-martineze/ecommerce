@@ -12,9 +12,9 @@
 	 */
 	const año = new Date().getFullYear();
 
-	const columnas = [
+	const columns = [
 		{
-			titulo: 'Producto',
+			title: 'Producto',
 			enlaces: [
 				{ href: '#como-funciona', label: 'Cómo funciona' },
 				{ href: '#que-vendes', label: 'Para quién es' },
@@ -23,14 +23,14 @@
 			]
 		},
 		{
-			titulo: 'Tu cuenta',
+			title: 'Tu cuenta',
 			enlaces: [
 				{ href: '/signup', label: 'Empieza gratis' },
 				{ href: '/admin/login', label: 'Entrar' }
 			]
 		},
 		{
-			titulo: 'Globerce',
+			title: 'Globerce',
 			enlaces: [
 				{ href: '/contact', label: 'Contacto' },
 				{ href: '/terms', label: 'Términos' },
@@ -61,11 +61,11 @@
 				<p class="text-muted-foreground mt-5 text-sm">Para quien vende todos los días.</p>
 			</div>
 
-			{#each columnas as columna (columna.titulo)}
-				<nav aria-label={columna.titulo}>
-					<p class="text-sm font-semibold">{columna.titulo}</p>
+			{#each columns as column (column.title)}
+				<nav aria-label={column.title}>
+					<p class="text-sm font-semibold">{column.title}</p>
 					<ul class="text-muted-foreground mt-4 space-y-2.5 text-sm">
-						{#each columna.enlaces as enlace (enlace.href)}
+						{#each column.enlaces as enlace (enlace.href)}
 							<li>
 								<a href={enlace.href} class="hover:text-foreground transition-colors"
 									>{enlace.label}</a

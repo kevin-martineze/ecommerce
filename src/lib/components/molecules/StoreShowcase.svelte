@@ -1,9 +1,9 @@
 <script lang="ts">
 	// Tipos
-	import type { Shot } from '$lib/config/capturas';
+	import type { Shot } from '$lib/config/screenshots';
 
 	// Dominio
-	import { HOST_MAQUETA } from '$lib/config/maqueta';
+	import { MOCKUP_HOST } from '$lib/config/mockup';
 
 	// Utilidades
 	import { cn } from '$lib/utils';
@@ -14,7 +14,7 @@
 	 * A diferencia de las tarjetas de la portada (`OrderCard`, `StockCard`), estas son fotos.
 	 * Para el panel una maqueta basta, pero «así se ve tu tienda terminada»
 	 * convence más con una tienda real, con sus fotos y sus precios. Para que no envejezcan sin
-	 * remedio salen de `scripts/capturas-marketing.mjs`, que las vuelve a tomar.
+	 * remedio salen de `scripts/marketing-screenshots.mjs`, que las vuelve a tomar.
 	 *
 	 * Cada foto llega en dos anchos (`srcset`) y con su tamaño, así la página no
 	 * salta mientras cargan. Las fotos y sus textos alternativos están en
@@ -31,13 +31,7 @@
 		class?: string;
 	}
 
-	let {
-		desktop,
-		mobile,
-		address = HOST_MAQUETA,
-		eager = false,
-		class: className
-	}: Props = $props();
+	let { desktop, mobile, address = MOCKUP_HOST, eager = false, class: className }: Props = $props();
 
 	const loading = $derived(eager ? 'eager' : 'lazy');
 </script>

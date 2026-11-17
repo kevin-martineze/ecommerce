@@ -24,8 +24,8 @@
 
 	let { data }: Props = $props();
 
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -133,7 +133,7 @@
 												class="text-destructive"
 												aria-label="Borrar {row.label ?? 'esta variación'}"
 												onclick={() =>
-													borrado.ask(
+													deletion.ask(
 														`borrar-${row.id}`,
 														`¿Borrar ${row.label ?? 'esta variación'}?`,
 														{
@@ -157,13 +157,13 @@
 {/if}
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />
 
 <!-- El HTML no admite <form> dentro de <tbody>: viven aquí y se referencian por id. -->
@@ -174,7 +174,7 @@
 				<input type="hidden" name="variantId" value={row.id} />
 			</form>
 
-			<form id="borrar-{row.id}" method="POST" action="?/delete" use:enhance={alBorrar}>
+			<form id="borrar-{row.id}" method="POST" action="?/delete" use:enhance={onDelete}>
 				<input type="hidden" name="variantId" value={row.id} />
 			</form>
 		{/each}

@@ -82,7 +82,9 @@
 
 	/** Un eje se pinta como muestras si TODOS sus valores traen tono. */
 	function esColor(option: CatalogFacets['options'][number]): boolean {
-		return option.values.length > 0 && option.values.every((valor) => valor.hex !== null);
+		return (
+			option.values.length > 0 && option.values.every((optionValue) => optionValue.hex !== null)
+		);
 	}
 </script>
 
@@ -127,8 +129,8 @@
 
 			{#if esColor(option)}
 				<div class="space-y-2">
-					{#each option.values as valor (valor.value)}
-						{@const clave = `${option.name}:${valor.value}`}
+					{#each option.values as optionValue (optionValue.value)}
+						{@const clave = `${option.name}:${optionValue.value}`}
 						{@const selected = filters.options.includes(clave)}
 						<div class="flex items-center gap-2">
 							<Checkbox
@@ -139,17 +141,17 @@
 							<Label for="opcion-{clave}" class="flex cursor-pointer items-center gap-2 text-sm">
 								<span
 									class="border-border size-3.5 rounded-full border"
-									style="background-color: {valor.hex}"
+									style="background-color: {optionValue.hex}"
 								></span>
-								{valor.value}
+								{optionValue.value}
 							</Label>
 						</div>
 					{/each}
 				</div>
 			{:else}
 				<div class="flex flex-wrap gap-2">
-					{#each option.values as valor (valor.value)}
-						{@const clave = `${option.name}:${valor.value}`}
+					{#each option.values as optionValue (optionValue.value)}
+						{@const clave = `${option.name}:${optionValue.value}`}
 						{@const selected = filters.options.includes(clave)}
 						<button
 							type="button"
@@ -159,7 +161,7 @@
 							aria-pressed={selected}
 							onclick={() => toggleMulti('option', clave, !selected)}
 						>
-							{valor.value}
+							{optionValue.value}
 						</button>
 					{/each}
 				</div>

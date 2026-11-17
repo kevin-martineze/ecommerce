@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Dominio
-	import { FOTO_PRODUCTO } from '$lib/config/fotos';
+	import { PHOTO_PRODUCT } from '$lib/config/photos';
 
 	// Utilidades
 	import { cn } from '$lib/utils';
@@ -17,76 +17,76 @@
 	 *
 	 * Decorativa: el texto de al lado dice lo mismo con palabras.
 	 */
-	export type Rubro = 'ropa' | 'cafe' | 'unico';
+	export type Industry = 'clothing' | 'coffee' | 'single';
 
 	interface Props {
-		rubro: Rubro;
+		industry: Industry;
 		class?: string;
 	}
 
-	let { rubro, class: className }: Props = $props();
+	let { industry, class: className }: Props = $props();
 
-	const fichas = {
-		ropa: {
-			nombre: 'Blusa Vera',
-			precio: '$89.900',
-			tono: 'oklch(0.86 0.02 60)',
-			nota: 'Quedan 3 en talla M',
-			ejes: [
+	const sheets = {
+		clothing: {
+			name: 'Blusa Vera',
+			price: '$89.900',
+			tone: 'oklch(0.86 0.02 60)',
+			note: 'Quedan 3 en talla M',
+			axes: [
 				{
-					nombre: 'Talla',
-					opciones: [
-						{ valor: 'S', estado: 'libre' },
-						{ valor: 'M', estado: 'elegida' },
-						{ valor: 'L', estado: 'agotada' },
-						{ valor: 'XL', estado: 'libre' }
+					name: 'Talla',
+					options: [
+						{ value: 'S', state: 'available' },
+						{ value: 'M', state: 'selected' },
+						{ value: 'L', state: 'soldOut' },
+						{ value: 'XL', state: 'available' }
 					]
 				},
 				{
-					nombre: 'Color',
-					opciones: [
-						{ valor: 'Verde', estado: 'elegida', tono: 'oklch(0.55 0.08 160)' },
-						{ valor: 'Arena', estado: 'libre', tono: 'oklch(0.82 0.04 80)' },
-						{ valor: 'Negro', estado: 'libre', tono: 'oklch(0.25 0.01 60)' }
+					name: 'Color',
+					options: [
+						{ value: 'Verde', state: 'selected', tone: 'oklch(0.55 0.08 160)' },
+						{ value: 'Arena', state: 'available', tone: 'oklch(0.82 0.04 80)' },
+						{ value: 'Negro', state: 'available', tone: 'oklch(0.25 0.01 60)' }
 					]
 				}
 			]
 		},
-		cafe: {
-			nombre: 'Café Huila',
-			precio: '$38.000',
-			tono: 'oklch(0.78 0.04 40)',
-			nota: '500 g · molienda fina',
-			ejes: [
+		coffee: {
+			name: 'Café Huila',
+			price: '$38.000',
+			tone: 'oklch(0.78 0.04 40)',
+			note: '500 g · molienda fina',
+			axes: [
 				{
-					nombre: 'Molienda',
-					opciones: [
-						{ valor: 'Grano', estado: 'libre' },
-						{ valor: 'Fina', estado: 'elegida' },
-						{ valor: 'Media', estado: 'libre' }
+					name: 'Molienda',
+					options: [
+						{ value: 'Grano', state: 'available' },
+						{ value: 'Fina', state: 'selected' },
+						{ value: 'Media', state: 'available' }
 					]
 				},
 				{
-					nombre: 'Peso',
-					opciones: [
-						{ valor: '250 g', estado: 'libre' },
-						{ valor: '500 g', estado: 'elegida' },
-						{ valor: '1 kg', estado: 'libre' }
+					name: 'Peso',
+					options: [
+						{ value: '250 g', state: 'available' },
+						{ value: '500 g', state: 'selected' },
+						{ value: '1 kg', state: 'available' }
 					]
 				}
 			]
 		},
-		unico: {
-			nombre: 'Atlas de la Sierra',
-			precio: '$64.000',
-			tono: 'oklch(0.72 0.05 25)',
-			nota: 'Pieza única · 1 disponible',
-			ejes: []
+		single: {
+			name: 'Atlas de la Sierra',
+			price: '$64.000',
+			tone: 'oklch(0.72 0.05 25)',
+			note: 'Pieza única · 1 disponible',
+			axes: []
 		}
 	} as const;
 
-	const ficha = $derived(fichas[rubro]);
-	const foto = $derived(FOTO_PRODUCTO[rubro]);
+	const sheet = $derived(sheets[industry]);
+	const photo = $derived(PHOTO_PRODUCT[industry]);
 </script>
 
 <div
@@ -97,49 +97,49 @@
 	)}
 >
 	<img
-		src={foto.src}
-		srcset={foto.srcset}
+		src={photo.src}
+		srcset={photo.srcset}
 		sizes="18rem"
-		width={foto.width}
-		height={foto.height}
-		alt={foto.alt}
+		width={photo.width}
+		height={photo.height}
+		alt={photo.alt}
 		loading="lazy"
 		decoding="async"
 		class="aspect-[4/3] w-full rounded-[calc(var(--radius)-6px)] object-cover"
-		style="background-color: {ficha.tono}"
+		style="background-color: {sheet.tone}"
 	/>
 
 	<div class="mt-4 flex items-baseline justify-between gap-3">
-		<p class="font-semibold">{ficha.nombre}</p>
-		<p class="text-primary font-semibold tabular-nums">{ficha.precio}</p>
+		<p class="font-semibold">{sheet.name}</p>
+		<p class="text-primary font-semibold tabular-nums">{sheet.price}</p>
 	</div>
 
-	{#each ficha.ejes as eje (eje.nombre)}
+	{#each sheet.axes as axis (axis.name)}
 		<div class="mt-4">
 			<p class="text-muted-foreground text-xs font-medium tracking-[0.14em] uppercase">
-				{eje.nombre}
+				{axis.name}
 			</p>
 			<ul class="mt-2 flex flex-wrap gap-1.5">
-				{#each eje.opciones as opcion (opcion.valor)}
+				{#each axis.options as option (option.value)}
 					<li
 						class={cn(
 							'flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium',
-							opcion.estado === 'elegida' && 'border-primary bg-primary text-primary-foreground',
-							opcion.estado === 'agotada' && 'border-caution text-caution line-through',
-							opcion.estado === 'libre' && 'border-border text-muted-foreground'
+							option.state === 'selected' && 'border-primary bg-primary text-primary-foreground',
+							option.state === 'soldOut' && 'border-caution text-caution line-through',
+							option.state === 'available' && 'border-border text-muted-foreground'
 						)}
 					>
-						{#if 'tono' in opcion}
-							<span class="size-2.5 rounded-full" style="background-color: {opcion.tono}"></span>
+						{#if 'tone' in option}
+							<span class="size-2.5 rounded-full" style="background-color: {option.tone}"></span>
 						{/if}
-						{opcion.valor}
+						{option.value}
 					</li>
 				{/each}
 			</ul>
 		</div>
 	{/each}
 
-	<p class="text-muted-foreground mt-4 text-xs">{ficha.nota}</p>
+	<p class="text-muted-foreground mt-4 text-xs">{sheet.note}</p>
 
 	<p
 		class="bg-foreground text-background mt-3 rounded-full py-2.5 text-center text-sm font-semibold"

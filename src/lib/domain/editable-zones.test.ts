@@ -2,40 +2,40 @@
 import { describe, expect, it } from 'vitest';
 
 // Dominio
-import { SECCIONES } from '$lib/domain/diseno';
+import { SECTIONS } from '$lib/domain/design';
 import {
-	destinoDeZona,
+	zoneTarget,
 	EDITABLE_ZONE_NAMES,
 	EDITABLE_ZONES,
 	isEditableZone,
-	urlDeSeccion
+	sectionUrl
 } from '$lib/domain/editable-zones';
 import { PREVIEW_ZONES } from '$lib/domain/preview';
 
 describe('EDITABLE_ZONES', () => {
 	it('toda zona editable apunta a una sección válida', () => {
-		for (const zona of EDITABLE_ZONE_NAMES) {
-			expect(SECCIONES).toContain(EDITABLE_ZONES[zona].seccion);
+		for (const zone of EDITABLE_ZONE_NAMES) {
+			expect(SECTIONS).toContain(EDITABLE_ZONES[zone].section);
 		}
 	});
 
 	it('toda zona editable existe como zona de la vista previa', () => {
-		for (const zona of EDITABLE_ZONE_NAMES) {
-			expect(PREVIEW_ZONES).toContain(zona);
+		for (const zone of EDITABLE_ZONE_NAMES) {
+			expect(PREVIEW_ZONES).toContain(zone);
 		}
 	});
 
 	it('cada zona tiene una etiqueta con texto', () => {
-		for (const zona of EDITABLE_ZONE_NAMES) {
-			expect(EDITABLE_ZONES[zona].etiqueta.length).toBeGreaterThan(0);
+		for (const zone of EDITABLE_ZONE_NAMES) {
+			expect(EDITABLE_ZONES[zone].tagLabel.length).toBeGreaterThan(0);
 		}
 	});
 
 	it('los destinos son los que dice el mapa', () => {
-		expect(EDITABLE_ZONES['store-header']).toMatchObject({ seccion: 'marca', campo: 'storeName' });
-		expect(EDITABLE_ZONES.announcement).toMatchObject({ seccion: 'marca', campo: 'announcement' });
-		expect(EDITABLE_ZONES.hero).toMatchObject({ seccion: 'portada' });
-		expect(EDITABLE_ZONES.highlights).toMatchObject({ seccion: 'portada' });
+		expect(EDITABLE_ZONES['store-header']).toMatchObject({ section: 'marca', field: 'storeName' });
+		expect(EDITABLE_ZONES.announcement).toMatchObject({ section: 'marca', field: 'announcement' });
+		expect(EDITABLE_ZONES.hero).toMatchObject({ section: 'portada' });
+		expect(EDITABLE_ZONES.highlights).toMatchObject({ section: 'portada' });
 	});
 });
 
@@ -50,12 +50,12 @@ describe('isEditableZone', () => {
 
 describe('mapeo zona → URL de sección', () => {
 	it('cada sección tiene su ?section=', () => {
-		expect(urlDeSeccion('marca')).toBe('?section=marca');
-		expect(urlDeSeccion('portada')).toBe('?section=portada');
+		expect(sectionUrl('marca')).toBe('?section=marca');
+		expect(sectionUrl('portada')).toBe('?section=portada');
 	});
 
 	it('una zona lleva a su sección y a su campo', () => {
-		expect(destinoDeZona('store-header')).toEqual({ url: '?section=marca', campo: 'storeName' });
-		expect(destinoDeZona('hero')).toEqual({ url: '?section=portada', campo: 'heroCollectionId' });
+		expect(zoneTarget('store-header')).toEqual({ url: '?section=marca', field: 'storeName' });
+		expect(zoneTarget('hero')).toEqual({ url: '?section=portada', field: 'heroCollectionId' });
 	});
 });

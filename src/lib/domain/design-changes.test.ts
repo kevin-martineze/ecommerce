@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 // Dominio
 import {
-	textoDelCambio,
+	changeText,
 	describeDesignChanges,
-	recortar,
+	truncate,
 	type DesignChange,
 	type DesignCollection,
 	type DesignSnapshot
@@ -24,183 +24,183 @@ const base: DesignSnapshot = {
 	heroSubtitle: ''
 };
 
-const colecciones: DesignCollection[] = [{ id: 'col-negras', name: 'Negras' }];
+const collections: DesignCollection[] = [{ id: 'col-negras', name: 'Negras' }];
 
 describe('describeDesignChanges', () => {
 	it('sin cambios no devuelve nada', () => {
-		expect(describeDesignChanges(base, { ...base }, colecciones)).toEqual([]);
+		expect(describeDesignChanges(base, { ...base }, collections)).toEqual([]);
 	});
 
 	it('un cambio de plantilla usa el nombre visible y se destaca', () => {
-		const cambios = describeDesignChanges(base, { ...base, template: 'moda' }, colecciones);
+		const changes = describeDesignChanges(base, { ...base, template: 'moda' }, collections);
 
-		expect(cambios).toHaveLength(1);
-		expect(cambios[0]).toMatchObject({
-			seccion: 'estilo',
-			campo: 'Plantilla',
-			tipo: 'cambia',
-			destacado: true
+		expect(changes).toHaveLength(1);
+		expect(changes[0]).toMatchObject({
+			section: 'estilo',
+			field: 'Plantilla',
+			kind: 'cambia',
+			featured: true
 		});
-		expect(cambios[0].antes).not.toBe('editorial');
-		expect(cambios[0].despues).not.toBe('moda');
+		expect(changes[0].antes).not.toBe('editorial');
+		expect(changes[0].after).not.toBe('moda');
 	});
 
 	it('un color que aparece es «agrega» y trae su muestra', () => {
-		const [cambio] = describeDesignChanges(base, { ...base, accent: '#6D28D9' }, colecciones);
+		const [change] = describeDesignChanges(base, { ...base, accent: '#6D28D9' }, collections);
 
-		expect(cambio).toMatchObject({
-			seccion: 'estilo',
-			campo: 'Color',
-			tipo: 'agrega',
+		expect(change).toMatchObject({
+			section: 'estilo',
+			field: 'Color',
+			kind: 'agrega',
 			antes: '',
-			despues: '#6D28D9',
+			after: '#6D28D9',
 			swatch: '#6D28D9'
 		});
 	});
 
 	it('un color que se quita vuelve a lo que trae la plantilla', () => {
-		const guardado = { ...base, accent: '#111111' };
-		const [cambio] = describeDesignChanges(guardado, base, colecciones);
+		const saved = { ...base, accent: '#111111' };
+		const [change] = describeDesignChanges(saved, base, collections);
 
-		expect(cambio).toMatchObject({
-			campo: 'Color',
-			tipo: 'quita',
+		expect(change).toMatchObject({
+			field: 'Color',
+			kind: 'quita',
 			antes: '#111111',
-			nota: 'Vuelve a lo que trae la plantilla'
+			note: 'Vuelve a lo que trae la plantilla'
 		});
 	});
 
 	it('«Quitar mis ajustes» deja una nota en cada campo de estilo afectado', () => {
-		const guardado = {
+		const saved = {
 			...base,
 			accent: '#111111',
 			fonts: 'serif',
 			corners: 'round',
 			hero: 'split'
 		};
-		const cambios = describeDesignChanges(guardado, base, colecciones);
+		const changes = describeDesignChanges(saved, base, collections);
 
-		expect(cambios.map((cambio) => cambio.campo)).toEqual([
+		expect(changes.map((change) => change.field)).toEqual([
 			'Color',
 			'Letras',
 			'Esquinas',
 			'Estilo de la imagen de arriba'
 		]);
-		for (const cambio of cambios) {
-			expect(cambio.tipo).toBe('quita');
-			expect(cambio.nota).toBe('Vuelve a lo que trae la plantilla');
+		for (const change of changes) {
+			expect(change.kind).toBe('quita');
+			expect(change.note).toBe('Vuelve a lo que trae la plantilla');
 		}
 	});
 
 	it('las letras, esquinas y estilo de portada usan su nombre visible', () => {
-		const [letras] = describeDesignChanges(base, { ...base, fonts: 'serif' }, colecciones);
+		const [fontCode] = describeDesignChanges(base, { ...base, fonts: 'serif' }, collections);
 
-		expect(letras).toMatchObject({ campo: 'Letras', tipo: 'agrega', despues: 'Clásica' });
+		expect(fontCode).toMatchObject({ field: 'Letras', kind: 'agrega', after: 'Clásica' });
 	});
 
 	it('la barra de anuncio que se borra sale como «quita»', () => {
-		const guardado = { ...base, announcement: 'Envío gratis hoy' };
-		const [cambio] = describeDesignChanges(guardado, base, colecciones);
+		const saved = { ...base, announcement: 'Envío gratis hoy' };
+		const [change] = describeDesignChanges(saved, base, collections);
 
-		expect(cambio).toMatchObject({
-			seccion: 'marca',
-			campo: 'Barra de anuncio',
-			tipo: 'quita',
+		expect(change).toMatchObject({
+			section: 'marca',
+			field: 'Barra de anuncio',
+			kind: 'quita',
 			antes: 'Envío gratis hoy'
 		});
 	});
 
 	it('un texto largo se trunca a 60 caracteres con …', () => {
 		const largo = 'x'.repeat(90);
-		const [cambio] = describeDesignChanges(base, { ...base, announcement: largo }, colecciones);
+		const [change] = describeDesignChanges(base, { ...base, announcement: largo }, collections);
 
-		expect(cambio.despues).toHaveLength(60);
-		expect(cambio.despues.endsWith('…')).toBe(true);
+		expect(change.after).toHaveLength(60);
+		expect(change.after.endsWith('…')).toBe(true);
 	});
 
 	it('la colección destacada sale por su nombre, no por el id', () => {
-		const [cambio] = describeDesignChanges(
+		const [change] = describeDesignChanges(
 			base,
 			{ ...base, heroCollectionId: 'col-negras' },
-			colecciones
+			collections
 		);
 
-		expect(cambio).toMatchObject({
-			seccion: 'portada',
-			campo: 'Colección destacada',
-			tipo: 'agrega',
+		expect(change).toMatchObject({
+			section: 'portada',
+			field: 'Colección destacada',
+			kind: 'agrega',
 			antes: 'Ninguna',
-			despues: 'Negras',
-			destacado: true
+			after: 'Negras',
+			featured: true
 		});
 	});
 
 	it('el orden sigue a las secciones: Estilo, Marca y Portada', () => {
-		const borrador = {
+		const draft = {
 			...base,
 			heroTitle: 'Nuevo',
 			storeName: 'Otra',
 			accent: '#111111',
 			template: 'moda' as const
 		};
-		const secciones = describeDesignChanges(base, borrador, colecciones).map(
-			(cambio) => cambio.seccion
+		const sections = describeDesignChanges(base, draft, collections).map(
+			(change) => change.section
 		);
 
-		expect(secciones).toEqual(['estilo', 'estilo', 'marca', 'portada']);
+		expect(sections).toEqual(['estilo', 'estilo', 'marca', 'portada']);
 	});
 });
 
 describe('recortar', () => {
 	it('deja intacto un texto corto', () => {
-		expect(recortar('Hola')).toBe('Hola');
+		expect(truncate('Hola')).toBe('Hola');
 	});
 });
 
 describe('textoDelCambio', () => {
-	const cambia: DesignChange = {
-		seccion: 'estilo',
-		campo: 'Plantilla',
-		tipo: 'cambia',
+	const change: DesignChange = {
+		section: 'estilo',
+		field: 'Plantilla',
+		kind: 'cambia',
 		antes: 'Moda',
-		despues: 'Minimal',
-		destacado: true
+		after: 'Minimal',
+		featured: true
 	};
 
 	it('al guardar, un cambio dice «Cambia» con antes y después', () => {
-		expect(textoDelCambio(cambia, 'guardar')).toBe('Cambia Plantilla: «Moda» → «Minimal»');
+		expect(changeText(change, 'guardar')).toBe('Cambia Plantilla: «Moda» → «Minimal»');
 	});
 
 	it('al guardar, un agregado dice «Agrega» con el valor nuevo', () => {
-		const agrega: DesignChange = { ...cambia, tipo: 'agrega', antes: '', despues: 'Envíos gratis' };
+		const addItem: DesignChange = { ...change, kind: 'agrega', antes: '', after: 'Envíos gratis' };
 
-		expect(textoDelCambio(agrega, 'guardar')).toBe('Agrega Plantilla: «Envíos gratis»');
+		expect(changeText(addItem, 'guardar')).toBe('Agrega Plantilla: «Envíos gratis»');
 	});
 
 	it('al guardar, un quitado con nota dice la nota', () => {
-		const quita: DesignChange = {
-			...cambia,
-			tipo: 'quita',
+		const removeItem: DesignChange = {
+			...change,
+			kind: 'quita',
 			antes: 'Moda',
-			despues: '',
-			nota: 'Vuelve a lo que trae la plantilla'
+			after: '',
+			note: 'Vuelve a lo que trae la plantilla'
 		};
 
-		expect(textoDelCambio(quita, 'guardar')).toBe(
+		expect(changeText(removeItem, 'guardar')).toBe(
 			'Quita Plantilla · Vuelve a lo que trae la plantilla'
 		);
 	});
 
 	it('al descartar, dice lo que se pierde con el valor guardado y el borrador', () => {
 		const color: DesignChange = {
-			seccion: 'estilo',
-			campo: 'Color',
-			tipo: 'cambia',
+			section: 'estilo',
+			field: 'Color',
+			kind: 'cambia',
 			antes: '#111111',
-			despues: '#6D28D9',
-			destacado: false
+			after: '#6D28D9',
+			featured: false
 		};
 
-		expect(textoDelCambio(color, 'descartar')).toBe('Se pierde: Color #111111 → #6D28D9');
+		expect(changeText(color, 'descartar')).toBe('Se pierde: Color #111111 → #6D28D9');
 	});
 });

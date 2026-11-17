@@ -9,34 +9,34 @@
  * Al constituir la empresa se llenan aquí y aparecen solos en las tres
  * páginas.
  */
-export interface DatosEmpresa {
+export interface CompanyInfo {
 	/** Nombre comercial. Siempre hay. */
-	marca: string;
-	razonSocial: string | null;
+	brand: string;
+	legalName: string | null;
 	nit: string | null;
 	/** Correo al que escribe quien tiene una duda o ejerce sus derechos de datos. */
 	email: string | null;
 	/** Solo dígitos, con indicativo. */
 	whatsapp: string | null;
-	ciudad: string | null;
+	city: string | null;
 	/** País cuya ley rige el servicio. */
 	pais: string;
 }
 
-export const EMPRESA: DatosEmpresa = {
-	marca: 'Globerce',
-	razonSocial: null,
+export const COMPANY: CompanyInfo = {
+	brand: 'Globerce',
+	legalName: null,
 	nit: null,
 	email: null,
 	whatsapp: null,
-	ciudad: null,
+	city: null,
 	pais: 'Colombia'
 };
 
 /** Desde cuándo rige la versión actual de los textos legales. */
-export const VIGENCIA_LEGAL = '19 de septiembre de 2026';
+export const LEGAL_EFFECTIVE_DATE = '19 de septiembre de 2026';
 
 /** Si hay al menos una forma de contactarnos. */
-export function hayContacto(empresa: DatosEmpresa = EMPRESA): boolean {
-	return Boolean(empresa.email || empresa.whatsapp);
+export function hasContact(company: CompanyInfo = COMPANY): boolean {
+	return Boolean(company.email || company.whatsapp);
 }

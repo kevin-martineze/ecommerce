@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 // Servidor
 import { checkoutSchema } from '$lib/server/api/panel-team';
 
-const cobro = {
+const charge = {
 	url: 'https://checkout.wompi.co/p/?reference=sub-1',
 	reference: 'sub-1',
 	amountCop: 99000
@@ -22,7 +22,7 @@ const widget = {
 
 describe('checkoutSchema (cobro del plan)', () => {
 	it('traduce el widget a snake_case cuando viene', () => {
-		const parsed = checkoutSchema.parse({ ...cobro, widget });
+		const parsed = checkoutSchema.parse({ ...charge, widget });
 
 		expect(parsed.widget).toEqual({
 			public_key: 'pub_test_llave_publica',
@@ -37,10 +37,10 @@ describe('checkoutSchema (cobro del plan)', () => {
 	});
 
 	it('si la API anterior no manda widget, queda en null', () => {
-		expect(checkoutSchema.parse(cobro).widget).toBeNull();
+		expect(checkoutSchema.parse(charge).widget).toBeNull();
 	});
 
 	it('si la pasarela simulada manda widget null, queda en null', () => {
-		expect(checkoutSchema.parse({ ...cobro, widget: null }).widget).toBeNull();
+		expect(checkoutSchema.parse({ ...charge, widget: null }).widget).toBeNull();
 	});
 });

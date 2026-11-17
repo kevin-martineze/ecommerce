@@ -67,8 +67,8 @@
 	const currentPlan = $derived(data.plans.find((plan) => plan.code === store.plan_code));
 
 	let planCode = $state(untrack(() => data.store.plan_code ?? ''));
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -108,7 +108,7 @@
 		{/if}
 	</div>
 
-	<form id="estado" method="POST" action="?/status" use:enhance={alBorrar}>
+	<form id="estado" method="POST" action="?/status" use:enhance={onDelete}>
 		{#if store.status === 'suspended'}
 			<input type="hidden" name="status" value="active" />
 			<Button type="submit">Reactivar tienda</Button>
@@ -118,7 +118,7 @@
 				type="button"
 				variant="destructive"
 				onclick={() =>
-					borrado.ask('estado', `¿Suspender ${store.name}?`, {
+					deletion.ask('estado', `¿Suspender ${store.name}?`, {
 						description: 'Su tienda dejará de verse en internet.',
 						confirmLabel: 'Suspender',
 						pendingLabel: 'Suspendiendo…'
@@ -290,11 +290,11 @@
 </section>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

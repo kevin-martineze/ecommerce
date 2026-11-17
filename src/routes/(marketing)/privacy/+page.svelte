@@ -3,7 +3,7 @@
 	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
 
 	// Dominio
-	import { EMPRESA } from '$lib/config/empresa';
+	import { COMPANY } from '$lib/config/company';
 </script>
 
 <svelte:head>
@@ -18,10 +18,10 @@
 	<section>
 		<h2>1. Quién trata tus datos</h2>
 		<p>
-			{#if EMPRESA.razonSocial}
-				{EMPRESA.razonSocial}{#if EMPRESA.nit}, NIT {EMPRESA.nit}{/if}, que opera {EMPRESA.marca}.
+			{#if COMPANY.legalName}
+				{COMPANY.legalName}{#if COMPANY.nit}, NIT {COMPANY.nit}{/if}, que opera {COMPANY.brand}.
 			{:else}
-				Quien opera {EMPRESA.marca}.
+				Quien opera {COMPANY.brand}.
 			{/if}
 			Para los datos de tu propia cuenta somos responsables del tratamiento; para los datos de los clientes
 			de tu tienda somos encargados: los guardamos por cuenta tuya y hacemos con ellos lo que tú nos indiques.
@@ -89,7 +89,7 @@
 		<p>
 			Puedes conocer, actualizar y rectificar tus datos, pedir una copia, revocar la autorización y
 			pedir que se supriman cuando no haya un deber legal de conservarlos (Ley 1581 de 2012 y sus
-			decretos, en {EMPRESA.pais}). Los clientes de una tienda pueden ejercer esos derechos ante la
+			decretos, en {COMPANY.pais}). Los clientes de una tienda pueden ejercer esos derechos ante la
 			tienda; si nos escriben a nosotros, las ponemos en contacto y ayudamos a atender la solicitud.
 		</p>
 		<p>

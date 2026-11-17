@@ -6,8 +6,8 @@ import { z } from 'zod';
 import { fieldErrors } from '$lib/utils/form';
 
 const schema = z.object({
-	nombre: z.string().min(2, 'Escribe el nombre.').max(4, 'Muy largo.'),
-	correo: z.string().email('Correo inválido.')
+	name: z.string().min(2, 'Escribe el nombre.').max(4, 'Muy largo.'),
+	emailAddress: z.string().email('Correo inválido.')
 });
 
 function errorsOf(value: unknown) {
@@ -18,18 +18,18 @@ function errorsOf(value: unknown) {
 
 describe('fieldErrors', () => {
 	it('junta un mensaje por campo', () => {
-		expect(errorsOf({ nombre: '', correo: 'no-es-correo' })).toEqual({
-			nombre: 'Escribe el nombre.',
-			correo: 'Correo inválido.'
+		expect(errorsOf({ name: '', emailAddress: 'no-es-correo' })).toEqual({
+			name: 'Escribe el nombre.',
+			emailAddress: 'Correo inválido.'
 		});
 	});
 
 	it('se queda con el primero de cada campo', () => {
-		expect(errorsOf({ nombre: 12, correo: 'ana@tienda.com' }).nombre).toBeDefined();
-		expect(Object.keys(errorsOf({ nombre: '', correo: '' }))).toEqual(['nombre', 'correo']);
+		expect(errorsOf({ name: 12, emailAddress: 'ana@tienda.com' }).name).toBeDefined();
+		expect(Object.keys(errorsOf({ name: '', emailAddress: '' }))).toEqual(['name', 'emailAddress']);
 	});
 
 	it('sin errores, no hay nada que pintar', () => {
-		expect(errorsOf({ nombre: 'Ana', correo: 'ana@tienda.com' })).toEqual({});
+		expect(errorsOf({ name: 'Ana', emailAddress: 'ana@tienda.com' })).toEqual({});
 	});
 });

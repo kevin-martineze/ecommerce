@@ -27,7 +27,7 @@
 		device: 'desktop' | 'mobile';
 		title: string;
 		/** Qué zona de la vista previa pidió editar la dueña con un clic. */
-		onedit?: (zona: EditableZoneName) => void;
+		onedit?: (zone: EditableZoneName) => void;
 	}
 
 	let { src, draft, device, title, onedit }: Props = $props();
@@ -66,9 +66,9 @@
 			}
 
 			// Un clic en una zona editable de la tienda: el editor decide a dónde llevarlo.
-			const zona = readPreviewEdit(event.data);
+			const zone = readPreviewEdit(event.data);
 
-			if (zona) onedit?.(zona);
+			if (zone) onedit?.(zone);
 		}
 
 		window.addEventListener('message', onMessage);

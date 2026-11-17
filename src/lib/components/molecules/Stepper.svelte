@@ -13,55 +13,54 @@
 	 * saltar, porque cada paso valida lo suyo antes de dejar pasar.
 	 */
 	interface Props {
-		pasos: string[];
+		steps: string[];
 		/** Índice del paso en curso, desde 0. */
 		actual: number;
-		onir?: (indice: number) => void;
+		ongo?: (index: number) => void;
 	}
 
-	let { pasos, actual, onir }: Props = $props();
+	let { steps, actual, ongo }: Props = $props();
 </script>
 
 <ol class="flex items-center" aria-label="Progreso del registro">
-	{#each pasos as titulo, indice (titulo)}
-		{@const hecho = indice < actual}
-		{@const activo = indice === actual}
+	{#each steps as title, index (title)}
+		{@const done = index < actual}
+		{@const isActive = index === actual}
 
-		<li class={cn('flex items-center', indice < pasos.length - 1 && 'flex-1')}>
+		<li class={cn('flex items-center', index < steps.length - 1 && 'flex-1')}>
 			<button
 				type="button"
-				disabled={!hecho}
-				onclick={() => onir?.(indice)}
-				aria-current={activo ? 'step' : undefined}
+				disabled={!done}
+				onclick={() => ongo?.(index)}
+				aria-current={isActive ? 'step' : undefined}
 				class={cn(
 					'flex items-center gap-2 rounded-md text-sm',
-					hecho && 'cursor-pointer',
-					!activo && !hecho && 'text-muted-foreground'
+					done && 'cursor-pointer',
+					!isActive && !done && 'text-muted-foreground'
 				)}
 			>
 				<span
 					class={cn(
 						'flex size-7 shrink-0 items-center justify-center rounded-full border text-xs tabular-nums transition-colors',
-						activo && 'border-foreground bg-foreground text-background',
-						hecho && 'border-foreground text-foreground',
-						!activo && !hecho && 'border-border'
+						isActive && 'border-foreground bg-foreground text-background',
+						done && 'border-foreground text-foreground',
+						!isActive && !done && 'border-border'
 					)}
 				>
-					{#if hecho}
+					{#if done}
 						<Check class="size-3.5" />
 					{:else}
-						{indice + 1}
+						{index + 1}
 					{/if}
 				</span>
 
 				<!-- El rótulo se esconde en pantallas angostas: el número y la línea
 				     ya dicen dónde va, y tres rótulos completos no caben. -->
-				<span class={cn('hidden sm:inline', activo && 'font-medium')}>{titulo}</span>
+				<span class={cn('hidden sm:inline', isActive && 'font-medium')}>{title}</span>
 			</button>
 
-			{#if indice < pasos.length - 1}
-				<span
-					class={cn('mx-3 h-px flex-1 transition-colors', hecho ? 'bg-foreground' : 'bg-border')}
+			{#if index < steps.length - 1}
+				<span class={cn('mx-3 h-px flex-1 transition-colors', done ? 'bg-foreground' : 'bg-border')}
 				></span>
 			{/if}
 		</li>

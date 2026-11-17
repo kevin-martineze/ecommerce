@@ -10,7 +10,7 @@ import { failWith, orFail, panelContext } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
 
 // Dominio
-import { dominioSchema } from '$lib/schemas/domain';
+import { domainSchema } from '$lib/schemas/domain';
 
 /** Dominio propio: solo la dueña (`OWNER`) lo configura. El resto va al inicio del panel. */
 export const load: PageServerLoad = async (event) => {
@@ -28,7 +28,7 @@ export const actions: Actions = {
 		const ctx = panelContext(event);
 		const formData = await event.request.formData();
 
-		const parsed = dominioSchema(serverEnv().PUBLIC_STORE_ROOT_DOMAIN).safeParse(
+		const parsed = domainSchema(serverEnv().PUBLIC_STORE_ROOT_DOMAIN).safeParse(
 			formData.get('host') ?? ''
 		);
 

@@ -97,26 +97,29 @@
 	 */
 	const valueOptions = $derived([
 		{ value: '', label: 'Todas' },
-		...product.options.flatMap((eje) =>
-			eje.values
-				.filter((valor) => valor.hex !== null)
-				.map((valor) => ({ value: valor.id, label: `${eje.name}: ${valor.value}` }))
+		...product.options.flatMap((axis) =>
+			axis.values
+				.filter((optionValue) => optionValue.hex !== null)
+				.map((optionValue) => ({
+					value: optionValue.id,
+					label: `${axis.name}: ${optionValue.value}`
+				}))
 		)
 	]);
 
 	/** El nombre de un valor, para etiquetar la foto ya subida. */
-	function nombreValor(id: string): string {
-		for (const eje of product.options) {
-			const valor = eje.values.find((candidato) => candidato.id === id);
+	function valueName(id: string): string {
+		for (const axis of product.options) {
+			const optionValue = axis.values.find((candidate) => candidate.id === id);
 
-			if (valor) return valor.value;
+			if (optionValue) return optionValue.value;
 		}
 
 		return '';
 	}
 	let uploading = $state(false);
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -180,14 +183,14 @@
 				method="POST"
 				action="?/delete"
 				class="mt-4"
-				use:enhance={alBorrar}
+				use:enhance={onDelete}
 			>
 				<Button
 					type="button"
 					variant="destructive"
 					size="sm"
 					onclick={() =>
-						borrado.ask('borrar-producto', '¿Eliminar este producto?', {
+						deletion.ask('borrar-producto', '¿Eliminar este producto?', {
 							description:
 								'Si ya salió en pedidos no se borra: se archiva para conservar el historial.',
 							confirmLabel: 'Eliminar',
@@ -288,7 +291,7 @@
 									id="borrar-imagen-{image.id}"
 									method="POST"
 									action="?/deleteImage"
-									use:enhance={alBorrar}
+									use:enhance={onDelete}
 								>
 									<input type="hidden" name="imageId" value={image.id} />
 									<Button
@@ -298,7 +301,7 @@
 										class="text-destructive"
 										aria-label="Borrar foto"
 										onclick={() =>
-											borrado.ask(`borrar-imagen-${image.id}`, '¿Borrar esta foto?', {
+											deletion.ask(`borrar-imagen-${image.id}`, '¿Borrar esta foto?', {
 												description: 'No se puede deshacer.'
 											})}
 									>
@@ -309,7 +312,7 @@
 
 							{#if image.option_value_id}
 								<p class="text-muted-foreground text-xs">
-									{nombreValor(image.option_value_id)}
+									{valueName(image.option_value_id)}
 								</p>
 							{/if}
 						</div>
@@ -333,11 +336,11 @@
 </Tabs.Root>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

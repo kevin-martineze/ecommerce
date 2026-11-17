@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Dominio
-	import { TIENDA_MAQUETA } from '$lib/config/maqueta';
+	import { MOCKUP_STORE } from '$lib/config/mockup';
 
 	// Utilidades
 	import { cn } from '$lib/utils';
@@ -21,8 +21,8 @@
 	let { class: className }: Props = $props();
 
 	const lineas = [
-		{ concepto: 'Blusa Vera · M · verde', valor: '$89.900' },
-		{ concepto: 'Envío Medellín', valor: '$12.000' }
+		{ concept: 'Blusa Vera · M · verde', value: '$89.900' },
+		{ concept: 'Envío Medellín', value: '$12.000' }
 	];
 
 	const medios = ['Tarjeta', 'Transferencia', 'Billetera'];
@@ -37,14 +37,14 @@
 >
 	<div class="flex items-center gap-2 text-sm font-semibold">
 		<span class="bg-primary size-2 rounded-full"></span>
-		{TIENDA_MAQUETA.nombre} · Pago seguro
+		{MOCKUP_STORE.name} · Pago seguro
 	</div>
 
 	<dl class="mt-4 space-y-2 text-sm">
-		{#each lineas as linea (linea.concepto)}
+		{#each lineas as linea (linea.concept)}
 			<div class="flex items-baseline justify-between gap-4">
-				<dt class="text-muted-foreground">{linea.concepto}</dt>
-				<dd class="tabular-nums">{linea.valor}</dd>
+				<dt class="text-muted-foreground">{linea.concept}</dt>
+				<dd class="tabular-nums">{linea.value}</dd>
 			</div>
 		{/each}
 		<div class="border-border flex items-baseline justify-between gap-4 border-t pt-2">

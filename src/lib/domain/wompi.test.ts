@@ -4,21 +4,21 @@ import { describe, expect, it } from 'vitest';
 // Dominio
 import { completeWompiKeys, mixedModes, parseWompiKeys, wompiMode } from '$lib/domain/wompi';
 
-const PEGADO_ETIQUETADO = `
+const PASTE_LABELED = `
 Llave pública: pub_test_a1b2c3d4e5f6g7h8
 Llave privada: prv_test_z9y8x7w6v5u4t3s2
 Secreto de integridad: test_integrity_1234567890abcdef
 Secreto de eventos: test_events_abcdef1234567890
 `;
 
-const PEGADO_SIN_ETIQUETAS = `pub_prod_abcdefghij123456
+const PASTE_UNLABELED = `pub_prod_abcdefghij123456
 prv_prod_123456abcdefghij
 prod_integrity_qwertyuiop1234
 prod_events_asdfghjkl56789`;
 
 describe('parseWompiKeys', () => {
 	it('reconoce las cuatro llaves de un bloque pegado con etiquetas', () => {
-		expect(parseWompiKeys(PEGADO_ETIQUETADO)).toEqual({
+		expect(parseWompiKeys(PASTE_LABELED)).toEqual({
 			publicKey: 'pub_test_a1b2c3d4e5f6g7h8',
 			privateKey: 'prv_test_z9y8x7w6v5u4t3s2',
 			integritySecret: 'test_integrity_1234567890abcdef',
@@ -27,7 +27,7 @@ describe('parseWompiKeys', () => {
 	});
 
 	it('reconoce las cuatro sin etiquetas, en el orden que sea', () => {
-		expect(parseWompiKeys(PEGADO_SIN_ETIQUETAS)).toEqual({
+		expect(parseWompiKeys(PASTE_UNLABELED)).toEqual({
 			publicKey: 'pub_prod_abcdefghij123456',
 			privateKey: 'prv_prod_123456abcdefghij',
 			integritySecret: 'prod_integrity_qwertyuiop1234',
@@ -43,14 +43,14 @@ describe('parseWompiKeys', () => {
 	});
 
 	it('con dos llaves del mismo tipo, gana la primera', () => {
-		const dosVeces = 'pub_test_primeraaaaaaaaa pub_test_segundaaaaaaaa';
-		expect(parseWompiKeys(dosVeces).publicKey).toBe('pub_test_primeraaaaaaaaa');
+		const twice = 'pub_test_primeraaaaaaaaa pub_test_segundaaaaaaaa';
+		expect(parseWompiKeys(twice).publicKey).toBe('pub_test_primeraaaaaaaaa');
 	});
 });
 
 describe('completeWompiKeys', () => {
 	it('arma el juego completo cuando están las cuatro', () => {
-		expect(completeWompiKeys(parseWompiKeys(PEGADO_ETIQUETADO))).toEqual({
+		expect(completeWompiKeys(parseWompiKeys(PASTE_LABELED))).toEqual({
 			publicKey: 'pub_test_a1b2c3d4e5f6g7h8',
 			privateKey: 'prv_test_z9y8x7w6v5u4t3s2',
 			integritySecret: 'test_integrity_1234567890abcdef',
@@ -81,16 +81,16 @@ describe('wompiMode', () => {
 
 describe('mixedModes', () => {
 	it('false cuando todas las llaves son del mismo mundo', () => {
-		expect(mixedModes(parseWompiKeys(PEGADO_ETIQUETADO))).toBe(false);
-		expect(mixedModes(parseWompiKeys(PEGADO_SIN_ETIQUETAS))).toBe(false);
+		expect(mixedModes(parseWompiKeys(PASTE_LABELED))).toBe(false);
+		expect(mixedModes(parseWompiKeys(PASTE_UNLABELED))).toBe(false);
 	});
 
 	it('true cuando se mezclan pruebas con producción', () => {
-		const mezclado = `pub_test_a1b2c3d4e5f6g7h8
+		const mixed = `pub_test_a1b2c3d4e5f6g7h8
 prv_prod_z9y8x7w6v5u4t3s2
 test_integrity_1234567890abcdef
 test_events_abcdef1234567890`;
-		expect(mixedModes(parseWompiKeys(mezclado))).toBe(true);
+		expect(mixedModes(parseWompiKeys(mixed))).toBe(true);
 	});
 
 	it('false si solo hay una llave, aunque sea de un mundo', () => {

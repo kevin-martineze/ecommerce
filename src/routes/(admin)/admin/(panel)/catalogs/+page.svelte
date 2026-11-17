@@ -41,7 +41,7 @@
 		return rows.reduce((max, row) => Math.max(max, row.sort_order), 0) + 1;
 	}
 
-	function usoCategoria(id: string): number {
+	function categoryUsage(id: string): number {
 		return data.usage.categories[id] ?? 0;
 	}
 
@@ -105,8 +105,8 @@
 	function editCategory(id: string, patch: CategoryEdit) {
 		categoryEdits[id] = { ...categoryEdits[id], ...patch };
 	}
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -172,7 +172,7 @@
 
 				<div class="space-y-4">
 					{#each rows as category (category.id)}
-						{@const enUso = usoCategoria(category.id)}
+						{@const inUse = categoryUsage(category.id)}
 						<EditableRowCard>
 							<div class="grid gap-4 md:grid-cols-2">
 								<div class="space-y-1.5">
@@ -220,11 +220,11 @@
 								</div>
 
 								<p class="text-muted-foreground pb-2 text-xs">
-									{enUso > 0 ? `${enUso} productos` : 'sin usar'}
+									{inUse > 0 ? `${inUse} productos` : 'sin usar'}
 								</p>
 							</div>
 
-							{#snippet acciones()}
+							{#snippet actionList()}
 								<Button type="submit" form="categoria-{category.id}" size="sm" variant="outline">
 									Guardar
 								</Button>
@@ -232,7 +232,7 @@
 								<Button
 									type="button"
 									onclick={() =>
-										borrado.ask(`borrar-categoria-${category.id}`, `¿Borrar ${category.name}?`, {
+										deletion.ask(`borrar-categoria-${category.id}`, `¿Borrar ${category.name}?`, {
 											description: 'Lo que ya esté en uso no se borra: se oculta.'
 										})}
 									size="sm"
@@ -265,7 +265,7 @@
 			id="borrar-categoria-{category.id}"
 			method="POST"
 			action="?/deleteCategory"
-			use:enhance={alBorrar}
+			use:enhance={onDelete}
 		>
 			<input type="hidden" name="id" value={category.id} />
 		</form>
@@ -273,11 +273,11 @@
 </div>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

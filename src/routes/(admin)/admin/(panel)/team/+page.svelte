@@ -46,8 +46,8 @@
 		await tick();
 		document.getElementById(`role-submit-${userId}`)?.click();
 	}
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
@@ -158,7 +158,7 @@
 								id="quitar-{member.user_id}"
 								method="POST"
 								action="?/remove"
-								use:enhance={alBorrar}
+								use:enhance={onDelete}
 							>
 								<input type="hidden" name="userId" value={member.user_id} />
 								<Button
@@ -167,7 +167,7 @@
 									size="icon"
 									aria-label={`Quitar a ${member.email}`}
 									onclick={() =>
-										borrado.ask(
+										deletion.ask(
 											`quitar-${member.user_id}`,
 											`¿Quitar a ${member.email} del equipo?`,
 											{
@@ -215,11 +215,11 @@
 {/if}
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

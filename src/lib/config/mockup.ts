@@ -8,10 +8,10 @@
  * para que quepa en un subdominio, y que suene a una tienda que puede vender
  * cualquier cosa.
  */
-export const TIENDA_MAQUETA = {
-	nombre: 'Casa Oliva',
+export const MOCKUP_STORE = {
+	name: 'Casa Oliva',
 	slug: 'casaoliva'
 } as const;
 
 /** La dirección que se pinta en la barra del navegador de `StoreShowcase`. */
-export const HOST_MAQUETA = `${TIENDA_MAQUETA.slug}.globerce.store`;
+export const MOCKUP_HOST = `${MOCKUP_STORE.slug}.globerce.store`;

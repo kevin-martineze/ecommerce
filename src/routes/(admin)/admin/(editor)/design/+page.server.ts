@@ -26,7 +26,7 @@ import {
 	homeHighlightSchema,
 	storeThemeSchema,
 	templateSchema,
-	tiendaSchema
+	storeSchema
 } from '$lib/schemas/admin';
 
 /**
@@ -101,12 +101,12 @@ export const actions: Actions = {
 
 		if (problem) return fail(400, { error: problem });
 
-		const marca = tiendaSchema.safeParse({
+		const brand = storeSchema.safeParse({
 			storeName: formData.get('storeName') ?? '',
 			announcement: formData.get('announcement') ?? ''
 		});
 
-		if (!marca.success) return fail(400, { error: firstIssue(marca.error.issues) });
+		if (!brand.success) return fail(400, { error: firstIssue(brand.error.issues) });
 
 		const portada = heroSchema.safeParse({
 			heroCollectionId: String(formData.get('heroCollectionId') ?? '') || null,
@@ -120,8 +120,8 @@ export const actions: Actions = {
 		const result = await updateSettings(ctx, {
 			template: template.data,
 			theme: isEmptyTheme(theme.data) ? null : theme.data,
-			storeName: marca.data.storeName,
-			announcement: marca.data.announcement || null,
+			storeName: brand.data.storeName,
+			announcement: brand.data.announcement || null,
 			heroCollectionId: portada.data.heroCollectionId ?? null,
 			heroTitle: portada.data.heroTitle || null,
 			heroSubtitle: portada.data.heroSubtitle || null

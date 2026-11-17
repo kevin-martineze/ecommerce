@@ -16,13 +16,13 @@
 
 	let { value, label, class: className }: Props = $props();
 
-	let copiado = $state(false);
+	let copied = $state(false);
 
-	async function copiar() {
+	async function copy() {
 		try {
 			await navigator.clipboard.writeText(value);
-			copiado = true;
-			setTimeout(() => (copiado = false), 1500);
+			copied = true;
+			setTimeout(() => (copied = false), 1500);
 		} catch (cause) {
 			console.warn('No se pudo copiar al portapapeles.', cause);
 		}
@@ -37,9 +37,9 @@
 	)}
 	aria-label={`Copiar ${label}`}
 	title={`Copiar ${label}`}
-	onclick={copiar}
+	onclick={copy}
 >
-	{#if copiado}
+	{#if copied}
 		<Check class="size-3.5 text-success" />
 	{:else}
 		<Copy class="size-3.5" />

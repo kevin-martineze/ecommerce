@@ -48,7 +48,7 @@ export type HostTarget =
  * vacía colándose como "tienda por defecto", el dominio raíz se comportaba
  * como una tienda sin nombre y no encontraba nada.
  */
-function limpiar(value: string | undefined): string | undefined {
+function clear(value: string | undefined): string | undefined {
 	const trimmed = value?.trim().toLowerCase();
 
 	return trimmed ? trimmed : undefined;
@@ -62,7 +62,7 @@ export function normalizeHost(host: string): string {
 	return host.trim().toLowerCase().replace(/:\d+$/, '').replace(/\.$/, '');
 }
 
-function dominioRaiz(raw: string | undefined): string | undefined {
+function normalizeRootDomain(raw: string | undefined): string | undefined {
 	const trimmed = raw?.trim();
 
 	return trimmed ? normalizeHost(trimmed) || undefined : undefined;
@@ -94,7 +94,7 @@ export function resolveHost(
 	platformHosts: readonly string[] = []
 ): HostTarget {
 	const normalized = normalizeHost(host);
-	const rootDomain = dominioRaiz(rootDomainRaw);
+	const rootDomain = normalizeRootDomain(rootDomainRaw);
 
 	if (!rootDomain) return { kind: 'platform' };
 
@@ -127,7 +127,7 @@ export function resolveHost(
 export function hostServesStore(target: HostTarget, fallbackRaw: string | undefined): boolean {
 	if (target.kind !== 'platform') return true;
 
-	return limpiar(fallbackRaw) !== undefined;
+	return clear(fallbackRaw) !== undefined;
 }
 
 /**
@@ -143,7 +143,7 @@ export function storeSlugFromHost(
 	const target = resolveHost(host, rootDomainRaw, platformHosts);
 
 	if (target.kind === 'store') return target.slug;
-	if (target.kind === 'platform') return limpiar(fallbackRaw) ?? null;
+	if (target.kind === 'platform') return clear(fallbackRaw) ?? null;
 
 	return null;
 }
@@ -179,7 +179,7 @@ export function storefrontUrl(
  * quiere cuando todo corre en el mismo.
  */
 export function sessionCookieDomain(rootDomainRaw: string | undefined): string | undefined {
-	const rootDomain = limpiar(rootDomainRaw);
+	const rootDomain = clear(rootDomainRaw);
 
 	if (!rootDomain || rootDomain.includes(':') || !rootDomain.includes('.')) return undefined;
 

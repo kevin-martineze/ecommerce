@@ -15,12 +15,12 @@
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import * as Table from '$lib/components/atoms/table';
-	import CobroWompiEstado from '$lib/components/molecules/CobroWompiEstado.svelte';
 	import UsageMeter from '$lib/components/molecules/UsageMeter.svelte';
+	import WompiChargeStatus from '$lib/components/molecules/WompiChargeStatus.svelte';
 	import PaymentCard from '$lib/components/organisms/PaymentCard.svelte';
 
 	// Estado
-	import { cobroWompi } from '$lib/utils/wompi-checkout.svelte';
+	import { wompiCharge } from '$lib/utils/wompi-checkout.svelte';
 
 	// Dominio
 	import { planFeatures, STORE_STATUS_LABEL } from '$lib/domain/account';
@@ -42,45 +42,45 @@
 	 * El período que había antes de cobrar. Cuando la pasarela confirma el pago,
 	 * el mes nuevo corre desde el fin del actual: si el fin cambia, ya está pago.
 	 */
-	let periodoAntesDelCobro = $state('');
+	let periodBeforeCharge = $state('');
 
-	const cobro = cobroWompi({
-		pagado: () => subscription.current_period_end !== periodoAntesDelCobro,
-		recargar: () => invalidateAll()
+	const charge = wompiCharge({
+		paid: () => subscription.current_period_end !== periodBeforeCharge,
+		reload: () => invalidateAll()
 	});
 
 	/** Cobrarse sola es de la dueña, y solo mientras la tienda no esté suspendida. */
-	const puedePagar = $derived(
+	const canPayNow = $derived(
 		data.canPay && subscription.self_service_billing && subscription.store_status !== 'suspended'
 	);
 
 	/** Los demás planes: cambiar de plan es pagar el nuevo. */
-	const otros = $derived(data.plans.filter((otro) => otro.code !== plan.code));
+	const others = $derived(data.plans.filter((other) => other.code !== plan.code));
 
 	/** Mientras se confirma o expira el cobro, no se ofrece otro: evita cobrar dos veces. */
-	const mostrarCobro = $derived(!cobro.confirmando && !cobro.expirado);
+	const showCharge = $derived(!charge.confirming && !charge.isExpired);
 
 	/** El plan que se está cobrando: solo su botón dice «Abriendo el pago…». */
-	let planCobrando = $state('');
+	let chargingPlan = $state('');
 
-	const pagar: SubmitFunction = ({ formData }) => {
-		const codigo = formData.get('planCode');
+	const pay: SubmitFunction = ({ formData }) => {
+		const selectedCode = formData.get('planCode');
 
-		planCobrando = typeof codigo === 'string' ? codigo : '';
-		periodoAntesDelCobro = subscription.current_period_end;
-		cobro.iniciar();
+		chargingPlan = typeof selectedCode === 'string' ? selectedCode : '';
+		periodBeforeCharge = subscription.current_period_end;
+		charge.start();
 
-		return ({ result, update }) => cobro.procesar(result, () => update());
+		return ({ result, update }) => charge.process(result, () => update());
 	};
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'long', timeZone: 'UTC' });
 	const shortDate = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeZone: 'UTC' });
 
-	function fecha(day: string): string {
+	function date(day: string): string {
 		return dateFormatter.format(new Date(`${day}T00:00:00Z`));
 	}
 
-	const periodEnd = $derived(fecha(subscription.current_period_end));
+	const periodEnd = $derived(date(subscription.current_period_end));
 </script>
 
 <svelte:head>
@@ -103,7 +103,7 @@
 		billing={data.billing}
 		canPay={data.canPay}
 		{periodEnd}
-		enPrueba={subscription.store_status === 'trial'}
+		inTrial={subscription.store_status === 'trial'}
 	/>
 </div>
 
@@ -155,17 +155,17 @@
 			</div>
 		</dl>
 
-		{#if puedePagar}
-			{#if mostrarCobro}
+		{#if canPayNow}
+			{#if showCharge}
 				<form
 					method="POST"
 					action="?/pay"
 					class="border-border space-y-2 border-t pt-4"
-					use:enhance={pagar}
+					use:enhance={pay}
 				>
 					<input type="hidden" name="planCode" value={plan.code} />
-					<Button type="submit" class="w-full" disabled={cobro.abriendo}>
-						{cobro.abriendo && planCobrando === plan.code
+					<Button type="submit" class="w-full" disabled={charge.opening}>
+						{charge.opening && chargingPlan === plan.code
 							? 'Abriendo el pago…'
 							: `Pagar un mes de ${plan.name}`}
 					</Button>
@@ -176,7 +176,7 @@
 				</form>
 			{/if}
 
-			<CobroWompiEstado {cobro} />
+			<WompiChargeStatus {charge} />
 		{:else}
 			<p class="text-muted-foreground border-border border-t pt-4 text-xs">
 				{#if !data.canPay}
@@ -223,7 +223,7 @@
 	</section>
 </div>
 
-{#if puedePagar && otros.length > 0}
+{#if canPayNow && others.length > 0}
 	<section class="mt-8">
 		<h2 class="mb-1 text-lg">Cambiar de plan</h2>
 		<p class="text-muted-foreground mb-4 text-sm">
@@ -231,48 +231,48 @@
 		</p>
 
 		<div class="grid gap-4 md:grid-cols-2">
-			{#each otros as otro (otro.code)}
+			{#each others as other (other.code)}
 				<div
 					class={cn(
 						'border-border bg-card flex flex-col rounded-lg border p-6',
-						otro.ai_replies_per_month > 0 && 'ai-aurora border-transparent'
+						other.ai_replies_per_month > 0 && 'ai-aurora border-transparent'
 					)}
 				>
 					<div class="flex items-baseline justify-between gap-3">
 						<h3 class="flex items-center gap-2 text-xl">
-							{otro.name}
-							{#if otro.ai_replies_per_month > 0}
+							{other.name}
+							{#if other.ai_replies_per_month > 0}
 								<Sparkles class="size-4" />
 							{/if}
 						</h3>
 						<p class="font-semibold">
-							{formatMoney(otro.price_cop)}<span class="text-muted-foreground text-xs font-normal">
+							{formatMoney(other.price_cop)}<span class="text-muted-foreground text-xs font-normal">
 								/ mes</span
 							>
 						</p>
 					</div>
 
 					<ul class="mt-4 space-y-2 text-sm">
-						{#each planFeatures(otro) as caracteristica (caracteristica)}
+						{#each planFeatures(other) as feature (feature)}
 							<li class="flex items-start gap-2">
 								<Check class="text-muted-foreground mt-0.5 size-4 flex-none" />
-								<span>{caracteristica}</span>
+								<span>{feature}</span>
 							</li>
 						{/each}
 					</ul>
 
-					{#if mostrarCobro}
-						<form method="POST" action="?/pay" class="mt-6" use:enhance={pagar}>
-							<input type="hidden" name="planCode" value={otro.code} />
+					{#if showCharge}
+						<form method="POST" action="?/pay" class="mt-6" use:enhance={pay}>
+							<input type="hidden" name="planCode" value={other.code} />
 							<Button
 								type="submit"
-								variant={otro.price_cop > plan.price_cop ? 'default' : 'outline'}
+								variant={other.price_cop > plan.price_cop ? 'default' : 'outline'}
 								class="w-full"
-								disabled={cobro.abriendo}
+								disabled={charge.opening}
 							>
-								{cobro.abriendo && planCobrando === otro.code
+								{charge.opening && chargingPlan === other.code
 									? 'Abriendo el pago…'
-									: `Pasarme a ${otro.name}`}
+									: `Pasarme a ${other.name}`}
 							</Button>
 						</form>
 					{/if}
@@ -281,7 +281,7 @@
 		</div>
 
 		<div class="mt-4">
-			<CobroWompiEstado {cobro} />
+			<WompiChargeStatus {charge} />
 		</div>
 	</section>
 {/if}
@@ -300,17 +300,19 @@
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{#each subscription.payments as pago (pago.id)}
+				{#each subscription.payments as payment (payment.id)}
 					<Table.Row>
-						<Table.Cell>{shortDate.format(new Date(pago.created_at))}</Table.Cell>
+						<Table.Cell>{shortDate.format(new Date(payment.created_at))}</Table.Cell>
 						<Table.Cell class="text-muted-foreground">
-							{shortDate.format(new Date(`${pago.period_start}T00:00:00Z`))} —
-							{shortDate.format(new Date(`${pago.period_end}T00:00:00Z`))}
+							{shortDate.format(new Date(`${payment.period_start}T00:00:00Z`))} —
+							{shortDate.format(new Date(`${payment.period_end}T00:00:00Z`))}
 						</Table.Cell>
-						<Table.Cell class={cn(pago.method === 'simulado' && 'text-muted-foreground')}>
-							{pago.method === 'simulado' ? 'Pago de prueba' : pago.method}
+						<Table.Cell class={cn(payment.method === 'simulado' && 'text-muted-foreground')}>
+							{payment.method === 'simulado' ? 'Pago de prueba' : payment.method}
 						</Table.Cell>
-						<Table.Cell class="text-right tabular-nums">{formatMoney(pago.amount_cop)}</Table.Cell>
+						<Table.Cell class="text-right tabular-nums"
+							>{formatMoney(payment.amount_cop)}</Table.Cell
+						>
 					</Table.Row>
 				{/each}
 			</Table.Body>

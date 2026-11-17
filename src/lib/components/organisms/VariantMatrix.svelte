@@ -35,12 +35,12 @@
 
 	let defaultStock = $state(0);
 
-	interface Grupo {
+	interface Group {
 		/** El valor del primer eje, o vacío cuando el producto no tiene ejes. */
 		clave: string;
-		titulo: string;
+		heading: string;
 		hex: string | null;
-		filas: AdminVariantRow[];
+		rows: AdminVariantRow[];
 	}
 
 	/**
@@ -50,43 +50,43 @@
 	 * lo elige quien vende: la tienda de ropa verá un bloque por color, la
 	 * tostadora uno por molienda, y el libro un único bloque sin título.
 	 */
-	const grupos = $derived.by(() => {
-		const salida: Grupo[] = [];
+	const groups = $derived.by(() => {
+		const output: Group[] = [];
 
-		for (const variante of variants) {
-			const primero = variante.values.at(0);
-			const clave = primero?.id ?? '';
-			const existente = salida.find((grupo) => grupo.clave === clave);
+		for (const variantRow of variants) {
+			const firstOne = variantRow.values.at(0);
+			const clave = firstOne?.id ?? '';
+			const existing = output.find((group) => group.clave === clave);
 
-			if (existente) existente.filas.push(variante);
+			if (existing) existing.rows.push(variantRow);
 			else
-				salida.push({
+				output.push({
 					clave,
-					titulo: primero?.value ?? '',
-					hex: primero?.hex ?? null,
-					filas: [variante]
+					heading: firstOne?.value ?? '',
+					hex: firstOne?.hex ?? null,
+					rows: [variantRow]
 				});
 		}
 
-		return salida;
+		return output;
 	});
 
 	/** Cómo se llama la fila dentro de su grupo: los ejes que quedan. */
-	function resto(variante: AdminVariantRow): string {
-		return variante.values
+	function rest(variantRow: AdminVariantRow): string {
+		return variantRow.values
 			.slice(1)
-			.map((valor) => valor.value)
+			.map((optionValue) => optionValue.value)
 			.join(' · ');
 	}
 
 	/** Cuántas combinaciones darían los ejes actuales. */
-	const posibles = $derived(
-		options.reduce((total, eje) => total * Math.max(1, eje.values.length), 1)
+	const possible = $derived(
+		options.reduce((total, axis) => total * Math.max(1, axis.values.length), 1)
 	);
 
-	const faltan = $derived(Math.max(0, posibles - variants.length));
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const missing = $derived(Math.max(0, possible - variants.length));
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <div class="space-y-6">
@@ -96,11 +96,11 @@
 			<Card.Description>
 				{#if options.length === 0}
 					Este producto no se divide en nada, así que tiene una sola existencia.
-				{:else if faltan > 0}
-					Faltan {faltan} de las {posibles} que dan tus ejes. Se crean las que falten, sin tocar las que
-					ya existen.
+				{:else if missing > 0}
+					Faltan {missing} de las {possible} que dan tus ejes. Se crean las que falten, sin tocar las
+					que ya existen.
 				{:else}
-					Ya existen las {posibles} combinaciones de tus ejes. Si añades un valor arriba, vuelve aquí
+					Ya existen las {possible} combinaciones de tus ejes. Si añades un valor arriba, vuelve aquí
 					para crear las nuevas.
 				{/if}
 			</Card.Description>
@@ -118,33 +118,33 @@
 					/>
 				</div>
 
-				<Button type="submit" disabled={faltan === 0 && variants.length > 0}>
-					{faltan > 0 ? `Crear ${faltan}` : 'Crear'}
-					{faltan === 1 ? 'combinación' : 'combinaciones'}
+				<Button type="submit" disabled={missing === 0 && variants.length > 0}>
+					{missing > 0 ? `Crear ${missing}` : 'Crear'}
+					{missing === 1 ? 'combinación' : 'combinaciones'}
 				</Button>
 			</form>
 		</Card.Content>
 	</Card.Root>
 
-	{#if grupos.length === 0}
+	{#if groups.length === 0}
 		<Card.Root>
 			<Card.Content class="text-muted-foreground py-12 text-center text-sm">
 				Este producto todavía no tiene existencias. Créalas arriba para poder venderlo.
 			</Card.Content>
 		</Card.Root>
 	{:else}
-		{#each grupos as grupo (grupo.clave)}
+		{#each groups as group (group.clave)}
 			<Card.Root>
-				{#if grupo.titulo}
+				{#if group.heading}
 					<Card.Header>
 						<div class="flex items-center gap-2">
-							{#if grupo.hex}
+							{#if group.hex}
 								<span
 									class="border-border size-4 rounded-full border"
-									style="background-color: {grupo.hex}"
+									style="background-color: {group.hex}"
 								></span>
 							{/if}
-							<Card.Title class="text-base">{grupo.titulo}</Card.Title>
+							<Card.Title class="text-base">{group.heading}</Card.Title>
 						</div>
 					</Card.Header>
 				{/if}
@@ -163,10 +163,10 @@
 						</Table.Header>
 
 						<Table.Body>
-							{#each grupo.filas as variant (`${variant.id}:${variant.active}`)}
+							{#each group.rows as variant (`${variant.id}:${variant.active}`)}
 								<Table.Row>
 									<Table.Cell data-label="Combinación" class="text-sm font-medium">
-										{resto(variant) || variant.label || 'Única'}
+										{rest(variant) || variant.label || 'Única'}
 									</Table.Cell>
 
 									<Table.Cell data-label="Existencias">
@@ -220,7 +220,7 @@
 												<Button
 													type="button"
 													onclick={() =>
-														borrado.ask(
+														deletion.ask(
 															`borrar-variante-${variant.id}`,
 															`¿Borrar ${variant.label || 'esta combinación'}?`,
 															{
@@ -259,7 +259,7 @@
 			id="borrar-variante-{variant.id}"
 			method="POST"
 			action="?/deleteVariant"
-			use:enhance={alBorrar}
+			use:enhance={onDelete}
 		>
 			<input type="hidden" name="variantId" value={variant.id} />
 		</form>
@@ -267,11 +267,11 @@
 </div>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

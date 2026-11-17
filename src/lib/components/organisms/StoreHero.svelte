@@ -43,7 +43,7 @@
 	 * Sin foto no hay nada que oscurecer: el fondo es el `muted` de la
 	 * plantilla y el texto toma su color normal, si no salía blanco sobre gris.
 	 */
-	const sobreFoto = $derived(image !== null);
+	const onPhoto = $derived(image !== null);
 </script>
 
 {#if layout === 'split'}
@@ -229,9 +229,9 @@
 			<div
 				class="relative mx-auto flex min-h-[70vh] max-w-7xl flex-col justify-end px-4 pb-14 sm:px-6 md:min-h-[82vh] md:pb-20"
 			>
-				<div class={cn('max-w-2xl space-y-5', sobreFoto ? 'text-white' : 'text-foreground')}>
+				<div class={cn('max-w-2xl space-y-5', onPhoto ? 'text-white' : 'text-foreground')}>
 					<div class="rise-clip">
-						<p class={cn('eyebrow rise rise-1', sobreFoto && 'text-white/80')}>{eyebrow}</p>
+						<p class={cn('eyebrow rise rise-1', onPhoto && 'text-white/80')}>{eyebrow}</p>
 					</div>
 
 					<div class="rise-clip">
@@ -243,7 +243,7 @@
 							<p
 								class={cn(
 									'rise rise-3 max-w-md text-sm md:text-base',
-									sobreFoto ? 'text-white/85' : 'text-muted-foreground'
+									onPhoto ? 'text-white/85' : 'text-muted-foreground'
 								)}
 							>
 								{subtitle}
@@ -255,7 +255,7 @@
 						<Button
 							href="/shop"
 							size="lg"
-							class={sobreFoto ? 'bg-white text-black hover:bg-white/90' : undefined}
+							class={onPhoto ? 'bg-white text-black hover:bg-white/90' : undefined}
 						>
 							Ver la tienda
 						</Button>
@@ -265,7 +265,7 @@
 								href="/collections/{collectionSlug}"
 								variant="outline"
 								size="lg"
-								class={sobreFoto
+								class={onPhoto
 									? 'border-white/60 bg-transparent text-white hover:bg-white/10 hover:text-white'
 									: undefined}
 							>

@@ -28,26 +28,26 @@
 	let { data }: Props = $props();
 
 	let host = $state('');
-	let enviando = $state(false);
+	let sending = $state(false);
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
 
 	const domain = $derived(data.domain);
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <svelte:head>
 	<title>Dominio — Globerce</title>
 </svelte:head>
 
-{#snippet quitarDominio(texto: string)}
+{#snippet removeDomain(text: string)}
 	<Button
 		type="button"
 		variant="ghost"
 		onclick={() =>
-			borrado.ask('quitar-dominio', '¿Quitar el dominio?', {
-				description: texto,
+			deletion.ask('quitar-dominio', '¿Quitar el dominio?', {
+				description: text,
 				confirmLabel: 'Quitar',
 				pendingLabel: 'Quitando…'
 			})}
@@ -79,7 +79,7 @@
 			<p class="text-muted-foreground mb-4 text-sm">
 				Tu tienda vuelve a verse en su subdominio hasta que cambies de plan.
 			</p>
-			{@render quitarDominio(
+			{@render removeDomain(
 				'¿Quitar el dominio? Puedes conectarlo de nuevo si vuelves a un plan que lo incluya.'
 			)}
 		</section>
@@ -96,10 +96,10 @@
 			action="?/save"
 			class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end"
 			use:enhance={() => {
-				enviando = true;
+				sending = true;
 				return async ({ update }) => {
 					await update();
-					enviando = false;
+					sending = false;
 				};
 			}}
 		>
@@ -119,7 +119,7 @@
 				</p>
 			</div>
 
-			<Button type="submit" disabled={enviando}>Conectar dominio</Button>
+			<Button type="submit" disabled={sending}>Conectar dominio</Button>
 		</form>
 	</section>
 {:else}
@@ -201,19 +201,19 @@
 				action="?/verify"
 				class="mb-6"
 				use:enhance={() => {
-					enviando = true;
+					sending = true;
 					return async ({ update }) => {
 						await update();
-						enviando = false;
+						sending = false;
 					};
 				}}
 			>
-				<Button type="submit" disabled={enviando}>Ya los puse, verificar</Button>
+				<Button type="submit" disabled={sending}>Ya los puse, verificar</Button>
 			</form>
 		{/if}
 
 		{#if domain.status !== 'disabled'}
-			{@render quitarDominio(
+			{@render removeDomain(
 				'¿Quitar el dominio? Tu tienda vuelve a su subdominio. Para conectar otro, primero quita este.'
 			)}
 		{/if}
@@ -221,15 +221,15 @@
 {/if}
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />
 
 <div hidden>
-	<form id="quitar-dominio" method="POST" action="?/remove" use:enhance={alBorrar}></form>
+	<form id="quitar-dominio" method="POST" action="?/remove" use:enhance={onDelete}></form>
 </div>

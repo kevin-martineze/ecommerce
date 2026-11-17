@@ -15,11 +15,11 @@
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Separator } from '$lib/components/atoms/separator';
-	import CobroWompiEstado from '$lib/components/molecules/CobroWompiEstado.svelte';
+	import WompiChargeStatus from '$lib/components/molecules/WompiChargeStatus.svelte';
 
 	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
-	import { cobroWompi } from '$lib/utils/wompi-checkout.svelte';
+	import { wompiCharge } from '$lib/utils/wompi-checkout.svelte';
 
 	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
@@ -33,22 +33,22 @@
 
 	let openForm = $state<HTMLFormElement | null>(null);
 
-	const pagado = $derived(data.order.payment_status === 'paid');
+	const paid = $derived(data.order.payment_status === 'paid');
 
-	const cobro = cobroWompi({
-		pagado: () => pagado,
-		recargar: () => invalidateAll()
+	const charge = wompiCharge({
+		paid: () => paid,
+		reload: () => invalidateAll()
 	});
 
-	const mostrarPago = $derived(
-		data.canPayOnline && !pagado && !cobro.confirmando && !cobro.expirado
+	const showPayment = $derived(
+		data.canPayOnline && !paid && !charge.confirming && !charge.isExpired
 	);
 
 	/** El botón se apaga mientras se pide el enlace o se abre el pago: son unos segundos y un cobro. */
-	const pagando: SubmitFunction = () => {
-		cobro.iniciar();
+	const paying: SubmitFunction = () => {
+		charge.start();
 
-		return ({ result, update }) => cobro.procesar(result, () => update());
+		return ({ result, update }) => charge.process(result, () => update());
 	};
 
 	// El pedido ya está guardado: el carrito local deja de tener sentido.
@@ -79,7 +79,7 @@
 		<p class="eyebrow">Paso 2 de 2</p>
 		<h1 class="text-4xl md:text-5xl">Pedido #{data.order.number} guardado</h1>
 		<p class="text-muted-foreground text-sm text-balance">
-			{#if pagado}
+			{#if paid}
 				Tu pago quedó registrado. {data.settings.store_name} ya lo está preparando.
 			{:else if data.canPayOnline}
 				Págalo en línea o envíalo por WhatsApp: las dos cosas llegan a {data.settings.store_name}.
@@ -95,14 +95,14 @@
 	</form>
 
 	<div class="mt-8 space-y-3">
-		<CobroWompiEstado {cobro} />
+		<WompiChargeStatus {charge} />
 
-		{#if mostrarPago}
-			<form method="POST" action="?/pay" use:enhance={pagando}>
+		{#if showPayment}
+			<form method="POST" action="?/pay" use:enhance={paying}>
 				<input type="hidden" name="t" value={data.order.public_token} />
-				<Button type="submit" size="lg" class="w-full" disabled={cobro.abriendo}>
+				<Button type="submit" size="lg" class="w-full" disabled={charge.opening}>
 					<CreditCard class="mr-2 size-5" />
-					{cobro.abriendo ? 'Abriendo el pago…' : `Pagar ${formatMoney(data.order.total)} en línea`}
+					{charge.opening ? 'Abriendo el pago…' : `Pagar ${formatMoney(data.order.total)} en línea`}
 				</Button>
 			</form>
 

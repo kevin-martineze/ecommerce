@@ -80,12 +80,12 @@ export const actions: Actions = {
 
 		if (!storefront.ok) return fail(storefront.status || 503, { error: storefront.message });
 
-		const volver = new URL(
+		const returnTo = new URL(
 			`/order/${orderNumber}?t=${token}`,
 			storefront.data.public_url
 		).toString();
 
-		const result = await startOrderPayment(publicContext(event), orderNumber, token, volver);
+		const result = await startOrderPayment(publicContext(event), orderNumber, token, returnTo);
 
 		if (!result.ok) return fail(result.status || 400, { error: result.message });
 

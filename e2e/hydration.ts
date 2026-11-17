@@ -11,7 +11,7 @@ import { expect, type Page } from '@playwright/test';
  * En el registro la señal es la dirección, que sigue al nombre solo en el
  * cliente. Se escribe y se borra: el formulario queda como estaba.
  */
-export async function esperarRegistroHidratado(page: Page): Promise<void> {
+export async function waitForHydratedRecord(page: Page): Promise<void> {
 	await page.fill('input[name="storeName"]', 'Casa Oliva');
 	await expect(page.locator('input[name="storeSlug"]')).toHaveValue('casa-oliva');
 	await page.fill('input[name="storeName"]', '');

@@ -47,7 +47,7 @@ export function formatCardNumber(raw: string): string {
 
 	if (cardBrand(digits) === 'amex') {
 		return [digits.slice(0, 4), digits.slice(4, 10), digits.slice(10, 15)]
-			.filter((parte) => parte.length > 0)
+			.filter((part) => part.length > 0)
 			.join(' ');
 	}
 
@@ -74,22 +74,22 @@ export function luhn(raw: string): boolean {
 
 	if (digits.length < 12) return false;
 
-	let suma = 0;
-	let doblar = false;
+	let sum = 0;
+	let fold = false;
 
 	for (let i = digits.length - 1; i >= 0; i -= 1) {
-		let valor = Number(digits[i]);
+		let value = Number(digits[i]);
 
-		if (doblar) {
-			valor *= 2;
-			if (valor > 9) valor -= 9;
+		if (fold) {
+			value *= 2;
+			if (value > 9) value -= 9;
 		}
 
-		suma += valor;
-		doblar = !doblar;
+		sum += value;
+		fold = !fold;
 	}
 
-	return suma % 10 === 0;
+	return sum % 10 === 0;
 }
 
 /** Mes y año de dos cifras, o `null` si no se entiende o ya pasó. */
@@ -107,9 +107,9 @@ export function parseExpiry(
 	if (month < 1 || month > 12) return null;
 
 	// Una tarjeta vence al final de su mes, no al principio.
-	const vence = new Date(Date.UTC(2000 + year, month, 1));
+	const expires = new Date(Date.UTC(2000 + year, month, 1));
 
-	return vence.getTime() > now.getTime() ? { month, year } : null;
+	return expires.getTime() > now.getTime() ? { month, year } : null;
 }
 
 export type CardErrors = Partial<Record<keyof CardInput, string>>;
@@ -118,7 +118,7 @@ export type CardErrors = Partial<Record<keyof CardInput, string>>;
 export function validateCard(card: CardInput, now: Date = new Date()): CardErrors {
 	const errors: CardErrors = {};
 	const digits = cardDigits(card.number);
-	const esperado = cardBrand(digits) === 'amex' ? 4 : 3;
+	const expected = cardBrand(digits) === 'amex' ? 4 : 3;
 
 	if (digits.length < 12 || !luhn(digits)) {
 		errors.number = 'Revisa el número de la tarjeta.';
@@ -128,8 +128,8 @@ export function validateCard(card: CardInput, now: Date = new Date()): CardError
 		errors.expiry = 'Revisa el vencimiento, como 09/29.';
 	}
 
-	if (cardDigits(card.cvc).length !== esperado) {
-		errors.cvc = `El código son ${esperado} dígitos, al respaldo.`;
+	if (cardDigits(card.cvc).length !== expected) {
+		errors.cvc = `El código son ${expected} dígitos, al respaldo.`;
 	}
 
 	if (card.holder.trim().length < 3) {
@@ -142,7 +142,7 @@ export function validateCard(card: CardInput, now: Date = new Date()): CardError
 /** Si la tarjeta está vacía del todo: no se validan campos que nadie tocó. */
 export function cardIsEmpty(card: CardInput): boolean {
 	return [card.number, card.expiry, card.cvc, card.holder].every(
-		(valor) => valor.trim().length === 0
+		(value) => value.trim().length === 0
 	);
 }
 

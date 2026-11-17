@@ -55,28 +55,28 @@
 	 * seleccionado, y la de abajo tachada sin explicar por qué.
 	 */
 	$effect(() => {
-		const primera =
-			product.variants.find((variante) => variante.stock > 0) ?? product.variants.at(0);
+		const first =
+			product.variants.find((variantOption) => variantOption.stock > 0) ?? product.variants.at(0);
 
 		selected = Object.fromEntries(
-			product.options.flatMap((eje) => {
-				const valor = eje.values.find((candidato) => primera?.valueIds.includes(candidato.id));
+			product.options.flatMap((axis) => {
+				const optionValue = axis.values.find((candidate) => first?.valueIds.includes(candidate.id));
 
-				return valor ? [[eje.id, valor.id] as const] : [];
+				return optionValue ? [[axis.id, optionValue.id] as const] : [];
 			})
 		);
 	});
 
 	const selectedVariant = $derived.by(() => {
-		const elegidos = Object.values(selected);
+		const chosenItems = Object.values(selected);
 
-		if (elegidos.length !== product.options.length) return null;
+		if (chosenItems.length !== product.options.length) return null;
 
 		return (
 			product.variants.find(
-				(variante) =>
-					variante.valueIds.length === elegidos.length &&
-					elegidos.every((valor) => variante.valueIds.includes(valor))
+				(variantOption) =>
+					variantOption.valueIds.length === chosenItems.length &&
+					chosenItems.every((optionValue) => variantOption.valueIds.includes(optionValue))
 			) ?? null
 		);
 	});
@@ -101,9 +101,9 @@
 			return;
 		}
 
-		const etiqueta = product.options
-			.map((eje) => eje.values.find((valor) => valor.id === selected[eje.id])?.value)
-			.filter((valor): valor is string => Boolean(valor))
+		const tagLabel = product.options
+			.map((axis) => axis.values.find((optionValue) => optionValue.id === selected[axis.id])?.value)
+			.filter((optionValue): optionValue is string => Boolean(optionValue))
 			.join(' · ');
 
 		const image =
@@ -119,7 +119,7 @@
 			preview: {
 				productName: product.name,
 				productSlug: product.slug,
-				variantLabel: etiqueta,
+				variantLabel: tagLabel,
 				unitPrice: selectedVariant.price,
 				imageUrl: image?.url_thumb ?? null
 			}
@@ -280,10 +280,10 @@
 				<Accordion.Root type="single" class="border-border border-t">
 					<!-- Los datos del producto los pone quien vende: "Material" en ropa,
 					     "ISBN" en una librería, "Origen" en café. -->
-					{#each product.attributes as dato (dato.name)}
-						<Accordion.Item value={dato.name}>
-							<Accordion.Trigger>{dato.name}</Accordion.Trigger>
-							<Accordion.Content>{dato.value}</Accordion.Content>
+					{#each product.attributes as attribute (attribute.name)}
+						<Accordion.Item value={attribute.name}>
+							<Accordion.Trigger>{attribute.name}</Accordion.Trigger>
+							<Accordion.Content>{attribute.value}</Accordion.Content>
 						</Accordion.Item>
 					{/each}
 

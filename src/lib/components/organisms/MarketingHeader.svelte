@@ -16,7 +16,7 @@
 
 	let { signedIn }: Props = $props();
 
-	const secciones = [
+	const sections = [
 		{ href: '#como-funciona', label: 'Cómo funciona' },
 		{ href: '#que-vendes', label: 'Para quién es' },
 		{ href: '#precios', label: 'Precios' },
@@ -34,12 +34,12 @@
 		</a>
 
 		<nav class="text-muted-foreground mx-auto hidden items-center gap-1 text-sm md:flex">
-			{#each secciones as seccion (seccion.href)}
+			{#each sections as section (section.href)}
 				<a
-					href={seccion.href}
+					href={section.href}
 					class="hover:text-foreground rounded-full px-3 py-1.5 transition-colors"
 				>
-					{seccion.label}
+					{section.label}
 				</a>
 			{/each}
 		</nav>

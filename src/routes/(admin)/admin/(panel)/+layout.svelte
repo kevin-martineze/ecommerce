@@ -54,9 +54,9 @@
 	 * título, lo que se configura una vez en «Tienda», y lo administrativo
 	 * en «Cuenta». La lista plana sirve al menú horizontal del celular.
 	 */
-	const gruposBase = [
+	const baseGroups = [
 		{
-			titulo: null,
+			title: null,
 			links: [
 				{ href: '/admin', label: 'Resumen', icon: LayoutDashboard },
 				{ href: '/admin/orders', label: 'Pedidos', icon: Receipt },
@@ -66,7 +66,7 @@
 			]
 		},
 		{
-			titulo: 'Tienda',
+			title: 'Tienda',
 			links: [
 				{ href: '/admin/design', label: 'Diseño', icon: Paintbrush },
 				{ href: '/admin/catalogs', label: 'Catálogos', icon: Palette },
@@ -77,7 +77,7 @@
 			]
 		},
 		{
-			titulo: 'Cuenta',
+			title: 'Cuenta',
 			links: [
 				{ href: '/admin/support', label: 'Soporte', icon: LifeBuoy },
 				{ href: '/admin/settings', label: 'Ajustes', icon: Settings },
@@ -90,16 +90,16 @@
 	];
 
 	/** Lo que solo administra la dueña: el resto de la tienda no lo ve en el menú. */
-	const soloDuena = new Set(['/admin/domain']);
+	const ownerOnly = new Set(['/admin/domain']);
 
-	const grupos = $derived(
-		gruposBase.map((grupo) => ({
-			...grupo,
-			links: grupo.links.filter((link) => !soloDuena.has(link.href) || data.role === 'owner')
+	const groups = $derived(
+		baseGroups.map((group) => ({
+			...group,
+			links: group.links.filter((link) => !ownerOnly.has(link.href) || data.role === 'owner')
 		}))
 	);
 
-	const links = $derived(grupos.flatMap((grupo) => grupo.links));
+	const links = $derived(groups.flatMap((group) => group.links));
 
 	const platformLink = { href: '/platform', label: 'Plataforma', icon: Shield };
 
@@ -159,12 +159,12 @@
 			{/if}
 
 			<nav class="flex-1 overflow-y-auto">
-				{#each grupos as grupo (grupo.titulo ?? 'principal')}
+				{#each groups as group (group.title ?? 'principal')}
 					<div class="pt-3">
-						{#if grupo.titulo}
-							<p class="text-muted-foreground px-2 pb-1 text-xs">{grupo.titulo}</p>
+						{#if group.title}
+							<p class="text-muted-foreground px-2 pb-1 text-xs">{group.title}</p>
 						{/if}
-						{#each grupo.links as link (link.href)}
+						{#each group.links as link (link.href)}
 							{@const Icon = link.icon}
 							<a
 								href={link.href}

@@ -20,33 +20,33 @@ import { clientAddress } from '$lib/server/context';
  * por defecto.
  */
 export const load: PageServerLoad = ({ url }) => {
-	const referencia = url.searchParams.get('reference');
-	const monto = Number(url.searchParams.get('amount') ?? '0');
+	const reference = url.searchParams.get('reference');
+	const amount = Number(url.searchParams.get('amount') ?? '0');
 
-	if (!referencia || !Number.isFinite(monto) || monto <= 0) {
+	if (!reference || !Number.isFinite(amount) || amount <= 0) {
 		error(400, 'Este cobro no es válido.');
 	}
 
 	return {
-		referencia,
-		monto,
-		concepto: url.searchParams.get('concept') ?? 'Pago',
+		reference,
+		amount,
+		concept: url.searchParams.get('concept') ?? 'Pago',
 		// A dónde se vuelve, pase lo que pase.
-		volver: url.searchParams.get('returnTo') ?? '/admin/plan'
+		returnTo: url.searchParams.get('returnTo') ?? '/admin/plan'
 	};
 };
 
 export const actions: Actions = {
 	approve: async (event) => {
 		const formData = await event.request.formData();
-		const referencia = String(formData.get('referencia') ?? '');
-		const monto = Number(formData.get('monto') ?? '0');
-		const volver = String(formData.get('volver') ?? '/admin/plan');
+		const reference = String(formData.get('referencia') ?? '');
+		const amount = Number(formData.get('monto') ?? '0');
+		const returnTo = String(formData.get('volver') ?? '/admin/plan');
 
-		if (!referencia || !Number.isFinite(monto)) error(400, 'Este cobro no es válido.');
+		if (!reference || !Number.isFinite(amount)) error(400, 'Este cobro no es válido.');
 
-		await approveSimulatedPayment(referencia, monto, clientAddress(event));
+		await approveSimulatedPayment(reference, amount, clientAddress(event));
 
-		redirect(303, volver);
+		redirect(303, returnTo);
 	}
 };

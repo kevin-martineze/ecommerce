@@ -48,17 +48,17 @@
 
 <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 	{#each TEMPLATES as template (template.code)}
-		{@const elegida = template.code === current}
+		{@const selected = template.code === current}
 
 		<div
 			class={cn(
 				'border-border bg-card flex flex-col rounded-lg border p-5 transition-colors',
-				elegida && 'border-foreground'
+				selected && 'border-foreground'
 			)}
 		>
 			<div class="mb-4 flex items-center justify-between gap-3">
 				<h3 class="text-xl">{template.name}</h3>
-				{#if elegida}
+				{#if selected}
 					<span class="text-muted-foreground flex items-center gap-1.5 text-xs">
 						<Check class="size-4" />
 						La que usas
@@ -109,12 +109,12 @@
 				<Button
 					type="submit"
 					class="w-full"
-					variant={elegida ? 'outline' : 'default'}
-					disabled={elegida || submitting !== ''}
+					variant={selected ? 'outline' : 'default'}
+					disabled={selected || submitting !== ''}
 				>
 					{#if submitting === template.code}
 						Aplicando…
-					{:else if elegida}
+					{:else if selected}
 						En uso
 					{:else}
 						{cta}

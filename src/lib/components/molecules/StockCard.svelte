@@ -15,11 +15,11 @@
 
 	let { class: className }: Props = $props();
 
-	const tallas = [
-		{ nombre: 'S', estado: 'libre' },
-		{ nombre: 'M', estado: 'elegida' },
-		{ nombre: 'L', estado: 'agotada' },
-		{ nombre: 'XL', estado: 'libre' }
+	const sizes = [
+		{ name: 'S', status: 'libre' },
+		{ name: 'M', status: 'elegida' },
+		{ name: 'L', status: 'agotada' },
+		{ name: 'XL', status: 'libre' }
 	] as const;
 </script>
 
@@ -39,16 +39,16 @@
 	</div>
 
 	<ul class="mt-4 flex flex-wrap gap-1.5">
-		{#each tallas as talla (talla.nombre)}
+		{#each sizes as size (size.name)}
 			<li
 				class={cn(
 					'rounded-full border px-3 py-1 text-xs font-medium',
-					talla.estado === 'elegida' && 'border-primary bg-primary text-primary-foreground',
-					talla.estado === 'agotada' && 'border-caution text-caution line-through',
-					talla.estado === 'libre' && 'border-border text-muted-foreground'
+					size.status === 'elegida' && 'border-primary bg-primary text-primary-foreground',
+					size.status === 'agotada' && 'border-caution text-caution line-through',
+					size.status === 'libre' && 'border-border text-muted-foreground'
 				)}
 			>
-				{talla.nombre}
+				{size.name}
 			</li>
 		{/each}
 	</ul>

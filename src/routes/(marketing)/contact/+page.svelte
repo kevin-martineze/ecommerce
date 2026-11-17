@@ -7,7 +7,7 @@
 	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
 
 	// Dominio
-	import { EMPRESA, hayContacto } from '$lib/config/empresa';
+	import { COMPANY, hasContact } from '$lib/config/company';
 
 	// Utilidades
 	import { buildWhatsAppUrl } from '$lib/utils/whatsapp';
@@ -19,11 +19,11 @@
 </svelte:head>
 
 <LegalPage title="Hablemos" summary="Dudas sobre los planes, ayuda con tu tienda o lo que sea.">
-	{#if hayContacto()}
+	{#if hasContact()}
 		<div class="space-y-3">
-			{#if EMPRESA.whatsapp}
+			{#if COMPANY.whatsapp}
 				<a
-					href={buildWhatsAppUrl(EMPRESA.whatsapp, 'Hola, tengo una duda sobre Globerce.')}
+					href={buildWhatsAppUrl(COMPANY.whatsapp, 'Hola, tengo una duda sobre Globerce.')}
 					class="border-border hover:border-foreground/40 flex items-center gap-3 border p-4 transition-colors"
 				>
 					<MessageCircle class="size-5 flex-none" />
@@ -34,14 +34,14 @@
 				</a>
 			{/if}
 
-			{#if EMPRESA.email}
+			{#if COMPANY.email}
 				<a
-					href="mailto:{EMPRESA.email}"
+					href="mailto:{COMPANY.email}"
 					class="border-border hover:border-foreground/40 flex items-center gap-3 border p-4 transition-colors"
 				>
 					<Mail class="size-5 flex-none" />
 					<span>
-						<span class="block font-medium">{EMPRESA.email}</span>
+						<span class="block font-medium">{COMPANY.email}</span>
 						<span class="text-muted-foreground text-sm">
 							Para facturación, datos personales y todo lo que deje rastro.
 						</span>
@@ -51,7 +51,7 @@
 		</div>
 	{:else}
 		<!-- Sin datos de contacto configurados: mejor decirlo que inventar una
-		     dirección que nadie lee. Se llenan en `$lib/config/empresa.ts`. -->
+		     dirección que nadie lee. Se llenan en `$lib/config/company.ts`. -->
 		<p>
 			Estamos terminando de montar los canales de atención. Mientras tanto, si ya tienes una tienda,
 			escríbenos desde tu panel: sabemos quién eres y te respondemos ahí mismo.

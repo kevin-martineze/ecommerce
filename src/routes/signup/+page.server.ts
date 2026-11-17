@@ -26,16 +26,17 @@ export const load: PageServerLoad = async (event) => {
 	const plans = await listPublicPlans(ip);
 	// Sin planes se registra igual y la API pone el básico: no poder mostrar los
 	// precios no puede ser motivo para no dejar abrir la tienda.
-	const disponibles = plans.ok ? plans.data : [];
-	const pedido = event.url.searchParams.get('plan');
+	const availableItems = plans.ok ? plans.data : [];
+	const order = event.url.searchParams.get('plan');
 
 	return {
 		// Con sesión se crea una tienda más para esa cuenta: no se piden sus datos.
 		signedIn: event.locals.session !== null,
 		addressSuffix: rootDomain ? `.${rootDomain}` : null,
-		plans: disponibles,
+		plans: availableItems,
 		// El que venía de la página de precios; si no, el primero de la lista.
-		selectedPlan: disponibles.find((plan) => plan.code === pedido)?.code ?? disponibles[0]?.code
+		selectedPlan:
+			availableItems.find((plan) => plan.code === order)?.code ?? availableItems[0]?.code
 	};
 };
 
