@@ -98,16 +98,26 @@ class StorefrontDraftState {
 
 		const themed = { ...settings, template: this.current.template, theme: this.current.theme };
 		const draft = this.settings;
+		const home = this.home;
 
-		if (!draft) return themed;
+		const withSettings = draft
+			? {
+					...themed,
+					store_name: draft.storeName,
+					whatsapp_phone: draft.whatsappPhone,
+					instagram_url: draft.instagramUrl || null,
+					announcement: draft.announcement || null,
+					free_shipping_threshold: draft.freeShippingThreshold
+				}
+			: themed;
+
+		// La cabecera que edita Diseño viaja en la portada: nombre y anuncio.
+		if (home?.storeName === undefined) return withSettings;
 
 		return {
-			...themed,
-			store_name: draft.storeName,
-			whatsapp_phone: draft.whatsappPhone,
-			instagram_url: draft.instagramUrl || null,
-			announcement: draft.announcement || null,
-			free_shipping_threshold: draft.freeShippingThreshold
+			...withSettings,
+			store_name: home.storeName,
+			announcement: home.announcement || null
 		};
 	}
 

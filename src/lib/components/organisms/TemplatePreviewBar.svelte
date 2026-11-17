@@ -41,7 +41,9 @@
 		</p>
 
 		<div class="ml-auto flex items-center gap-2">
-			<Button href="/admin/portada" size="sm" class="rounded-full px-4">Usarla</Button>
+			<Button href="/admin/personalizar?seccion=estilo" size="sm" class="rounded-full px-4"
+				>Usarla</Button
+			>
 			<Button href={exitPreviewUrl()} variant="ghost" size="sm" class="rounded-full px-4">
 				Salir
 			</Button>

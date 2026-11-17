@@ -82,6 +82,9 @@ export interface DraftHome {
 	heroTitle: string;
 	heroSubtitle: string;
 	highlights: DraftHighlight[];
+	/** La cabecera de la tienda, cuando el editor de Diseño la edita junto con la portada. */
+	storeName?: string;
+	announcement?: string;
 }
 
 export type DraftProductStatus = 'draft' | 'active' | 'archived';

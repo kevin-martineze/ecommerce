@@ -7,7 +7,7 @@
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import * as Table from '$lib/components/atoms/table';
-	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 

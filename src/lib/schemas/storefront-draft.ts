@@ -35,7 +35,9 @@ const homeSchema = z.object({
 	heroCollectionId: z.string().nullable(),
 	heroTitle: z.string(),
 	heroSubtitle: z.string(),
-	highlights: z.array(highlightSchema)
+	highlights: z.array(highlightSchema),
+	storeName: z.string().optional(),
+	announcement: z.string().optional()
 });
 
 const productSchema = z.object({

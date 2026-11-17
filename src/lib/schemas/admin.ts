@@ -158,14 +158,19 @@ export const shippingZoneSchema = z.object({
 	sortOrder: z.coerce.number().int().min(0).max(999).default(0)
 });
 
-export const settingsSchema = z.object({
+/** La marca que se edita en Diseño: el nombre y la barra de anuncio. */
+export const tiendaSchema = z.object({
 	storeName: z.string().trim().min(2, 'Escribe el nombre de la tienda.').max(80),
+	announcement: z.string().trim().max(160, 'Máximo 160 caracteres.').optional().default('')
+});
+
+/** Lo de Ajustes: WhatsApp, Instagram y el envío gratis. No es diseño. */
+export const ajustesSchema = z.object({
 	whatsappPhone: z
 		.string()
 		.trim()
 		.regex(/^[0-9]{10,15}$/, 'Escribe el número con indicativo y sin símbolos. Ej: 573001234567'),
 	instagramUrl: z.string().trim().url('Escribe una URL válida.').or(z.literal('')).default(''),
-	announcement: z.string().trim().max(160, 'Máximo 160 caracteres.').optional().default(''),
 	freeShippingThreshold: price.nullable().optional()
 });
 
@@ -184,7 +189,8 @@ export const collectionSchema = z.object({
 export type ProductInput = z.infer<typeof productSchema>;
 export type CouponInput = z.infer<typeof couponSchema>;
 export type ShippingZoneInput = z.infer<typeof shippingZoneSchema>;
-export type SettingsInput = z.infer<typeof settingsSchema>;
+export type TiendaInput = z.infer<typeof tiendaSchema>;
+export type AjustesInput = z.infer<typeof ajustesSchema>;
 export type CollectionInput = z.infer<typeof collectionSchema>;
 
 /** Categorías: cómo agrupa la tienda sus productos. */
