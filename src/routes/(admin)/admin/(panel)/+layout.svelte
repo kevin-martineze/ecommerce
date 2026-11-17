@@ -7,7 +7,6 @@
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import Globe from '@lucide/svelte/icons/globe';
 	import Images from '@lucide/svelte/icons/images';
-	import LayoutTemplate from '@lucide/svelte/icons/layout-template';
 	import Paintbrush from '@lucide/svelte/icons/paintbrush';
 	import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 	import LifeBuoy from '@lucide/svelte/icons/life-buoy';
@@ -61,7 +60,6 @@
 		{
 			titulo: 'Tienda',
 			links: [
-				{ href: '/admin/portada', label: 'Portada', icon: LayoutTemplate },
 				{ href: '/admin/personalizar', label: 'Diseño', icon: Paintbrush },
 				{ href: '/admin/catalogos', label: 'Catálogos', icon: Palette },
 				{ href: '/admin/cupones', label: 'Cupones', icon: Ticket },

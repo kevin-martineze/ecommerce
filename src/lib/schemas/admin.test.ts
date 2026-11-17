@@ -4,7 +4,8 @@ import {
 	couponSchema,
 	priceOverrideSchema,
 	productSchema,
-	settingsSchema,
+	ajustesSchema,
+	tiendaSchema,
 	shippingZoneSchema
 } from '$lib/schemas/admin';
 
@@ -106,15 +107,36 @@ describe('otros montos del panel', () => {
 	});
 
 	it('el envío gratis desde se lee con puntos, y vacío es sin envío gratis', () => {
-		const ajustes = { storeName: 'Mi tienda', whatsappPhone: '573001234567' };
+		const ajustes = { whatsappPhone: '573001234567' };
 
 		expect(
-			settingsSchema.safeParse({ ...ajustes, freeShippingThreshold: '250.000' }).data
+			ajustesSchema.safeParse({ ...ajustes, freeShippingThreshold: '250.000' }).data
 				?.freeShippingThreshold
 		).toBe(250000);
 		expect(
-			settingsSchema.safeParse({ ...ajustes, freeShippingThreshold: null }).data
+			ajustesSchema.safeParse({ ...ajustes, freeShippingThreshold: null }).data
 				?.freeShippingThreshold
 		).toBeNull();
+	});
+});
+
+describe('marca de la tienda (Diseño)', () => {
+	it('el nombre se pide y se valida en español', () => {
+		const resultado = tiendaSchema.safeParse({ storeName: 'A' });
+
+		expect(resultado.error?.issues.at(0)?.message).toBe('Escribe el nombre de la tienda.');
+	});
+
+	it('el anuncio vacío es sin anuncio', () => {
+		expect(tiendaSchema.safeParse({ storeName: 'Mi tienda' }).data?.announcement).toBe('');
+	});
+
+	it('el anuncio pasa de 160 caracteres se rechaza', () => {
+		const resultado = tiendaSchema.safeParse({
+			storeName: 'Mi tienda',
+			announcement: 'x'.repeat(161)
+		});
+
+		expect(resultado.error?.issues.at(0)?.message).toBe('Máximo 160 caracteres.');
 	});
 });

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/molecules/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { untrack } from 'svelte';
 
 	import { enhance } from '$app/forms';
@@ -10,7 +8,6 @@
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
-	import { Textarea } from '$lib/components/atoms/textarea';
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import { themePreviewUrl } from '$lib/template-preview';
@@ -22,29 +19,27 @@
 	let { data }: Props = $props();
 
 	// Copia editable de los ajustes; no se sincroniza sola.
-	let storeName = $state(untrack(() => data.current.store_name));
 	let whatsappPhone = $state(untrack(() => data.current.whatsapp_phone));
 	let instagramUrl = $state(untrack(() => data.current.instagram_url ?? ''));
-	let announcement = $state(untrack(() => data.current.announcement ?? ''));
 	let freeShippingThreshold = $state<number | null>(
 		untrack(() => data.current.free_shipping_threshold)
 	);
 
 	let saving = $state(false);
-	let logoSaving = $state(false);
 
 	/** La zona de la tienda que se resalta según el campo que se está editando. */
-	let focus = $state<PreviewZone>('store-header');
+	let focus = $state<PreviewZone>('store-footer');
 
+	// El nombre y el anuncio no se editan aquí: la vista previa los pinta como están.
 	const draft = $derived<StorefrontDraft>({
 		template: data.current.template,
 		theme: data.current.theme,
 		content: {
 			kind: 'settings',
-			storeName,
+			storeName: data.current.store_name,
 			whatsappPhone,
 			instagramUrl,
-			announcement,
+			announcement: data.current.announcement ?? '',
 			freeShippingThreshold
 		},
 		focus
@@ -57,8 +52,6 @@
 			data.current.theme
 		)
 	);
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
 </script>
 
 <svelte:head>
@@ -68,7 +61,17 @@
 <header class="mb-6">
 	<h1 class="text-3xl">Ajustes</h1>
 	<p class="text-muted-foreground text-sm">
-		Estos datos se ven en la tienda y arman el mensaje de WhatsApp.
+		Tu WhatsApp, tu Instagram y el envío gratis. Arman el mensaje de WhatsApp y los datos de la
+		tienda.
+	</p>
+	<p class="text-muted-foreground text-sm">
+		El logo, el nombre y la barra de anuncio están en
+		<a
+			href="/admin/personalizar?seccion=marca"
+			class="text-foreground underline underline-offset-4"
+		>
+			Diseño › Marca
+		</a>.
 	</p>
 </header>
 
@@ -87,17 +90,6 @@
 				};
 			}}
 		>
-			<div class="space-y-2">
-				<Label for="storeName">Nombre de la tienda</Label>
-				<Input
-					id="storeName"
-					name="storeName"
-					bind:value={storeName}
-					required
-					onfocusin={() => (focus = 'store-header')}
-				/>
-			</div>
-
 			<div class="space-y-2">
 				<Label for="whatsappPhone">WhatsApp</Label>
 				<Input
@@ -126,20 +118,6 @@
 			</div>
 
 			<div class="space-y-2">
-				<Label for="announcement">Barra de anuncio</Label>
-				<Textarea
-					id="announcement"
-					name="announcement"
-					rows={2}
-					maxlength={160}
-					bind:value={announcement}
-					placeholder="Envío gratis por compras sobre $250.000"
-					onfocusin={() => (focus = 'store-header')}
-				/>
-				<p class="text-muted-foreground text-xs">Déjalo vacío para ocultar la barra.</p>
-			</div>
-
-			<div class="space-y-2">
 				<Label for="freeShippingThreshold">Envío gratis desde</Label>
 				<MoneyField
 					id="freeShippingThreshold"
@@ -154,80 +132,3 @@
 		</form>
 	</div>
 </LivePreviewLayout>
-
-<section class="border-border bg-card mt-6 rounded-lg border p-6">
-	<h2 class="mb-1 text-lg">Logo</h2>
-	<p class="text-muted-foreground mb-4 text-sm">
-		Si subes un logo, la tienda lo muestra en vez del nombre: en la cabecera, en el menú y en el
-		pie.
-	</p>
-
-	{#if data.current.logo_url}
-		<div class="mb-4 grid place-items-center rounded-md bg-white p-4">
-			<img
-				src={data.current.logo_url}
-				alt={data.current.store_name}
-				class="h-16 w-auto max-w-full object-contain"
-			/>
-		</div>
-	{:else}
-		<p class="text-muted-foreground mb-4 text-sm">
-			Todavía no tienes logo: la tienda muestra el nombre.
-		</p>
-	{/if}
-
-	<form
-		method="POST"
-		action="?/subirLogo"
-		enctype="multipart/form-data"
-		class="space-y-3"
-		use:enhance={() => {
-			logoSaving = true;
-
-			return async ({ update }) => {
-				await update();
-				logoSaving = false;
-			};
-		}}
-	>
-		<Label for="logo">Archivo del logo</Label>
-		<Input
-			id="logo"
-			name="file"
-			type="file"
-			accept="image/png,image/jpeg,image/webp,image/svg+xml"
-			required
-		/>
-		<p class="text-muted-foreground text-xs">
-			Mejor en PNG o SVG con fondo transparente, horizontal. Máximo 2 MB.
-		</p>
-		<Button type="submit" disabled={logoSaving}>{logoSaving ? 'Subiendo…' : 'Subir logo'}</Button>
-	</form>
-
-	{#if data.current.logo_url}
-		<Button
-			type="button"
-			variant="ghost"
-			onclick={() =>
-				borrado.ask('quitar-logo', '¿Quitar el logo?', {
-					description: 'La tienda vuelve a mostrar el nombre.',
-					confirmLabel: 'Quitar',
-					pendingLabel: 'Quitando…'
-				})}>Quitar logo</Button
-		>
-	{/if}
-</section>
-
-<ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
-/>
-
-<div hidden>
-	<form id="quitar-logo" method="POST" action="?/quitarLogo" use:enhance={alBorrar}></form>
-</div>
