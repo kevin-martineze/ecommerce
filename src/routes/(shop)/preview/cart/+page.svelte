@@ -7,6 +7,7 @@
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import { Separator } from '$lib/components/atoms/separator';
+	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
 
 	// Estado
 	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
@@ -101,7 +102,78 @@
 		</p>
 	</header>
 
-	<div class="grid gap-12 lg:grid-cols-[1.3fr_0.7fr]">
+	<SplitLayout variant="summary">
+		{#snippet side()}
+			<aside>
+				<div class="border-border space-y-5 border p-5">
+					<h2 class="font-display text-2xl">Resumen</h2>
+
+					<div class="space-y-2" data-preview-zone="cart-coupon">
+						<Label for="coupon">Cupón</Label>
+						<div class="flex gap-2">
+							<Input
+								id="coupon"
+								name="couponCode"
+								value={coupon?.code ?? ''}
+								placeholder="CÓDIGO"
+								class="uppercase"
+								readonly
+							/>
+							<Button type="button" variant="outline" disabled>Aplicar</Button>
+						</div>
+
+						{#if coupon}
+							<p class={coupon.active ? 'text-success text-xs' : 'text-destructive text-xs'}>
+								{coupon.active ? `Cupón ${coupon.code} aplicado.` : 'Ese cupón ya no está activo.'}
+							</p>
+							<p class="text-muted-foreground text-xs">
+								{coupon.benefit}{coupon.minimum ? ` · ${coupon.minimum}` : ''}
+							</p>
+						{/if}
+					</div>
+
+					<Separator />
+
+					<div class="space-y-2" data-preview-zone="shipping-info">
+						<Label for="zone">Zona de envío</Label>
+						<select
+							id="zone"
+							name="shippingZoneId"
+							value={selectedZoneId}
+							onchange={(event) => (pickedZoneId = event.currentTarget.value)}
+							class="border-border bg-background focus-visible:ring-ring w-full border px-3 py-2 text-sm focus-visible:ring-1 focus-visible:outline-none"
+						>
+							{#each zones as zone (zone.id)}
+								<option value={zone.id}>
+									{zone.name} — {zone.cost === 0 ? 'Gratis' : formatMoney(zone.cost)}
+									{zone.etaDays ? `· ${zone.etaDays} días` : ''}
+								</option>
+							{/each}
+						</select>
+
+						{#if zones.length === 0}
+							<p class="text-muted-foreground text-xs">
+								Todavía no tienes zonas de envío disponibles.
+							</p>
+						{:else if selectedZone}
+							<p class="text-muted-foreground text-xs">
+								{selectedZone.cost === 0
+									? 'Envío gratis'
+									: `Costo ${formatMoney(selectedZone.cost)}`}
+								{selectedZone.etaDays ? `· llega en ${selectedZone.etaDays} días` : ''}
+							</p>
+						{/if}
+					</div>
+
+					<Separator />
+
+					<p class="text-muted-foreground text-xs">
+						El subtotal, el descuento y el total los calcula la tienda con los precios del momento.
+					</p>
+				</div>
+			</aside>
+		{/snippet}
+
 		<section class="space-y-6">
 			<p
 				class="text-muted-foreground border-border border border-dashed px-6 py-16 text-center text-sm"
@@ -109,72 +181,5 @@
 				Aquí van los productos de tu carrito. Esta vista muestra el resumen: envío y cupón.
 			</p>
 		</section>
-
-		<aside class="lg:sticky lg:top-24 lg:self-start">
-			<div class="border-border space-y-5 border p-5">
-				<h2 class="font-display text-2xl">Resumen</h2>
-
-				<div class="space-y-2" data-preview-zone="cart-coupon">
-					<Label for="coupon">Cupón</Label>
-					<div class="flex gap-2">
-						<Input
-							id="coupon"
-							name="couponCode"
-							value={coupon?.code ?? ''}
-							placeholder="CÓDIGO"
-							class="uppercase"
-							readonly
-						/>
-						<Button type="button" variant="outline" disabled>Aplicar</Button>
-					</div>
-
-					{#if coupon}
-						<p class={coupon.active ? 'text-success text-xs' : 'text-destructive text-xs'}>
-							{coupon.active ? `Cupón ${coupon.code} aplicado.` : 'Ese cupón ya no está activo.'}
-						</p>
-						<p class="text-muted-foreground text-xs">
-							{coupon.benefit}{coupon.minimum ? ` · ${coupon.minimum}` : ''}
-						</p>
-					{/if}
-				</div>
-
-				<Separator />
-
-				<div class="space-y-2" data-preview-zone="shipping-info">
-					<Label for="zone">Zona de envío</Label>
-					<select
-						id="zone"
-						name="shippingZoneId"
-						value={selectedZoneId}
-						onchange={(event) => (pickedZoneId = event.currentTarget.value)}
-						class="border-border bg-background focus-visible:ring-ring w-full border px-3 py-2 text-sm focus-visible:ring-1 focus-visible:outline-none"
-					>
-						{#each zones as zone (zone.id)}
-							<option value={zone.id}>
-								{zone.name} — {zone.cost === 0 ? 'Gratis' : formatMoney(zone.cost)}
-								{zone.etaDays ? `· ${zone.etaDays} días` : ''}
-							</option>
-						{/each}
-					</select>
-
-					{#if zones.length === 0}
-						<p class="text-muted-foreground text-xs">
-							Todavía no tienes zonas de envío disponibles.
-						</p>
-					{:else if selectedZone}
-						<p class="text-muted-foreground text-xs">
-							{selectedZone.cost === 0 ? 'Envío gratis' : `Costo ${formatMoney(selectedZone.cost)}`}
-							{selectedZone.etaDays ? `· llega en ${selectedZone.etaDays} días` : ''}
-						</p>
-					{/if}
-				</div>
-
-				<Separator />
-
-				<p class="text-muted-foreground text-xs">
-					El subtotal, el descuento y el total los calcula la tienda con los precios del momento.
-				</p>
-			</div>
-		</aside>
-	</div>
+	</SplitLayout>
 </div>

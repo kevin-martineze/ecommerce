@@ -4,7 +4,7 @@
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 
 	// Componentes
-	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
+	import LegalTemplate from '$lib/components/templates/LegalTemplate.svelte';
 
 	// Dominio
 	import { COMPANY, hasContact } from '$lib/config/company';
@@ -18,7 +18,7 @@
 	<meta name="description" content="Cómo hablar con el equipo de Globerce." />
 </svelte:head>
 
-<LegalPage title="Hablemos" summary="Dudas sobre los planes, ayuda con tu tienda o lo que sea.">
+<LegalTemplate title="Hablemos" summary="Dudas sobre los planes, ayuda con tu tienda o lo que sea.">
 	{#if hasContact()}
 		<div class="space-y-3">
 			{#if COMPANY.whatsapp}
@@ -74,4 +74,4 @@
 			que terminen.
 		</p>
 	</section>
-</LegalPage>
+</LegalTemplate>

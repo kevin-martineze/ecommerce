@@ -1,14 +1,18 @@
+<!--
+@component
+Las páginas legales y de contacto de Globerce: `StackedLayout` con la marca y
+el enlace de vuelta fijos, y un ancho de lectura. La página pone el texto.
+-->
 <script lang="ts">
 	// Tipos
 	import type { Snippet } from 'svelte';
 
+	// Componentes
+	import StackedLayout from '$lib/components/layouts/StackedLayout.svelte';
+
 	// Dominio
 	import { COMPANY, LEGAL_EFFECTIVE_DATE } from '$lib/config/company';
 
-	/**
-	 * El marco de las páginas legales: mismo ancho de lectura, misma cabecera y
-	 * el mismo pie para volver. Lo que cambia es el texto.
-	 */
 	interface Props {
 		title: string;
 		summary: string;
@@ -18,15 +22,17 @@
 	let { title, summary, children }: Props = $props();
 </script>
 
-<div class="marketing bg-background min-h-screen">
-	<header class="border-border border-b">
-		<div class="mx-auto flex max-w-3xl items-center justify-between gap-6 px-4 py-4 sm:px-6">
-			<a href="/" class="font-display text-xl tracking-tight">{COMPANY.brand}</a>
-			<a href="/" class="text-muted-foreground hover:text-foreground text-sm">Volver al inicio</a>
+<StackedLayout class="marketing bg-background" headerPosition="static">
+	{#snippet header()}
+		<div class="border-border border-b">
+			<div class="mx-auto flex max-w-3xl items-center justify-between gap-6 px-4 py-4 sm:px-6">
+				<a href="/" class="font-display text-xl tracking-tight">{COMPANY.brand}</a>
+				<a href="/" class="text-muted-foreground hover:text-foreground text-sm">Volver al inicio</a>
+			</div>
 		</div>
-	</header>
+	{/snippet}
 
-	<main class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+	<div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
 		<h1 class="text-4xl">{title}</h1>
 		<p class="text-muted-foreground mt-3">{summary}</p>
 		<p class="text-muted-foreground mt-1 text-sm">En vigor desde el {LEGAL_EFFECTIVE_DATE}.</p>
@@ -34,8 +40,8 @@
 		<div class="legal mt-10 space-y-8">
 			{@render children()}
 		</div>
-	</main>
-</div>
+	</div>
+</StackedLayout>
 
 <style>
 	/* Ritmo de lectura largo: los títulos respiran y los párrafos no se pegan. */

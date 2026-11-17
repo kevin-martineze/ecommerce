@@ -12,6 +12,7 @@
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Sheet from '$lib/components/atoms/sheet';
+	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
 	import FilterPanel from '$lib/components/organisms/FilterPanel.svelte';
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
 
@@ -69,72 +70,68 @@
 		</p>
 	</header>
 
-	<div class="flex gap-10">
-		<aside class="hidden w-56 flex-none lg:block">
-			<div class="sticky top-24">
-				<FilterPanel facets={data.facets} filters={data.filters} />
-			</div>
-		</aside>
+	<SplitLayout variant="filters">
+		{#snippet side()}
+			<FilterPanel facets={data.facets} filters={data.filters} />
+		{/snippet}
 
-		<div class="min-w-0 flex-1">
-			<div class="mb-6 flex items-center justify-between gap-3">
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					class="lg:hidden"
-					onclick={() => (filtersOpen = true)}
+		<div class="mb-6 flex items-center justify-between gap-3">
+			<Button
+				type="button"
+				variant="outline"
+				size="sm"
+				class="lg:hidden"
+				onclick={() => (filtersOpen = true)}
+			>
+				<SlidersHorizontal class="mr-2 size-4" />
+				Filtros
+			</Button>
+
+			<label class="ml-auto flex items-center gap-2 text-sm">
+				<span class="text-muted-foreground hidden sm:inline">Ordenar por</span>
+				<select
+					value={data.filters.sort}
+					onchange={changeSort}
+					class="border-border bg-background focus-visible:ring-ring border px-3 py-2 text-sm focus-visible:ring-1 focus-visible:outline-none"
 				>
-					<SlidersHorizontal class="mr-2 size-4" />
-					Filtros
-				</Button>
-
-				<label class="ml-auto flex items-center gap-2 text-sm">
-					<span class="text-muted-foreground hidden sm:inline">Ordenar por</span>
-					<select
-						value={data.filters.sort}
-						onchange={changeSort}
-						class="border-border bg-background focus-visible:ring-ring border px-3 py-2 text-sm focus-visible:ring-1 focus-visible:outline-none"
-					>
-						{#each sortOptions as option (option.value)}
-							<option value={option.value}>{option.label}</option>
-						{/each}
-					</select>
-				</label>
-			</div>
-
-			{#if data.products.length === 0}
-				<div
-					class="border-border flex flex-col items-center gap-4 border border-dashed px-6 py-24 text-center"
-				>
-					<h2 class="text-2xl">No encontramos productos con esos filtros</h2>
-					<p class="text-muted-foreground max-w-sm text-sm">
-						Prueba quitando alguna variación o color, o mira el catálogo completo.
-					</p>
-					<Button href="/shop" variant="outline">Ver todo</Button>
-				</div>
-			{:else}
-				<ProductGrid products={data.products} columns={3} />
-			{/if}
-
-			{#if data.pageCount > 1}
-				<nav class="mt-14 flex items-center justify-center gap-2" aria-label="Paginación">
-					{#each Array.from({ length: data.pageCount }, (_, index) => index + 1) as target (target)}
-						<a
-							href={pageUrl(target)}
-							aria-current={target === data.page ? 'page' : undefined}
-							class="border-border grid size-10 place-items-center border text-sm transition-colors {target ===
-							data.page
-								? 'bg-primary text-primary-foreground border-primary'
-								: 'hover:bg-accent'}"
-						>
-							{target}
-						</a>
+					{#each sortOptions as option (option.value)}
+						<option value={option.value}>{option.label}</option>
 					{/each}
-				</nav>
-			{/if}
+				</select>
+			</label>
 		</div>
-	</div>
+
+		{#if data.products.length === 0}
+			<div
+				class="border-border flex flex-col items-center gap-4 border border-dashed px-6 py-24 text-center"
+			>
+				<h2 class="text-2xl">No encontramos productos con esos filtros</h2>
+				<p class="text-muted-foreground max-w-sm text-sm">
+					Prueba quitando alguna variación o color, o mira el catálogo completo.
+				</p>
+				<Button href="/shop" variant="outline">Ver todo</Button>
+			</div>
+		{:else}
+			<ProductGrid products={data.products} columns={3} />
+		{/if}
+
+		{#if data.pageCount > 1}
+			<nav class="mt-14 flex items-center justify-center gap-2" aria-label="Paginación">
+				{#each Array.from({ length: data.pageCount }, (_, index) => index + 1) as target (target)}
+					<a
+						href={pageUrl(target)}
+						aria-current={target === data.page ? 'page' : undefined}
+						class="border-border grid size-10 place-items-center border text-sm transition-colors {target ===
+						data.page
+							? 'bg-primary text-primary-foreground border-primary'
+							: 'hover:bg-accent'}"
+					>
+						{target}
+					</a>
+				{/each}
+			</nav>
+		{/if}
+	</SplitLayout>
 </div>
 
 <Sheet.Root bind:open={filtersOpen}>

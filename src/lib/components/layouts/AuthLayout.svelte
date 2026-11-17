@@ -1,6 +1,7 @@
 <!--
 @component
-Layout de las pantallas de acceso (entrar, recuperar, invitación, registro).
+Layout de las pantallas de acceso (entrar, recuperar, invitación, registro)
+y de las de error.
 
 Modo documento: la página hace scroll como un documento y el contenido va
 centrado. Contrato de GlobUI: `data-layout`, y cada slot con `data-slot` y
@@ -20,7 +21,7 @@ centrado. Contrato de GlobUI: `data-layout`, y cada slot con `data-slot` y
 		/** Una línea al pie: enlaces legales, «¿ya tienes cuenta?». */
 		footer?: Snippet;
 		/** El ancho del contenido: `wide` para pantallas con tablas o planes lado a lado. */
-		width?: 'narrow' | 'wide';
+		width?: 'narrow' | 'medium' | 'wide';
 		class?: string;
 	}
 
@@ -28,7 +29,12 @@ centrado. Contrato de GlobUI: `data-layout`, y cada slot con `data-slot` y
 </script>
 
 <main data-layout="auth" class={cn('grid min-h-dvh place-items-center px-4 py-10', className)}>
-	<div class={cn('w-full space-y-8', width === 'wide' ? 'max-w-4xl' : 'max-w-sm')}>
+	<div
+		class={cn(
+			'w-full space-y-8',
+			width === 'wide' ? 'max-w-4xl' : width === 'medium' ? 'max-w-xl' : 'max-w-sm'
+		)}
+	>
 		{#if header}
 			<header data-slot="header" data-scroll="fixed" class="space-y-2 text-center">
 				{@render header()}

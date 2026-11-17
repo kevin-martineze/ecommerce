@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Componentes
-	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
+	import LegalTemplate from '$lib/components/templates/LegalTemplate.svelte';
 
 	// Dominio
 	import { COMPANY } from '$lib/config/company';
@@ -12,7 +12,7 @@
 	<meta name="description" content="Las condiciones con las que se usa Globerce." />
 </svelte:head>
 
-<LegalPage
+<LegalTemplate
 	title="Términos del servicio"
 	summary="Las condiciones con las que {COMPANY.brand} le presta el servicio a tu tienda."
 >
@@ -130,4 +130,4 @@
 			¿Dudas? Escríbenos desde <a href="/contact">la página de contacto</a>.
 		</p>
 	</section>
-</LegalPage>
+</LegalTemplate>

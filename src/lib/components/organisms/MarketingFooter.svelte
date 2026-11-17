@@ -40,7 +40,7 @@
 	];
 </script>
 
-<footer class="marketing-dark bg-background text-foreground relative overflow-hidden">
+<div class="marketing-dark bg-background text-foreground relative overflow-hidden">
 	<!-- Textura de la esquina: se desvanece hacia arriba y a la derecha para
 	     no competir con los enlaces. -->
 	<div
@@ -92,4 +92,4 @@
 	>
 		Globerce
 	</p>
-</footer>
+</div>

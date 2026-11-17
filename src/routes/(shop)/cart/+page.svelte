@@ -20,6 +20,7 @@
 	import { Label } from '$lib/components/atoms/label';
 	import { Separator } from '$lib/components/atoms/separator';
 	import { Textarea } from '$lib/components/atoms/textarea';
+	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
 
 	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
@@ -111,7 +112,171 @@
 			<Button href="/shop">Ver la tienda</Button>
 		</div>
 	{:else}
-		<div class="grid gap-12 lg:grid-cols-[1.3fr_0.7fr]">
+		<SplitLayout variant="summary">
+			{#snippet side()}
+				<aside>
+					<form
+						method="POST"
+						action="?/confirm"
+						class="border-border space-y-5 border p-5"
+						use:enhance={checkout.submit({
+							reset: false,
+							prepare: (formData) => formData.set('cart', cart.serialize())
+						})}
+					>
+						<input type="hidden" name="cart" value="[]" />
+
+						<h2 class="font-display text-2xl">Resumen</h2>
+
+						<div class="space-y-2 text-sm">
+							<div class="flex justify-between">
+								<span class="text-muted-foreground">Subtotal</span>
+								<span class="tabular-nums">
+									{formatMoney(totals?.subtotal ?? cart.previewSubtotal)}
+								</span>
+							</div>
+
+							{#if totals && totals.discount > 0}
+								<div class="text-success flex justify-between">
+									<span>Descuento {appliedCoupon ? `(${appliedCoupon.code})` : ''}</span>
+									<span class="tabular-nums">-{formatMoney(totals.discount)}</span>
+								</div>
+							{/if}
+
+							<div class="flex justify-between">
+								<span class="text-muted-foreground">
+									Envío {selectedZone ? `· ${selectedZone.name}` : ''}
+								</span>
+								<span class="tabular-nums">
+									{totals && totals.shippingCost === 0
+										? 'Gratis'
+										: formatMoney(totals?.shippingCost ?? selectedZone?.cost ?? 0)}
+								</span>
+							</div>
+
+							<Separator />
+
+							<div class="flex justify-between text-base font-medium">
+								<span>Total</span>
+								<span class="tabular-nums">
+									{formatMoney(totals?.total ?? cart.previewSubtotal)}
+								</span>
+							</div>
+
+							{#if quote.pending}
+								<p class="text-muted-foreground text-xs">Actualizando precios…</p>
+							{/if}
+						</div>
+
+						<Separator />
+
+						<div
+							class="space-y-2"
+							data-preview-zone={data.draftPreview ? 'cart-coupon' : undefined}
+						>
+							<Label for="coupon">Cupón</Label>
+							<div class="flex gap-2">
+								<Input
+									id="coupon"
+									name="couponCode"
+									bind:value={couponCode}
+									placeholder="CÓDIGO"
+									class="uppercase"
+								/>
+								<Button
+									type="button"
+									variant="outline"
+									onclick={() => prepareForm?.requestSubmit()}
+									disabled={quote.pending}
+								>
+									Aplicar
+								</Button>
+							</div>
+
+							{#if rejection}
+								<p class="text-destructive text-xs">
+									{COUPON_REJECTION_LABEL[rejection] ?? 'Ese cupón no aplica.'}
+								</p>
+							{:else if appliedCoupon}
+								<p class="text-success text-xs">Cupón {appliedCoupon.code} aplicado.</p>
+							{/if}
+						</div>
+
+						<div
+							class="space-y-2"
+							data-preview-zone={data.draftPreview ? 'shipping-info' : undefined}
+						>
+							<Label for="zone">Zona de envío</Label>
+							<select
+								id="zone"
+								name="shippingZoneId"
+								bind:value={zoneId}
+								required
+								class="border-border bg-background focus-visible:ring-ring w-full border px-3 py-2 text-sm focus-visible:ring-1 focus-visible:outline-none"
+							>
+								{#each data.zones as zone (zone.id)}
+									<option value={zone.id}>
+										{zone.name} — {zone.cost === 0 ? 'Gratis' : formatMoney(zone.cost)}
+										{zone.eta_days ? `· ${zone.eta_days} días` : ''}
+									</option>
+								{/each}
+							</select>
+						</div>
+
+						<Separator />
+
+						<div class="space-y-3">
+							<div class="space-y-2">
+								<Label for="name">Nombre completo</Label>
+								<Input id="name" name="name" required autocomplete="name" />
+							</div>
+
+							<div class="space-y-2">
+								<Label for="phone">WhatsApp</Label>
+								<Input id="phone" name="phone" required inputmode="tel" placeholder="3001234567" />
+							</div>
+
+							<div class="space-y-2">
+								<Label for="city">Ciudad</Label>
+								<Input id="city" name="city" autocomplete="address-level2" />
+							</div>
+
+							<div class="space-y-2">
+								<Label for="address">Dirección</Label>
+								<Input id="address" name="address" autocomplete="street-address" />
+							</div>
+
+							<div class="space-y-2">
+								<Label for="notes">Notas</Label>
+								<Textarea
+									id="notes"
+									name="notes"
+									rows={2}
+									placeholder="Punto de referencia, horario…"
+								/>
+							</div>
+						</div>
+
+						{#if checkoutError}
+							<p class="text-destructive text-sm">{checkoutError}</p>
+						{/if}
+
+						<Button
+							type="submit"
+							size="lg"
+							class="w-full"
+							disabled={checkout.pending || quote.pending}
+						>
+							{checkout.pending ? 'Creando pedido…' : 'Confirmar y abrir WhatsApp'}
+						</Button>
+
+						<p class="text-muted-foreground text-center text-xs">
+							No se cobra nada en la web. El pago se acuerda por WhatsApp.
+						</p>
+					</form>
+				</aside>
+			{/snippet}
+
 			<section class="space-y-6">
 				{#if priced && priced.removed.length > 0}
 					<div class="border-destructive/40 bg-destructive/5 border p-4 text-sm">
@@ -199,165 +364,6 @@
 					{/each}
 				</ul>
 			</section>
-
-			<aside class="lg:sticky lg:top-24 lg:self-start">
-				<form
-					method="POST"
-					action="?/confirm"
-					class="border-border space-y-5 border p-5"
-					use:enhance={checkout.submit({
-						reset: false,
-						prepare: (formData) => formData.set('cart', cart.serialize())
-					})}
-				>
-					<input type="hidden" name="cart" value="[]" />
-
-					<h2 class="font-display text-2xl">Resumen</h2>
-
-					<div class="space-y-2 text-sm">
-						<div class="flex justify-between">
-							<span class="text-muted-foreground">Subtotal</span>
-							<span class="tabular-nums">
-								{formatMoney(totals?.subtotal ?? cart.previewSubtotal)}
-							</span>
-						</div>
-
-						{#if totals && totals.discount > 0}
-							<div class="text-success flex justify-between">
-								<span>Descuento {appliedCoupon ? `(${appliedCoupon.code})` : ''}</span>
-								<span class="tabular-nums">-{formatMoney(totals.discount)}</span>
-							</div>
-						{/if}
-
-						<div class="flex justify-between">
-							<span class="text-muted-foreground">
-								Envío {selectedZone ? `· ${selectedZone.name}` : ''}
-							</span>
-							<span class="tabular-nums">
-								{totals && totals.shippingCost === 0
-									? 'Gratis'
-									: formatMoney(totals?.shippingCost ?? selectedZone?.cost ?? 0)}
-							</span>
-						</div>
-
-						<Separator />
-
-						<div class="flex justify-between text-base font-medium">
-							<span>Total</span>
-							<span class="tabular-nums">
-								{formatMoney(totals?.total ?? cart.previewSubtotal)}
-							</span>
-						</div>
-
-						{#if quote.pending}
-							<p class="text-muted-foreground text-xs">Actualizando precios…</p>
-						{/if}
-					</div>
-
-					<Separator />
-
-					<div class="space-y-2" data-preview-zone={data.draftPreview ? 'cart-coupon' : undefined}>
-						<Label for="coupon">Cupón</Label>
-						<div class="flex gap-2">
-							<Input
-								id="coupon"
-								name="couponCode"
-								bind:value={couponCode}
-								placeholder="CÓDIGO"
-								class="uppercase"
-							/>
-							<Button
-								type="button"
-								variant="outline"
-								onclick={() => prepareForm?.requestSubmit()}
-								disabled={quote.pending}
-							>
-								Aplicar
-							</Button>
-						</div>
-
-						{#if rejection}
-							<p class="text-destructive text-xs">
-								{COUPON_REJECTION_LABEL[rejection] ?? 'Ese cupón no aplica.'}
-							</p>
-						{:else if appliedCoupon}
-							<p class="text-success text-xs">Cupón {appliedCoupon.code} aplicado.</p>
-						{/if}
-					</div>
-
-					<div
-						class="space-y-2"
-						data-preview-zone={data.draftPreview ? 'shipping-info' : undefined}
-					>
-						<Label for="zone">Zona de envío</Label>
-						<select
-							id="zone"
-							name="shippingZoneId"
-							bind:value={zoneId}
-							required
-							class="border-border bg-background focus-visible:ring-ring w-full border px-3 py-2 text-sm focus-visible:ring-1 focus-visible:outline-none"
-						>
-							{#each data.zones as zone (zone.id)}
-								<option value={zone.id}>
-									{zone.name} — {zone.cost === 0 ? 'Gratis' : formatMoney(zone.cost)}
-									{zone.eta_days ? `· ${zone.eta_days} días` : ''}
-								</option>
-							{/each}
-						</select>
-					</div>
-
-					<Separator />
-
-					<div class="space-y-3">
-						<div class="space-y-2">
-							<Label for="name">Nombre completo</Label>
-							<Input id="name" name="name" required autocomplete="name" />
-						</div>
-
-						<div class="space-y-2">
-							<Label for="phone">WhatsApp</Label>
-							<Input id="phone" name="phone" required inputmode="tel" placeholder="3001234567" />
-						</div>
-
-						<div class="space-y-2">
-							<Label for="city">Ciudad</Label>
-							<Input id="city" name="city" autocomplete="address-level2" />
-						</div>
-
-						<div class="space-y-2">
-							<Label for="address">Dirección</Label>
-							<Input id="address" name="address" autocomplete="street-address" />
-						</div>
-
-						<div class="space-y-2">
-							<Label for="notes">Notas</Label>
-							<Textarea
-								id="notes"
-								name="notes"
-								rows={2}
-								placeholder="Punto de referencia, horario…"
-							/>
-						</div>
-					</div>
-
-					{#if checkoutError}
-						<p class="text-destructive text-sm">{checkoutError}</p>
-					{/if}
-
-					<Button
-						type="submit"
-						size="lg"
-						class="w-full"
-						disabled={checkout.pending || quote.pending}
-					>
-						{checkout.pending ? 'Creando pedido…' : 'Confirmar y abrir WhatsApp'}
-					</Button>
-
-					<p class="text-muted-foreground text-center text-xs">
-						No se cobra nada en la web. El pago se acuerda por WhatsApp.
-					</p>
-				</form>
-			</aside>
-		</div>
+		</SplitLayout>
 	{/if}
 </div>

@@ -9,6 +9,7 @@
 
 	// Componentes
 	import * as Accordion from '$lib/components/atoms/accordion';
+	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
 	import PriceTag from '$lib/components/molecules/PriceTag.svelte';
 	import ProductGallery from '$lib/components/organisms/ProductGallery.svelte';
 	import VariantPicker from '$lib/components/organisms/VariantPicker.svelte';
@@ -101,10 +102,8 @@
 		{/if}
 	</nav>
 
-	<div class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16" data-preview-zone="product-card">
-		<ProductGallery {images} productName={name} productSlug={product.slug} activeValueId={null} />
-
-		<div class="lg:sticky lg:top-24 lg:self-start">
+	<SplitLayout variant="detail" data-preview-zone="product-card">
+		{#snippet side()}
 			<div class="space-y-8">
 				<header class="space-y-3">
 					<h1 class="text-4xl md:text-5xl">{name}</h1>
@@ -142,6 +141,8 @@
 					</Accordion.Item>
 				</Accordion.Root>
 			</div>
-		</div>
-	</div>
+		{/snippet}
+
+		<ProductGallery {images} productName={name} productSlug={product.slug} activeValueId={null} />
+	</SplitLayout>
 </div>

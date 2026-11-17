@@ -129,18 +129,9 @@
 	}
 </script>
 
-{#if settings.announcement}
-	<div
-		class="bg-primary text-primary-foreground px-4 py-2 text-center text-xs tracking-wide"
-		data-preview-zone={draftPreview ? 'announcement' : undefined}
-	>
-		{settings.announcement}
-	</div>
-{/if}
-
-<header
+<div
 	data-preview-zone={draftPreview ? 'store-header' : undefined}
-	class="bg-background border-border sticky top-0 z-40 border-b"
+	class="bg-background border-border border-b"
 >
 	<div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
 		<Button
@@ -337,7 +328,7 @@
 			</form>
 		</div>
 	{/if}
-</header>
+</div>
 
 <Sheet.Root bind:open={menuOpen}>
 	<Sheet.Content side="left" class="w-80">

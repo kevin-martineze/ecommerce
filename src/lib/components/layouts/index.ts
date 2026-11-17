@@ -7,4 +7,5 @@ export { default as CanvasLayout } from './CanvasLayout.svelte';
 export { useLayoutScroll } from './layout-scroll';
 export { default as PageLayout } from './PageLayout.svelte';
 export { default as SettingsLayout } from './SettingsLayout.svelte';
+export { default as SplitLayout } from './SplitLayout.svelte';
 export { default as StackedLayout } from './StackedLayout.svelte';

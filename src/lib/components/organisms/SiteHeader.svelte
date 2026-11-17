@@ -82,19 +82,10 @@
 	}
 </script>
 
-{#if settings.announcement}
-	<div
-		class="bg-primary text-primary-foreground px-4 py-2 text-center text-xs tracking-wide"
-		data-preview-zone={draftPreview ? 'announcement' : undefined}
-	>
-		{settings.announcement}
-	</div>
-{/if}
-
-<header
+<div
 	data-preview-zone={draftPreview ? 'store-header' : undefined}
 	class={cn(
-		'bg-background/95 border-border sticky top-0 z-40 border-b backdrop-blur transition-transform duration-500 ease-[var(--ease-editorial)]',
+		'bg-background/95 border-border border-b backdrop-blur transition-transform duration-500 ease-[var(--ease-editorial)]',
 		hidden && '-translate-y-full'
 	)}
 >
@@ -218,7 +209,7 @@
 			</form>
 		</div>
 	{/if}
-</header>
+</div>
 
 <Sheet.Root bind:open={menuOpen}>
 	<Sheet.Content side="left" class="w-80">

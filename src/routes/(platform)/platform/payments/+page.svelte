@@ -9,6 +9,7 @@
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Table from '$lib/components/atoms/table';
+	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
 	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
@@ -57,16 +58,15 @@
 	<title>Pagos — Plataforma Globerce</title>
 </svelte:head>
 
-<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
-	<div class="space-y-1">
-		<h1 class="text-3xl">Pagos</h1>
-		<p class="text-muted-foreground text-sm">
+<PageTemplate title="Pagos">
+	{#snippet intro()}
+		<p>
 			{report.payments.length}
 			{report.payments.length === 1 ? 'pago' : 'pagos'} en {monthLabel}.
 		</p>
-	</div>
+	{/snippet}
 
-	<div class="flex items-center gap-2">
+	{#snippet actions()}
 		<Button
 			href={`/platform/payments?month=${shiftMonth(report.month, -1)}`}
 			variant="outline"
@@ -84,59 +84,62 @@
 		>
 			<ChevronRight class="size-4" />
 		</Button>
+	{/snippet}
+
+	<div class="border-border bg-card rounded-lg mb-6 border p-6">
+		<p class="text-muted-foreground text-sm">Total cobrado</p>
+		<p class="text-3xl font-semibold tabular-nums">{formatMoney(report.total)}</p>
 	</div>
-</header>
 
-<div class="border-border bg-card rounded-lg mb-6 border p-6">
-	<p class="text-muted-foreground text-sm">Total cobrado</p>
-	<p class="text-3xl font-semibold tabular-nums">{formatMoney(report.total)}</p>
-</div>
-
-{#if report.payments.length === 0}
-	<p
-		class="text-muted-foreground border-border border border-dashed px-6 py-16 text-center text-sm"
-	>
-		No hay pagos registrados en este mes.
-	</p>
-{:else}
-	<div class="border-border bg-card overflow-hidden rounded-lg border">
-		<Table.Root class="table-stack">
-			<Table.Header>
-				<Table.Row>
-					<Table.Head>Tienda</Table.Head>
-					<Table.Head>Período</Table.Head>
-					<Table.Head>Medio</Table.Head>
-					<Table.Head>Registrado</Table.Head>
-					<Table.Head class="text-right">Monto</Table.Head>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{#each report.payments as payment (payment.id)}
+	{#if report.payments.length === 0}
+		<p
+			class="text-muted-foreground border-border border border-dashed px-6 py-16 text-center text-sm"
+		>
+			No hay pagos registrados en este mes.
+		</p>
+	{:else}
+		<div class="border-border bg-card overflow-hidden rounded-lg border">
+			<Table.Root class="table-stack">
+				<Table.Header>
 					<Table.Row>
-						<Table.Cell data-label="Tienda">
-							<a href={`/platform/stores/${payment.store_id}`} class="font-medium hover:underline">
-								{payment.store_name}
-							</a>
-							<p class="text-muted-foreground text-xs">{payment.store_slug}</p>
-						</Table.Cell>
-						<Table.Cell data-label="Período">
-							{formatDate(payment.period_start)} – {formatDate(payment.period_end)}
-						</Table.Cell>
-						<Table.Cell data-label="Medio">
-							{payment.method}{payment.reference ? ` · ${payment.reference}` : ''}
-						</Table.Cell>
-						<Table.Cell data-label="Registrado" class="text-muted-foreground">
-							{dateTimeFormatter.format(new Date(payment.created_at))}
-							{#if payment.recorded_by}
-								<span class="block text-xs">{payment.recorded_by}</span>
-							{/if}
-						</Table.Cell>
-						<Table.Cell data-label="Monto" class="text-right tabular-nums">
-							{formatMoney(payment.amount_cop)}
-						</Table.Cell>
+						<Table.Head>Tienda</Table.Head>
+						<Table.Head>Período</Table.Head>
+						<Table.Head>Medio</Table.Head>
+						<Table.Head>Registrado</Table.Head>
+						<Table.Head class="text-right">Monto</Table.Head>
 					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
-	</div>
-{/if}
+				</Table.Header>
+				<Table.Body>
+					{#each report.payments as payment (payment.id)}
+						<Table.Row>
+							<Table.Cell data-label="Tienda">
+								<a
+									href={`/platform/stores/${payment.store_id}`}
+									class="font-medium hover:underline"
+								>
+									{payment.store_name}
+								</a>
+								<p class="text-muted-foreground text-xs">{payment.store_slug}</p>
+							</Table.Cell>
+							<Table.Cell data-label="Período">
+								{formatDate(payment.period_start)} – {formatDate(payment.period_end)}
+							</Table.Cell>
+							<Table.Cell data-label="Medio">
+								{payment.method}{payment.reference ? ` · ${payment.reference}` : ''}
+							</Table.Cell>
+							<Table.Cell data-label="Registrado" class="text-muted-foreground">
+								{dateTimeFormatter.format(new Date(payment.created_at))}
+								{#if payment.recorded_by}
+									<span class="block text-xs">{payment.recorded_by}</span>
+								{/if}
+							</Table.Cell>
+							<Table.Cell data-label="Monto" class="text-right tabular-nums">
+								{formatMoney(payment.amount_cop)}
+							</Table.Cell>
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		</div>
+	{/if}
+</PageTemplate>

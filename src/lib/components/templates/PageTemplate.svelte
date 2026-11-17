@@ -17,6 +17,8 @@ necesita, una columna al lado.
 		description?: string;
 		eyebrow?: string;
 		back?: { href: string; label: string };
+		/** Algo pegado al título: el estado de una tienda, de un pedido. */
+		badge?: Snippet;
 		/** Botones y filtros a la derecha del título. */
 		actions?: Snippet;
 		/** Texto de ayuda largo, bajo la descripción. */
@@ -26,13 +28,13 @@ necesita, una columna al lado.
 		width?: 'default' | 'narrow' | 'full';
 	}
 
-	let { title, description, eyebrow, back, actions, intro, children, aside, width }: Props =
+	let { title, description, eyebrow, back, badge, actions, intro, children, aside, width }: Props =
 		$props();
 </script>
 
 <PageLayout {aside} {width}>
 	{#snippet header()}
-		<PageHeader {title} {description} {eyebrow} {back} {actions} children={intro} />
+		<PageHeader {title} {description} {eyebrow} {back} {badge} {actions} children={intro} />
 	{/snippet}
 
 	{@render children()}

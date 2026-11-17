@@ -72,7 +72,10 @@ celular va debajo, salvo que la página la oculte y la ofrezca de otra forma.
 			<aside
 				data-slot="aside"
 				data-scroll="fixed"
-				class={cn('lg:sticky lg:top-6 lg:self-start', !asideOnMobile && 'hidden lg:block')}
+				class={cn(
+					'lg:sticky lg:top-[calc(var(--layout-header-h,0px)+1.5rem)] lg:self-start',
+					!asideOnMobile && 'hidden lg:block'
+				)}
 			>
 				{@render aside()}
 			</aside>

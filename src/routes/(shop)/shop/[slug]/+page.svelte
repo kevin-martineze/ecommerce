@@ -19,6 +19,7 @@
 	import * as Accordion from '$lib/components/atoms/accordion';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
+	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
 	import PriceTag from '$lib/components/molecules/PriceTag.svelte';
 	import ProductGallery from '$lib/components/organisms/ProductGallery.svelte';
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
@@ -173,18 +174,8 @@
 		{/if}
 	</nav>
 
-	<div
-		class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16"
-		data-preview-zone={data.draftPreview ? 'product-card' : undefined}
-	>
-		<ProductGallery
-			images={product.images}
-			productName={product.name}
-			productSlug={product.slug}
-			activeValueId={selectedVariant?.valueIds.at(0) ?? null}
-		/>
-
-		<div class="lg:sticky lg:top-24 lg:self-start">
+	<SplitLayout variant="detail" data-preview-zone={data.draftPreview ? 'product-card' : undefined}>
+		{#snippet side()}
 			<div class="space-y-8">
 				<header class="space-y-3">
 					<h1 class="text-4xl md:text-5xl">{product.name}</h1>
@@ -295,8 +286,15 @@
 					</Accordion.Item>
 				</Accordion.Root>
 			</div>
-		</div>
-	</div>
+		{/snippet}
+
+		<ProductGallery
+			images={product.images}
+			productName={product.name}
+			productSlug={product.slug}
+			activeValueId={selectedVariant?.valueIds.at(0) ?? null}
+		/>
+	</SplitLayout>
 
 	{#if data.related.length > 0}
 		<section class="mt-24">

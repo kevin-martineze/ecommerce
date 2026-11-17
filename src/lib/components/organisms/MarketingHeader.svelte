@@ -24,8 +24,8 @@
 	];
 </script>
 
-<header
-	class="marketing-dark border-border bg-background/80 text-foreground fixed inset-x-0 top-0 z-30 border-b backdrop-blur-md"
+<div
+	class="marketing-dark border-border bg-background/80 text-foreground border-b backdrop-blur-md"
 >
 	<div class="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3.5 sm:px-6">
 		<a href="/" class="flex items-center gap-2" aria-label="Globerce, inicio">
@@ -55,4 +55,4 @@
 			{/if}
 		</div>
 	</div>
-</header>
+</div>

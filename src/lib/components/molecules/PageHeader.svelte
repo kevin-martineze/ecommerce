@@ -21,6 +21,8 @@ Un solo `h1` por página, siempre aquí.
 		eyebrow?: string;
 		/** El enlace para volver al listado. */
 		back?: { href: string; label: string };
+		/** Algo pegado al título: el estado de una tienda, de un pedido. */
+		badge?: Snippet;
 		/** Botones y filtros a la derecha del título. */
 		actions?: Snippet;
 		/** Texto de ayuda largo, debajo de la descripción. */
@@ -28,7 +30,16 @@ Un solo `h1` por página, siempre aquí.
 		class?: string;
 	}
 
-	let { title, description, eyebrow, back, actions, children, class: className }: Props = $props();
+	let {
+		title,
+		description,
+		eyebrow,
+		back,
+		badge,
+		actions,
+		children,
+		class: className
+	}: Props = $props();
 </script>
 
 <header class={cn('flex flex-wrap items-start justify-between gap-3', className)}>
@@ -45,7 +56,10 @@ Un solo `h1` por página, siempre aquí.
 		{#if eyebrow}
 			<p class="eyebrow">{eyebrow}</p>
 		{/if}
-		<h1 class="text-3xl">{title}</h1>
+		<h1 class="flex flex-wrap items-center gap-3 text-3xl">
+			{title}
+			{#if badge}{@render badge()}{/if}
+		</h1>
 		{#if description}
 			<p class="text-muted-foreground max-w-2xl text-sm">{description}</p>
 		{/if}

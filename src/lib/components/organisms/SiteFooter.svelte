@@ -32,7 +32,7 @@
 	const year = new Date().getFullYear();
 </script>
 
-<footer
+<div
 	data-preview-zone={draftPreview ? 'store-footer' : undefined}
 	class="border-border mt-24 border-t"
 >
@@ -103,4 +103,4 @@
 		© {year}
 		{settings.store_name}. Todos los derechos reservados.
 	</div>
-</footer>
+</div>

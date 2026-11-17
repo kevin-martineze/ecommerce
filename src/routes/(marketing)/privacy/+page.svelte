@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Componentes
-	import LegalPage from '$lib/components/molecules/LegalPage.svelte';
+	import LegalTemplate from '$lib/components/templates/LegalTemplate.svelte';
 
 	// Dominio
 	import { COMPANY } from '$lib/config/company';
@@ -11,7 +11,7 @@
 	<meta name="description" content="Qué datos trata Globerce, para qué y qué puedes pedir." />
 </svelte:head>
 
-<LegalPage
+<LegalTemplate
 	title="Política de privacidad"
 	summary="Qué datos tratamos, para qué, con quién se comparten y qué puedes pedirnos."
 >
@@ -107,4 +107,4 @@
 			reportamos a la autoridad, como manda la ley.
 		</p>
 	</section>
-</LegalPage>
+</LegalTemplate>
