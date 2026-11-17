@@ -18,11 +18,13 @@ import {
 } from '$lib/server/api/panel-content';
 import { requireAdmin } from '$lib/server/auth';
 import { failWith, orFail, panelContext, storeUrl } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
 import { accentProblem, isEmptyTheme } from '$lib/domain/theme';
 import {
 	heroSchema,
+	idFormSchema,
 	homeHighlightSchema,
 	storeThemeSchema,
 	templateSchema,
@@ -162,9 +164,11 @@ export const actions: Actions = {
 
 	deleteBlock: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, idFormSchema);
 
-		const result = await removeHighlight(ctx, String(formData.get('id') ?? ''));
+		if (!form.ok) return form.failure;
+
+		const result = await removeHighlight(ctx, form.data.id);
 
 		if (!result.ok) return failWith(result);
 

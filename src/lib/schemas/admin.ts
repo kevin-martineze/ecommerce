@@ -4,6 +4,7 @@ import { z } from 'zod';
 // Dominio
 import { HERO_LAYOUTS, STOREFRONT_TEMPLATES } from '$lib/domain/templates';
 import { HEX_COLOR, THEME_CORNERS, THEME_FONTS } from '$lib/domain/theme';
+import { checkbox, formId, optionalInt } from '$lib/schemas/fields';
 
 // Utilidades
 import { parseAmount } from '$lib/utils/money';
@@ -146,8 +147,8 @@ export const couponSchema = z
 		minSubtotal: price.default(0),
 		startsAt: z.string().optional().default(''),
 		endsAt: z.string().optional().default(''),
-		maxUses: z.coerce.number().int().min(1).nullable().optional(),
-		active: z.boolean().default(true)
+		maxUses: optionalInt.refine((uses) => uses === null || uses >= 1, 'Los usos van desde 1.'),
+		active: checkbox
 	})
 	.refine((value) => value.type !== 'percent' || value.value <= 100, {
 		message: 'Un porcentaje no puede pasar de 100.',
@@ -157,9 +158,14 @@ export const couponSchema = z
 export const shippingZoneSchema = z.object({
 	name: z.string().trim().min(2, 'Ponle nombre a la zona.').max(80),
 	cost: price,
-	etaDays: z.coerce.number().int().min(0).max(60).nullable().optional(),
-	active: z.boolean().default(true),
-	sortOrder: z.coerce.number().int().min(0).max(999).default(0)
+	etaDays: optionalInt.refine(
+		(days) => days === null || (days >= 0 && days <= 60),
+		'Los días de entrega van de 0 a 60.'
+	),
+	active: checkbox,
+	sortOrder: optionalInt
+		.transform((order) => order ?? 0)
+		.refine((order) => order >= 0 && order <= 999, 'El orden va de 0 a 999.')
 });
 
 /** La marca que se edita en Diseño: el nombre y la barra de anuncio. */
@@ -192,6 +198,15 @@ export const collectionSchema = z.object({
 
 export type ProductInput = z.infer<typeof productSchema>;
 export type CouponInput = z.infer<typeof couponSchema>;
+
+/** Un formulario que solo manda el id de lo que se toca (borrar, quitar). */
+export const idFormSchema = z.object({ id: formId });
+
+/** Activar o desactivar: el estado nuevo llega como texto desde un input oculto. */
+export const toggleFormSchema = z.object({
+	id: formId,
+	active: z.enum(['true', 'false']).transform((value) => value === 'true')
+});
 export type ShippingZoneInput = z.infer<typeof shippingZoneSchema>;
 export type StoreInput = z.infer<typeof storeSchema>;
 export type AdjustmentsInput = z.infer<typeof adjustmentsSchema>;

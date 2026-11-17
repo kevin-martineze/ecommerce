@@ -13,6 +13,9 @@
 	import { Button } from '$lib/components/atoms/button';
 	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
@@ -22,7 +25,7 @@
 
 	let { data }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 </script>
 
 <svelte:head>
@@ -54,26 +57,14 @@
 		</div>
 	</dl>
 
-	<form
-		method="POST"
-		action="?/approve"
-		class="mt-6 space-y-3"
-		use:enhance={() => {
-			submitting = true;
-
-			return async ({ update }) => {
-				await update();
-				submitting = false;
-			};
-		}}
-	>
+	<form method="POST" action="?/approve" class="mt-6 space-y-3" use:enhance={submission.submit()}>
 		<input type="hidden" name="referencia" value={data.reference} />
 		<input type="hidden" name="monto" value={data.amount} />
 		<input type="hidden" name="volver" value={data.returnTo} />
 
-		<Button type="submit" class="w-full" disabled={submitting}>
+		<Button type="submit" class="w-full" disabled={submission.pending}>
 			<CreditCard class="mr-2 size-4" />
-			{submitting ? 'Confirmando…' : 'Aprobar el pago'}
+			{submission.pending ? 'Confirmando…' : 'Aprobar el pago'}
 		</Button>
 
 		<Button href={data.returnTo} variant="outline" class="w-full">Cancelar</Button>

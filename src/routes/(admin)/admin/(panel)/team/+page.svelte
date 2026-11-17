@@ -22,6 +22,7 @@
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	// Dominio
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
@@ -32,7 +33,7 @@
 
 	let { data }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 
 	const roleOptions = [
 		{ value: 'staff', label: 'Personal: catálogo y pedidos' },
@@ -70,14 +71,7 @@
 			method="POST"
 			action="?/invite"
 			class="grid gap-4 sm:grid-cols-[1fr_16rem_auto] sm:items-end"
-			use:enhance={() => {
-				submitting = true;
-
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
+			use:enhance={submission.submit()}
 		>
 			<div class="space-y-2">
 				<Label for="email">Correo</Label>
@@ -89,8 +83,8 @@
 				<SelectField id="role" name="role" value="staff" options={roleOptions} />
 			</div>
 
-			<Button type="submit" disabled={submitting}>
-				{submitting ? 'Enviando…' : 'Enviar invitación'}
+			<Button type="submit" disabled={submission.pending}>
+				{submission.pending ? 'Enviando…' : 'Enviar invitación'}
 			</Button>
 		</form>
 

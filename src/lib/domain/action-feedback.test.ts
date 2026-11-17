@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 
 // Dominio
-import { actionFeedback } from '$lib/domain/action-feedback';
+import { actionFeedback, actionFieldError } from '$lib/domain/action-feedback';
 
 describe('actionFeedback', () => {
 	it('un error string se muestra como error', () => {
@@ -56,5 +56,19 @@ describe('actionFeedback', () => {
 		expect(actionFeedback({})).toBeNull();
 		expect(actionFeedback({ ok: false })).toBeNull();
 		expect(actionFeedback({ error: 500, message: 12 })).toBeNull();
+	});
+});
+
+describe('actionFieldError', () => {
+	it('lee el error de un campo', () => {
+		expect(actionFieldError({ error: 'x', fields: { code: 'Muy corto.' } }, 'code')).toBe(
+			'Muy corto.'
+		);
+	});
+
+	it('null si el campo no tiene error o no hay campos', () => {
+		expect(actionFieldError({ fields: { code: 'Muy corto.' } }, 'value')).toBeNull();
+		expect(actionFieldError({ error: 'x' }, 'code')).toBeNull();
+		expect(actionFieldError(null, 'code')).toBeNull();
 	});
 });

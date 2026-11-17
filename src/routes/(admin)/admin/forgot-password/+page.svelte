@@ -11,13 +11,16 @@
 	import { Label } from '$lib/components/atoms/label';
 	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	interface Props {
 		form: ActionData;
 	}
 
 	let { form }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 </script>
 
 <svelte:head>
@@ -35,18 +38,7 @@
 			<p class="text-muted-foreground text-xs">¿No llega? Revisa el correo no deseado.</p>
 		</div>
 	{:else}
-		<form
-			method="POST"
-			class="space-y-4"
-			use:enhance={() => {
-				submitting = true;
-
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
-		>
+		<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
 			<p class="text-muted-foreground text-sm">
 				Escribe el correo con el que entras al panel y te enviaremos un enlace.
 			</p>
@@ -60,8 +52,8 @@
 				<p class="text-destructive text-sm">{form.error}</p>
 			{/if}
 
-			<Button type="submit" class="w-full" disabled={submitting}>
-				{submitting ? 'Enviando…' : 'Enviar enlace'}
+			<Button type="submit" class="w-full" disabled={submission.pending}>
+				{submission.pending ? 'Enviando…' : 'Enviar enlace'}
 			</Button>
 		</form>
 	{/if}

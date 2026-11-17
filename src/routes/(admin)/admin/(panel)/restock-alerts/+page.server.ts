@@ -4,6 +4,10 @@ import type { Actions, PageServerLoad } from './$types';
 // Servidor
 import { listRestock, markRestockNotified } from '$lib/server/api/panel-commerce';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
+
+// Dominio
+import { idFormSchema } from '$lib/schemas/admin';
 
 // Utilidades
 import { buildRestockUrl } from '$lib/utils/whatsapp';
@@ -37,9 +41,11 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	notified: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, idFormSchema);
 
-		const result = await markRestockNotified(ctx, String(formData.get('id') ?? ''), true);
+		if (!form.ok) return form.failure;
+
+		const result = await markRestockNotified(ctx, form.data.id, true);
 
 		if (!result.ok) return failWith(result);
 

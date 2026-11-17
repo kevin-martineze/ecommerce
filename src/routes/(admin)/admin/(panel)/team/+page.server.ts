@@ -14,6 +14,7 @@ import {
 	revokeInvitation
 } from '$lib/server/api/panel-team';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
 import { inviteSchema, memberRoleSchema } from '$lib/schemas/account';
@@ -47,17 +48,11 @@ function requiredId(formData: FormData, field: string): string {
 export const actions: Actions = {
 	invite: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
-		const parsed = inviteSchema.safeParse({
-			email: formData.get('email'),
-			role: formData.get('role')
-		});
+		const form = await parseForm(event, inviteSchema);
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
+		if (!form.ok) return form.failure;
 
-		const result = await invite(ctx, parsed.data.email, parsed.data.role);
+		const result = await invite(ctx, form.data.email, form.data.role);
 
 		if (!result.ok) return failWith(result);
 

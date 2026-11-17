@@ -13,6 +13,9 @@
 	import { Button } from '$lib/components/atoms/button';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Dominio
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
 	import { PASSWORD_MIN } from '$lib/schemas/account';
@@ -23,7 +26,7 @@
 
 	let { data }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 	let passwordForm = $state<HTMLFormElement>();
 </script>
 
@@ -47,15 +50,7 @@
 			method="POST"
 			action="?/password"
 			class="space-y-4"
-			use:enhance={() => {
-				submitting = true;
-
-				return async ({ result, update }) => {
-					await update({ reset: false });
-					if (result.type === 'success') passwordForm?.reset();
-					submitting = false;
-				};
-			}}
+			use:enhance={submission.submit({ reset: false, onSuccess: () => passwordForm?.reset() })}
 		>
 			<PasswordField
 				name="currentPassword"
@@ -74,8 +69,8 @@
 
 			<PasswordField name="confirm" label="Repítela" required />
 
-			<Button type="submit" disabled={submitting}>
-				{submitting ? 'Guardando…' : 'Cambiar contraseña'}
+			<Button type="submit" disabled={submission.pending}>
+				{submission.pending ? 'Guardando…' : 'Cambiar contraseña'}
 			</Button>
 		</form>
 	</section>

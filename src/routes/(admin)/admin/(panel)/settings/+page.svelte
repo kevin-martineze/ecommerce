@@ -16,6 +16,9 @@
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
 
@@ -32,7 +35,7 @@
 		untrack(() => data.current.free_shipping_threshold)
 	);
 
-	let saving = $state(false);
+	const submission = new FormState();
 
 	/** La zona de la tienda que se resalta según el campo que se está editando. */
 	let focus = $state<PreviewZone>('store-footer');
@@ -85,14 +88,7 @@
 			method="POST"
 			action="?/save"
 			class="space-y-5"
-			use:enhance={() => {
-				saving = true;
-
-				return async ({ update }) => {
-					await update({ reset: false });
-					saving = false;
-				};
-			}}
+			use:enhance={submission.submit({ reset: false })}
 		>
 			<div class="space-y-2">
 				<Label for="whatsappPhone">WhatsApp</Label>
@@ -132,7 +128,9 @@
 				/>
 			</div>
 
-			<Button type="submit" disabled={saving}>{saving ? 'Guardando…' : 'Guardar ajustes'}</Button>
+			<Button type="submit" disabled={submission.pending}
+				>{submission.pending ? 'Guardando…' : 'Guardar ajustes'}</Button
+			>
 		</form>
 	</div>
 </LivePreviewLayout>

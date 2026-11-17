@@ -13,6 +13,9 @@
 	import { Button } from '$lib/components/atoms/button';
 	import WompiKeysPaste from '$lib/components/molecules/WompiKeysPaste.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Utilidades
 	import { cn } from '$lib/utils';
 
@@ -22,7 +25,7 @@
 
 	let { data }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 	/** Abierto cuando la dueña quiere reemplazar las llaves de una cuenta ya conectada. */
 	let changing = $state(false);
 	let copied = $state(false);
@@ -182,19 +185,10 @@
 								action="?/connect"
 								novalidate
 								class="space-y-4"
-								use:enhance={() => {
-									submitting = true;
-
-									return async ({ result, update }) => {
-										await update();
-										submitting = false;
-
-										if (result.type === 'success') changing = false;
-									};
-								}}
+								use:enhance={submission.submit({ onSuccess: () => (changing = false) })}
 							>
 								<WompiKeysPaste
-									{submitting}
+									submitting={submission.pending}
 									submitLabel={isConnected ? 'Reemplazar llaves' : 'Conectar'}
 								/>
 
@@ -255,16 +249,9 @@
 				method="POST"
 				action="?/disconnect"
 				class="border-border border-t pt-6"
-				use:enhance={() => {
-					submitting = true;
-
-					return async ({ update }) => {
-						await update();
-						submitting = false;
-					};
-				}}
+				use:enhance={submission.submit()}
 			>
-				<Button type="submit" variant="outline" disabled={submitting}>
+				<Button type="submit" variant="outline" disabled={submission.pending}>
 					Dejar de cobrar en línea
 				</Button>
 				<p class="text-muted-foreground mt-2 text-xs">

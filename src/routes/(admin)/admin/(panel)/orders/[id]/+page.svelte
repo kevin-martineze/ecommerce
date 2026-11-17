@@ -19,6 +19,9 @@
 	import { Separator } from '$lib/components/atoms/separator';
 	import { Textarea } from '$lib/components/atoms/textarea';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Dominio
 	import { ORDER_PAYMENT_LABEL, ORDER_STATUSES, ORDER_STATUS_LABEL } from '$lib/domain/orders';
 
@@ -35,7 +38,7 @@
 
 	// Copia editable de la nota guardada; no se sincroniza sola.
 	let adminNotes = $state(untrack(() => data.order.admin_notes ?? ''));
-	let savingNotes = $state(false);
+	const submission = new FormState();
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', {
 		dateStyle: 'long',
@@ -165,18 +168,11 @@
 					method="POST"
 					action="?/notes"
 					class="space-y-3"
-					use:enhance={() => {
-						savingNotes = true;
-
-						return async ({ update }) => {
-							await update({ reset: false });
-							savingNotes = false;
-						};
-					}}
+					use:enhance={submission.submit({ reset: false })}
 				>
 					<Textarea name="adminNotes" bind:value={adminNotes} rows={3} />
-					<Button type="submit" variant="outline" size="sm" disabled={savingNotes}>
-						{savingNotes ? 'Guardando…' : 'Guardar nota'}
+					<Button type="submit" variant="outline" size="sm" disabled={submission.pending}>
+						{submission.pending ? 'Guardando…' : 'Guardar nota'}
 					</Button>
 				</form>
 			</Card.Content>

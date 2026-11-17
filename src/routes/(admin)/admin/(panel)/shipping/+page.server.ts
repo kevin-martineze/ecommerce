@@ -8,23 +8,15 @@ import { fail } from '@sveltejs/kit';
 // Servidor
 import { createZone, listZones, removeZone, updateZone } from '$lib/server/api/panel-commerce';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
-import { shippingZoneSchema } from '$lib/schemas/admin';
+import { shippingZoneSchema, idFormSchema } from '$lib/schemas/admin';
+import { formId } from '$lib/schemas/fields';
 
 export const load: PageServerLoad = async (event) => {
 	return { zones: orFail(await listZones(panelContext(event))) };
 };
-
-function parseZone(formData: FormData) {
-	return shippingZoneSchema.safeParse({
-		name: formData.get('name'),
-		cost: formData.get('cost'),
-		etaDays: String(formData.get('etaDays') ?? '') || null,
-		active: formData.get('active') === 'on',
-		sortOrder: formData.get('sortOrder') || 0
-	});
-}
 
 function toInput(zone: {
 	name: string;
@@ -45,13 +37,11 @@ function toInput(zone: {
 export const actions: Actions = {
 	create: async (event) => {
 		const ctx = panelContext(event);
-		const parsed = parseZone(await event.request.formData());
+		const form = await parseForm(event, shippingZoneSchema);
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
+		if (!form.ok) return form.failure;
 
-		const result = await createZone(ctx, toInput(parsed.data));
+		const result = await createZone(ctx, toInput(form.data));
 
 		if (!result.ok) return failWith(result);
 
@@ -60,14 +50,11 @@ export const actions: Actions = {
 
 	update: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
-		const parsed = parseZone(formData);
+		const form = await parseForm(event, shippingZoneSchema.extend({ id: formId }));
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
+		if (!form.ok) return form.failure;
 
-		const result = await updateZone(ctx, String(formData.get('id') ?? ''), toInput(parsed.data));
+		const result = await updateZone(ctx, form.data.id, toInput(form.data));
 
 		if (!result.ok) return failWith(result);
 
@@ -76,9 +63,11 @@ export const actions: Actions = {
 
 	delete: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, idFormSchema);
 
-		const result = await removeZone(ctx, String(formData.get('id') ?? ''));
+		if (!form.ok) return form.failure;
+
+		const result = await removeZone(ctx, form.data.id);
 
 		if (!result.ok) return failWith(result);
 

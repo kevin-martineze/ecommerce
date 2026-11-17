@@ -12,6 +12,9 @@
 	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Dominio
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
 	import { PASSWORD_MIN } from '$lib/schemas/account';
@@ -23,7 +26,7 @@
 
 	let { data, form }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 </script>
 
 <svelte:head>
@@ -38,18 +41,7 @@
 		</p>
 	{:else}
 		{@const invitation = data.invitation}
-		<form
-			method="POST"
-			class="space-y-4"
-			use:enhance={() => {
-				submitting = true;
-
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
-		>
+		<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
 			<p class="text-muted-foreground text-sm">
 				Te invitaron como <strong>{MEMBER_ROLE_LABEL[invitation.role].toLowerCase()}</strong> con el
 				correo <strong>{invitation.email}</strong>.
@@ -89,8 +81,8 @@
 				<p class="text-destructive text-sm">{form.error}</p>
 			{/if}
 
-			<Button type="submit" class="w-full" disabled={submitting}>
-				{submitting ? 'Entrando…' : 'Aceptar y entrar'}
+			<Button type="submit" class="w-full" disabled={submission.pending}>
+				{submission.pending ? 'Entrando…' : 'Aceptar y entrar'}
 			</Button>
 		</form>
 	{/if}

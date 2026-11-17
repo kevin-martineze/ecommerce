@@ -18,6 +18,9 @@
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Utilidades
 	import { slugify } from '$lib/utils/slug';
 
@@ -47,7 +50,7 @@
 		}))
 	);
 	let slugTouched = $state(untrack(() => values.slug !== ''));
-	let submitting = $state(false);
+	const submission = new FormState();
 
 	const categoryOptions = $derived([
 		{ value: '', label: 'Sin categoría' },
@@ -69,19 +72,7 @@
 	});
 </script>
 
-<form
-	method="POST"
-	{action}
-	class="space-y-6"
-	use:enhance={() => {
-		submitting = true;
-
-		return async ({ update }) => {
-			await update({ reset: false });
-			submitting = false;
-		};
-	}}
->
+<form method="POST" {action} class="space-y-6" use:enhance={submission.submit({ reset: false })}>
 	<div class="grid gap-4 sm:grid-cols-2">
 		<div class="space-y-2 sm:col-span-2">
 			<Label for="name">Nombre</Label>
@@ -150,7 +141,7 @@
 		<p class="text-destructive text-sm">{error}</p>
 	{/if}
 
-	<Button type="submit" disabled={submitting}>
-		{submitting ? 'Guardando…' : submitLabel}
+	<Button type="submit" disabled={submission.pending}>
+		{submission.pending ? 'Guardando…' : submitLabel}
 	</Button>
 </form>

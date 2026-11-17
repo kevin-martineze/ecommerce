@@ -13,16 +13,18 @@
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
-	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
+	import FormField from '$lib/components/molecules/FormField.svelte';
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+	import FormSection from '$lib/components/organisms/FormSection.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
@@ -66,6 +68,16 @@
 	);
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
+	const createForm = new FormState();
+
+	/** Después de crear, el borrador de la vista previa vuelve a vacío. */
+	function resetDraft() {
+		code = '';
+		type = 'percent';
+		value = null;
+		minSubtotal = 0;
+		active = true;
+	}
 	const deletion = new DeleteConfirm();
 	const onDelete = deletion.enhance();
 </script>
@@ -82,84 +94,78 @@
 </header>
 
 <LivePreviewLayout src={previewSrc} {draft} title="Así se ve tu cupón">
-	<section class="border-border bg-card rounded-lg mb-8 border p-6">
-		<h2 class="mb-4 text-lg">Nuevo cupón</h2>
-
+	<FormSection title="Nuevo cupón" class="mb-8">
 		<form
 			method="POST"
 			action="?/create"
 			class="grid gap-4 sm:grid-cols-3"
-			use:enhance={() => {
-				return async ({ result, update }) => {
-					await update();
-					if (result.type === 'success') {
-						code = '';
-						type = 'percent';
-						value = null;
-						minSubtotal = 0;
-						active = true;
-					}
-				};
-			}}
+			use:enhance={createForm.submit({ onSuccess: resetDraft })}
 		>
-			<div class="space-y-2">
-				<Label for="code">Código</Label>
-				<Input
-					id="code"
-					name="code"
-					required
-					placeholder="BIENVENIDA10"
-					class="uppercase"
-					bind:value={code}
-				/>
-			</div>
+			<FormField name="code" label="Código">
+				{#snippet children(field)}
+					<Input
+						{...field}
+						required
+						placeholder="BIENVENIDA10"
+						class="uppercase"
+						bind:value={code}
+					/>
+				{/snippet}
+			</FormField>
 
-			<div class="space-y-2">
-				<Label for="type">Tipo</Label>
-				<SelectField
-					id="type"
-					name="type"
-					bind:value={type}
-					options={[
-						{ value: 'percent', label: 'Porcentaje' },
-						{ value: 'fixed', label: 'Monto fijo' }
-					]}
-				/>
-			</div>
+			<FormField name="type" label="Tipo">
+				{#snippet children(field)}
+					<SelectField
+						id={field.id}
+						name={field.name}
+						bind:value={type}
+						options={[
+							{ value: 'percent', label: 'Porcentaje' },
+							{ value: 'fixed', label: 'Monto fijo' }
+						]}
+					/>
+				{/snippet}
+			</FormField>
 
-			<div class="space-y-2">
-				<Label for="value">{type === 'percent' ? 'Porcentaje (1-100)' : 'Monto en pesos'}</Label>
-				{#if type === 'percent'}
-					<Input id="value" name="value" type="number" min="1" max={100} required bind:value />
-				{:else}
-					<MoneyField id="value" name="value" required bind:value />
-				{/if}
-			</div>
+			<FormField name="value" label={type === 'percent' ? 'Porcentaje (1-100)' : 'Monto en pesos'}>
+				{#snippet children(field)}
+					{#if type === 'percent'}
+						<Input {...field} type="number" min="1" max={100} required bind:value />
+					{:else}
+						<MoneyField id={field.id} name={field.name} required bind:value />
+					{/if}
+				{/snippet}
+			</FormField>
 
-			<div class="space-y-2">
-				<Label for="minSubtotal">Mínimo de compra</Label>
-				<MoneyField id="minSubtotal" name="minSubtotal" bind:value={minSubtotal} />
-			</div>
+			<FormField name="minSubtotal" label="Mínimo de compra">
+				{#snippet children(field)}
+					<MoneyField id={field.id} name={field.name} bind:value={minSubtotal} />
+				{/snippet}
+			</FormField>
 
-			<div class="space-y-2">
-				<Label for="maxUses">Usos máximos</Label>
-				<Input id="maxUses" name="maxUses" type="number" min="1" placeholder="Sin límite" />
-			</div>
+			<FormField name="maxUses" label="Usos máximos">
+				{#snippet children(field)}
+					<Input {...field} type="number" min="1" placeholder="Sin límite" />
+				{/snippet}
+			</FormField>
 
-			<div class="space-y-2">
-				<Label for="endsAt">Vence el</Label>
-				<Input id="endsAt" name="endsAt" type="date" />
-			</div>
+			<FormField name="endsAt" label="Vence el">
+				{#snippet children(field)}
+					<Input {...field} type="date" />
+				{/snippet}
+			</FormField>
 
 			<div class="sm:col-span-3">
 				<CheckboxField id="active" name="active" label="Activo desde ya" bind:checked={active} />
 			</div>
 
 			<div class="sm:col-span-3">
-				<Button type="submit">Crear cupón</Button>
+				<Button type="submit" disabled={createForm.pending}>
+					{createForm.pending ? 'Creando…' : 'Crear cupón'}
+				</Button>
 			</div>
 		</form>
-	</section>
+	</FormSection>
 
 	{#if data.coupons.length === 0}
 		<p

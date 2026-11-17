@@ -12,6 +12,9 @@
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	interface Props {
 		data: PageData;
 		form: ActionData;
@@ -19,7 +22,7 @@
 
 	let { data, form }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 </script>
 
 <svelte:head>
@@ -38,18 +41,7 @@
 			<h1 class="text-3xl">Iniciar sesión</h1>
 		</header>
 
-		<form
-			method="POST"
-			class="space-y-4"
-			use:enhance={() => {
-				submitting = true;
-
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
-		>
+		<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
 			<div class="space-y-2">
 				<Label for="email">Correo</Label>
 				<Input id="email" name="email" type="email" required autocomplete="username" />
@@ -74,8 +66,8 @@
 				<p class="text-success text-sm">Listo, tu contraseña cambió. Entra con la nueva.</p>
 			{/if}
 
-			<Button type="submit" class="w-full" disabled={submitting}>
-				{submitting ? 'Entrando…' : 'Entrar'}
+			<Button type="submit" class="w-full" disabled={submission.pending}>
+				{submission.pending ? 'Entrando…' : 'Entrar'}
 			</Button>
 		</form>
 

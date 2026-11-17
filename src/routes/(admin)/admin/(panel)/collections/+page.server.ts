@@ -15,9 +15,10 @@ import {
 	uploadCollectionHero
 } from '$lib/server/api/panel-content';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
-import { collectionSchema } from '$lib/schemas/admin';
+import { collectionSchema, idFormSchema } from '$lib/schemas/admin';
 
 // Utilidades
 import { slugify } from '$lib/utils/slug';
@@ -150,9 +151,11 @@ export const actions: Actions = {
 
 	delete: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, idFormSchema);
 
-		const result = await removeCollection(ctx, String(formData.get('id') ?? ''));
+		if (!form.ok) return form.failure;
+
+		const result = await removeCollection(ctx, form.data.id);
 
 		if (!result.ok) return failWith(result);
 

@@ -17,6 +17,7 @@
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	// Dominio
 	import { DOMAIN_STATUS_LABEL } from '$lib/domain/domain';
@@ -28,7 +29,7 @@
 	let { data }: Props = $props();
 
 	let host = $state('');
-	let sending = $state(false);
+	const submission = new FormState();
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
 
@@ -95,13 +96,7 @@
 			method="POST"
 			action="?/save"
 			class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end"
-			use:enhance={() => {
-				sending = true;
-				return async ({ update }) => {
-					await update();
-					sending = false;
-				};
-			}}
+			use:enhance={submission.submit()}
 		>
 			<div class="space-y-2">
 				<Label for="host">Tu dominio</Label>
@@ -119,7 +114,7 @@
 				</p>
 			</div>
 
-			<Button type="submit" disabled={sending}>Conectar dominio</Button>
+			<Button type="submit" disabled={submission.pending}>Conectar dominio</Button>
 		</form>
 	</section>
 {:else}
@@ -196,19 +191,8 @@
 				</Table.Root>
 			</div>
 
-			<form
-				method="POST"
-				action="?/verify"
-				class="mb-6"
-				use:enhance={() => {
-					sending = true;
-					return async ({ update }) => {
-						await update();
-						sending = false;
-					};
-				}}
-			>
-				<Button type="submit" disabled={sending}>Ya los puse, verificar</Button>
+			<form method="POST" action="?/verify" class="mb-6" use:enhance={submission.submit()}>
+				<Button type="submit" disabled={submission.pending}>Ya los puse, verificar</Button>
 			</form>
 		{/if}
 

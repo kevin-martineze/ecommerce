@@ -12,9 +12,10 @@ import {
 	setCouponActive
 } from '$lib/server/api/panel-commerce';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
-import { couponSchema } from '$lib/schemas/admin';
+import { couponSchema, idFormSchema, toggleFormSchema } from '$lib/schemas/admin';
 
 export const load: PageServerLoad = async (event) => {
 	return { coupons: orFail(await listCoupons(panelContext(event))) };
@@ -23,24 +24,11 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	create: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, couponSchema);
 
-		const parsed = couponSchema.safeParse({
-			code: formData.get('code'),
-			type: formData.get('type'),
-			value: formData.get('value'),
-			minSubtotal: formData.get('minSubtotal') || 0,
-			startsAt: formData.get('startsAt') ?? '',
-			endsAt: formData.get('endsAt') ?? '',
-			maxUses: String(formData.get('maxUses') ?? '') || null,
-			active: formData.get('active') === 'on'
-		});
+		if (!form.ok) return form.failure;
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
-
-		const result = await createCoupon(ctx, parsed.data);
+		const result = await createCoupon(ctx, form.data);
 
 		if (!result.ok) return failWith(result);
 
@@ -49,13 +37,11 @@ export const actions: Actions = {
 
 	toggle: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, toggleFormSchema);
 
-		const result = await setCouponActive(
-			ctx,
-			String(formData.get('id') ?? ''),
-			formData.get('active') === 'true'
-		);
+		if (!form.ok) return form.failure;
+
+		const result = await setCouponActive(ctx, form.data.id, form.data.active);
 
 		if (!result.ok) return failWith(result);
 
@@ -64,9 +50,11 @@ export const actions: Actions = {
 
 	delete: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, idFormSchema);
 
-		const result = await removeCoupon(ctx, String(formData.get('id') ?? ''));
+		if (!form.ok) return form.failure;
+
+		const result = await removeCoupon(ctx, form.data.id);
 
 		if (!result.ok) return failWith(result);
 

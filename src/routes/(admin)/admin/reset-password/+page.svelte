@@ -10,6 +10,9 @@
 	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Dominio
 	import { PASSWORD_MIN } from '$lib/schemas/account';
 
@@ -20,7 +23,7 @@
 
 	let { data, form }: Props = $props();
 
-	let submitting = $state(false);
+	const submission = new FormState();
 </script>
 
 <svelte:head>
@@ -35,18 +38,7 @@
 			<a href="/admin/forgot-password" class="underline">pide uno nuevo</a>.
 		</p>
 	{:else}
-		<form
-			method="POST"
-			class="space-y-4"
-			use:enhance={() => {
-				submitting = true;
-
-				return async ({ update }) => {
-					await update();
-					submitting = false;
-				};
-			}}
-		>
+		<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
 			<input type="hidden" name="token" value={data.token} />
 
 			<PasswordField
@@ -66,8 +58,8 @@
 				</p>
 			{/if}
 
-			<Button type="submit" class="w-full" disabled={submitting}>
-				{submitting ? 'Guardando…' : 'Guardar contraseña'}
+			<Button type="submit" class="w-full" disabled={submission.pending}>
+				{submission.pending ? 'Guardando…' : 'Guardar contraseña'}
 			</Button>
 		</form>
 	{/if}
