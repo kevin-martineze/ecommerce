@@ -9,8 +9,8 @@
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
-	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
+	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
@@ -34,7 +34,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<AuthCard title={data.invitation ? `Únete a ${data.invitation.store_name}` : 'Invitación'}>
+<AuthTemplate title={data.invitation ? `Únete a ${data.invitation.store_name}` : 'Invitación'}>
 	{#if !data.invitation}
 		<p class="text-center text-sm">
 			{data.problem} Pídele a la dueña de la tienda que te invite de nuevo.
@@ -90,4 +90,4 @@
 	{#snippet footer()}
 		<a href="/admin/login" class="hover:text-foreground underline">Ir a iniciar sesión</a>
 	{/snippet}
-</AuthCard>
+</AuthTemplate>

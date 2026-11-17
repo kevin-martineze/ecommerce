@@ -9,8 +9,8 @@
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
-	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
+	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
@@ -30,50 +30,41 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<!-- Igual que el registro: la entrada lleva la marca de Globerce. -->
-<main class="marketing grid min-h-screen place-items-center px-4">
-	<div class="w-full max-w-sm space-y-8">
-		<header class="space-y-2 text-center">
-			<a href="/" class="mx-auto mb-4 block w-fit" aria-label="Globerce, inicio">
-				<GloberceMark size={44} label="" />
-			</a>
-			<p class="eyebrow">Globerce</p>
-			<h1 class="text-3xl">Iniciar sesión</h1>
-		</header>
+<AuthTemplate title="Iniciar sesión">
+	<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
+		<div class="space-y-2">
+			<Label for="email">Correo</Label>
+			<Input id="email" name="email" type="email" required autocomplete="username" />
+		</div>
 
-		<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
-			<div class="space-y-2">
-				<Label for="email">Correo</Label>
-				<Input id="email" name="email" type="email" required autocomplete="username" />
-			</div>
+		<PasswordField name="password" label="Contraseña" required autocomplete="current-password">
+			{#snippet labelAction()}
+				<a
+					href="/admin/forgot-password"
+					class="text-muted-foreground hover:text-foreground text-xs underline"
+				>
+					¿La olvidaste?
+				</a>
+			{/snippet}
+		</PasswordField>
 
-			<PasswordField name="password" label="Contraseña" required autocomplete="current-password">
-				{#snippet labelAction()}
-					<a
-						href="/admin/forgot-password"
-						class="text-muted-foreground hover:text-foreground text-xs underline"
-					>
-						¿La olvidaste?
-					</a>
-				{/snippet}
-			</PasswordField>
+		{#if form?.error}
+			<p class="text-destructive text-sm">{form.error}</p>
+		{:else if data.notice === 'no-access'}
+			<p class="text-destructive text-sm">Esa cuenta no tiene acceso al panel.</p>
+		{:else if data.notice === 'password-reset'}
+			<p class="text-success text-sm">Listo, tu contraseña cambió. Entra con la nueva.</p>
+		{/if}
 
-			{#if form?.error}
-				<p class="text-destructive text-sm">{form.error}</p>
-			{:else if data.notice === 'sin-permiso'}
-				<p class="text-destructive text-sm">Esa cuenta no tiene acceso al panel.</p>
-			{:else if data.notice === 'restablecida'}
-				<p class="text-success text-sm">Listo, tu contraseña cambió. Entra con la nueva.</p>
-			{/if}
+		<Button type="submit" class="w-full" disabled={submission.pending}>
+			{submission.pending ? 'Entrando…' : 'Entrar'}
+		</Button>
+	</form>
 
-			<Button type="submit" class="w-full" disabled={submission.pending}>
-				{submission.pending ? 'Entrando…' : 'Entrar'}
-			</Button>
-		</form>
-
-		<p class="text-muted-foreground space-x-3 text-center text-xs">
+	{#snippet footer()}
+		<span class="space-x-3">
 			<a href="/" class="hover:text-foreground underline">Volver a la tienda</a>
 			<a href="/signup" class="hover:text-foreground underline">Crear una tienda</a>
-		</p>
-	</div>
-</main>
+		</span>
+	{/snippet}
+</AuthTemplate>

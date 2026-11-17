@@ -3,8 +3,8 @@
 	import type { ActionData, PageData } from './$types';
 
 	// Componentes
-	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 	import RegisterForm from '$lib/components/organisms/RegisterForm.svelte';
+	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
 	// Dominio
 	import { TRIAL_DAYS } from '$lib/domain/account';
@@ -21,7 +21,7 @@
 	<title>Crea tu tienda — Globerce</title>
 </svelte:head>
 
-<AuthCard
+<AuthTemplate
 	eyebrow={data.signedIn ? 'Otra tienda' : `${TRIAL_DAYS} días gratis`}
 	title="Crea tu tienda en Globerce"
 	wide
@@ -42,4 +42,4 @@
 			<a href="/admin/login" class="hover:text-foreground underline">Inicia sesión</a>
 		{/if}
 	{/snippet}
-</AuthCard>
+</AuthTemplate>

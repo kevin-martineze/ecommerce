@@ -9,7 +9,7 @@
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
-	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
+	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
@@ -28,7 +28,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<AuthCard title="Recuperar contraseña">
+<AuthTemplate title="Recuperar contraseña">
 	{#if form?.sent}
 		<div class="space-y-4 text-center">
 			<p class="text-sm">
@@ -61,4 +61,4 @@
 	{#snippet footer()}
 		<a href="/admin/login" class="hover:text-foreground underline">Volver a iniciar sesión</a>
 	{/snippet}
-</AuthCard>
+</AuthTemplate>

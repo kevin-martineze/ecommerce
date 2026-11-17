@@ -11,7 +11,7 @@
 
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
-	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
+	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
@@ -33,7 +33,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<AuthCard eyebrow="Pago de prueba" title="Aquí iría la pasarela">
+<AuthTemplate eyebrow="Pago de prueba" title="Aquí iría la pasarela">
 	<div class="border-sale text-sale mb-6 flex items-start gap-2 border p-3 text-sm">
 		<TriangleAlert class="mt-0.5 size-4 flex-none" />
 		<p>
@@ -69,4 +69,4 @@
 
 		<Button href={data.returnTo} variant="outline" class="w-full">Cancelar</Button>
 	</form>
-</AuthCard>
+</AuthTemplate>

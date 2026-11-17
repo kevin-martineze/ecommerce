@@ -11,6 +11,7 @@
 	import { page } from '$app/state';
 
 	// Componentes
+	import CanvasLayout from '$lib/components/layouts/CanvasLayout.svelte';
 	import ActionToasts from '$lib/components/molecules/ActionToasts.svelte';
 	import ChangeList from '$lib/components/molecules/ChangeList.svelte';
 	import ConfirmDialog from '$lib/components/molecules/ConfirmDialog.svelte';
@@ -96,49 +97,47 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="admin-shell bg-background text-foreground flex flex-col lg:h-screen">
-	<DesignHeader {editor} storeName={data.settings.store_name} storeUrl={data.storeUrl} />
+<CanvasLayout class="admin-shell">
+	{#snippet toolbar()}
+		<DesignHeader {editor} storeName={data.settings.store_name} storeUrl={data.storeUrl} />
+	{/snippet}
 
-	<div class="grid min-h-0 flex-1 lg:grid-cols-[22rem_minmax(0,1fr)]">
-		<aside class="border-border min-h-0 overflow-y-auto border-b lg:border-r lg:border-b-0">
-			<nav class="border-border flex gap-1 border-b p-2" aria-label="Secciones de Diseño">
-				{#each SECTION_TABS as tab (tab.id)}
-					<a
-						href="?section={tab.id}"
-						aria-current={section === tab.id ? 'page' : undefined}
-						class={cn(
-							'flex-1 rounded-md px-2 py-1.5 text-center text-sm transition-colors',
-							section === tab.id
-								? 'bg-muted text-foreground font-medium'
-								: 'text-muted-foreground hover:text-foreground'
-						)}
-						onclick={() => (editor.inMessages = false)}
-					>
-						{tab.label}
-					</a>
-				{/each}
-			</nav>
+	{#snippet panel()}
+		<nav class="border-border flex gap-1 border-b p-2" aria-label="Secciones de Diseño">
+			{#each SECTION_TABS as tab (tab.id)}
+				<a
+					href="?section={tab.id}"
+					aria-current={section === tab.id ? 'page' : undefined}
+					class={cn(
+						'flex-1 rounded-md px-2 py-1.5 text-center text-sm transition-colors',
+						section === tab.id
+							? 'bg-muted text-foreground font-medium'
+							: 'text-muted-foreground hover:text-foreground'
+					)}
+					onclick={() => (editor.inMessages = false)}
+				>
+					{tab.label}
+				</a>
+			{/each}
+		</nav>
 
-			{#if section === 'style'}
-				<StyleSection {editor} />
-			{:else if section === 'brand'}
-				<BrandSection {editor} logoUrl={data.settings.logo_url} {deletion} />
-			{:else}
-				<CoverSection {editor} {deletion} />
-			{/if}
-		</aside>
+		{#if section === 'style'}
+			<StyleSection {editor} />
+		{:else if section === 'brand'}
+			<BrandSection {editor} logoUrl={data.settings.logo_url} {deletion} />
+		{:else}
+			<CoverSection {editor} {deletion} />
+		{/if}
+	{/snippet}
 
-		<section class="bg-muted/60 h-[75vh] min-h-0 p-4 lg:h-auto lg:p-6">
-			<DraftPreview
-				src={editor.previewSrc}
-				draft={editor.draft}
-				device={editor.device}
-				title="Vista previa de tu tienda"
-				onedit={editZone}
-			/>
-		</section>
-	</div>
-</div>
+	<DraftPreview
+		src={editor.previewSrc}
+		draft={editor.draft}
+		device={editor.device}
+		title="Vista previa de tu tienda"
+		onedit={editZone}
+	/>
+</CanvasLayout>
 
 <ConfirmDialog
 	bind:open={editor.saveDialogOpen}

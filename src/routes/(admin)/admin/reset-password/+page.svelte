@@ -7,8 +7,8 @@
 
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
-	import AuthCard from '$lib/components/molecules/AuthCard.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
+	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
@@ -31,7 +31,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<AuthCard title="Nueva contraseña">
+<AuthTemplate title="Nueva contraseña">
 	{#if !data.token}
 		<p class="text-center text-sm">
 			Este enlace está incompleto. Ábrelo de nuevo desde el correo o
@@ -67,4 +67,4 @@
 	{#snippet footer()}
 		<a href="/admin/login" class="hover:text-foreground underline">Volver a iniciar sesión</a>
 	{/snippet}
-</AuthCard>
+</AuthTemplate>
