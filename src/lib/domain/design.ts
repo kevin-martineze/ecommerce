@@ -10,25 +10,32 @@ import { readTheme } from '$lib/domain/theme';
  * el estilo (plantilla, color, letras, esquinas, portada en plantilla), la
  * marca (nombre, logo, anuncio) y la portada (imagen de arriba y mensajes).
  */
-export const SECTIONS = ['estilo', 'marca', 'portada'] as const;
+export const SECTIONS = ['style', 'brand', 'cover'] as const;
 
 export type Section = (typeof SECTIONS)[number];
 
+/** Los valores de `?section=` de antes del cambio a inglés: los enlaces viejos siguen sirviendo. */
+const LEGACY_SECTIONS: Record<string, Section> = {
+	estilo: 'style',
+	marca: 'brand',
+	portada: 'cover'
+};
+
 /** La sección que se ve, leída de `?section=`. Si falta o no existe: estilo. */
 export function sectionFrom(search: string): Section {
-	const value = new URLSearchParams(search).get('section');
+	const value = new URLSearchParams(search).get('section') ?? '';
 
-	return SECTIONS.find((section) => section === value) ?? 'estilo';
+	return SECTIONS.find((section) => section === value) ?? LEGACY_SECTIONS[value] ?? 'style';
 }
 
 /** La zona que la vista previa resalta al entrar en cada sección. */
 export function focusFor(section: Section): PreviewZone | null {
 	switch (section) {
-		case 'estilo':
+		case 'style':
 			return null;
-		case 'marca':
+		case 'brand':
 			return 'store-header';
-		case 'portada':
+		case 'cover':
 			return 'hero';
 	}
 }

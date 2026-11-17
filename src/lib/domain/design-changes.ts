@@ -29,8 +29,8 @@ export interface DesignCollection {
 export interface DesignChange {
 	section: Section;
 	field: string;
-	kind: 'cambia' | 'agrega' | 'quita';
-	antes: string;
+	kind: 'change' | 'add' | 'remove';
+	before: string;
 	after: string;
 	/** Frase extra, por ejemplo «Vuelve a lo que trae la plantilla». */
 	note?: string;
@@ -74,16 +74,16 @@ export function describeDesignChanges(
 		id === '' ? 'Ninguna' : (collections.find((collection) => collection.id === id)?.name ?? id);
 
 	/** Un campo de texto libre (nombre, anuncio, título, texto). */
-	function text(section: Section, field: string, antes: string, after: string): void {
-		if (antes === after) return;
+	function text(section: Section, field: string, before: string, after: string): void {
+		if (before === after) return;
 
-		const kind = antes === '' ? 'agrega' : after === '' ? 'quita' : 'cambia';
+		const kind = before === '' ? 'add' : after === '' ? 'remove' : 'change';
 
 		changes.push({
 			section,
 			field,
 			kind,
-			antes: truncate(antes),
+			before: truncate(before),
 			after: truncate(after),
 			featured: false
 		});
@@ -92,18 +92,18 @@ export function describeDesignChanges(
 	/** Un ajuste de estilo con opciones: '' es «De la plantilla». */
 	function style(
 		field: string,
-		antes: string,
+		before: string,
 		after: string,
 		tagLabel: (code: string) => string
 	): void {
-		if (antes === after) return;
+		if (before === after) return;
 
 		if (after === '') {
 			changes.push({
-				section: 'estilo',
+				section: 'style',
 				field,
-				kind: 'quita',
-				antes: tagLabel(antes),
+				kind: 'remove',
+				before: tagLabel(before),
 				after: '',
 				note: RETURN_TO,
 				featured: false
@@ -112,10 +112,10 @@ export function describeDesignChanges(
 		}
 
 		changes.push({
-			section: 'estilo',
+			section: 'style',
 			field,
-			kind: antes === '' ? 'agrega' : 'cambia',
-			antes: antes === '' ? '' : tagLabel(antes),
+			kind: before === '' ? 'add' : 'change',
+			before: before === '' ? '' : tagLabel(before),
 			after: tagLabel(after),
 			featured: false
 		});
@@ -124,23 +124,23 @@ export function describeDesignChanges(
 	// 1. Estilo: plantilla, color, letras, esquinas y el estilo de la imagen de arriba.
 	if (saved.template !== draft.template) {
 		changes.push({
-			section: 'estilo',
+			section: 'style',
 			field: 'Plantilla',
-			kind: 'cambia',
-			antes: templateOf(saved.template).name,
+			kind: 'change',
+			before: templateOf(saved.template).name,
 			after: templateOf(draft.template).name,
 			featured: true
 		});
 	}
 
 	if (saved.accent !== draft.accent) {
-		const kind = saved.accent === '' ? 'agrega' : draft.accent === '' ? 'quita' : 'cambia';
+		const kind = saved.accent === '' ? 'add' : draft.accent === '' ? 'remove' : 'change';
 
 		changes.push({
-			section: 'estilo',
+			section: 'style',
 			field: 'Color',
 			kind,
-			antes: saved.accent,
+			before: saved.accent,
 			after: draft.accent,
 			...(draft.accent === '' ? { note: RETURN_TO } : {}),
 			swatch: draft.accent || undefined,
@@ -155,34 +155,34 @@ export function describeDesignChanges(
 	);
 
 	// 2. Marca: nombre de la tienda y barra de anuncio.
-	text('marca', 'Nombre de la tienda', saved.storeName, draft.storeName);
-	text('marca', 'Barra de anuncio', saved.announcement, draft.announcement);
+	text('brand', 'Nombre de la tienda', saved.storeName, draft.storeName);
+	text('brand', 'Barra de anuncio', saved.announcement, draft.announcement);
 
 	// 3. Portada: colección destacada, título y texto de apoyo.
 	if (saved.heroCollectionId !== draft.heroCollectionId) {
 		const kind =
-			saved.heroCollectionId === '' ? 'agrega' : draft.heroCollectionId === '' ? 'quita' : 'cambia';
+			saved.heroCollectionId === '' ? 'add' : draft.heroCollectionId === '' ? 'remove' : 'change';
 
 		changes.push({
-			section: 'portada',
+			section: 'cover',
 			field: 'Colección destacada',
 			kind,
-			antes: collectionName(saved.heroCollectionId),
+			before: collectionName(saved.heroCollectionId),
 			after: collectionName(draft.heroCollectionId),
 			featured: true
 		});
 	}
 
-	text('portada', 'Título de la portada', saved.heroTitle, draft.heroTitle);
-	text('portada', 'Texto de la portada', saved.heroSubtitle, draft.heroSubtitle);
+	text('cover', 'Título de la portada', saved.heroTitle, draft.heroTitle);
+	text('cover', 'Texto de la portada', saved.heroSubtitle, draft.heroSubtitle);
 
 	return changes;
 }
 
-export type ChangesMode = 'guardar' | 'descartar';
+export type ChangesMode = 'save' | 'discard';
 
 /** Lo que se muestra de un valor; si está vacío, la nota o «vacío». */
-function valorDe(value: string, note?: string): string {
+function displayValue(value: string, note?: string): string {
 	if (value !== '') return value;
 
 	return note ?? 'vacío';
@@ -193,16 +193,16 @@ function valorDe(value: string, note?: string): string {
  * lo que se pierde: «Se pierde: Color #111111 → #6D28D9».
  */
 export function changeText(change: DesignChange, mode: ChangesMode): string {
-	if (mode === 'descartar') {
-		return `Se pierde: ${change.field} ${valorDe(change.antes)} → ${valorDe(change.after, change.note)}`;
+	if (mode === 'discard') {
+		return `Se pierde: ${change.field} ${displayValue(change.before)} → ${displayValue(change.after, change.note)}`;
 	}
 
 	switch (change.kind) {
-		case 'cambia':
-			return `Cambia ${change.field}: «${change.antes}» → «${change.after}»`;
-		case 'agrega':
+		case 'change':
+			return `Cambia ${change.field}: «${change.before}» → «${change.after}»`;
+		case 'add':
 			return `Agrega ${change.field}: «${change.after}»`;
-		case 'quita':
+		case 'remove':
 			return change.note ? `Quita ${change.field} · ${change.note}` : `Quita ${change.field}`;
 	}
 }

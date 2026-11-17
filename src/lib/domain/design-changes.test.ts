@@ -36,12 +36,12 @@ describe('describeDesignChanges', () => {
 
 		expect(changes).toHaveLength(1);
 		expect(changes[0]).toMatchObject({
-			section: 'estilo',
+			section: 'style',
 			field: 'Plantilla',
-			kind: 'cambia',
+			kind: 'change',
 			featured: true
 		});
-		expect(changes[0].antes).not.toBe('editorial');
+		expect(changes[0].before).not.toBe('editorial');
 		expect(changes[0].after).not.toBe('moda');
 	});
 
@@ -49,10 +49,10 @@ describe('describeDesignChanges', () => {
 		const [change] = describeDesignChanges(base, { ...base, accent: '#6D28D9' }, collections);
 
 		expect(change).toMatchObject({
-			section: 'estilo',
+			section: 'style',
 			field: 'Color',
-			kind: 'agrega',
-			antes: '',
+			kind: 'add',
+			before: '',
 			after: '#6D28D9',
 			swatch: '#6D28D9'
 		});
@@ -64,8 +64,8 @@ describe('describeDesignChanges', () => {
 
 		expect(change).toMatchObject({
 			field: 'Color',
-			kind: 'quita',
-			antes: '#111111',
+			kind: 'remove',
+			before: '#111111',
 			note: 'Vuelve a lo que trae la plantilla'
 		});
 	});
@@ -87,7 +87,7 @@ describe('describeDesignChanges', () => {
 			'Estilo de la imagen de arriba'
 		]);
 		for (const change of changes) {
-			expect(change.kind).toBe('quita');
+			expect(change.kind).toBe('remove');
 			expect(change.note).toBe('Vuelve a lo que trae la plantilla');
 		}
 	});
@@ -95,7 +95,7 @@ describe('describeDesignChanges', () => {
 	it('las letras, esquinas y estilo de portada usan su nombre visible', () => {
 		const [fontCode] = describeDesignChanges(base, { ...base, fonts: 'serif' }, collections);
 
-		expect(fontCode).toMatchObject({ field: 'Letras', kind: 'agrega', after: 'Clásica' });
+		expect(fontCode).toMatchObject({ field: 'Letras', kind: 'add', after: 'Clásica' });
 	});
 
 	it('la barra de anuncio que se borra sale como «quita»', () => {
@@ -103,10 +103,10 @@ describe('describeDesignChanges', () => {
 		const [change] = describeDesignChanges(saved, base, collections);
 
 		expect(change).toMatchObject({
-			section: 'marca',
+			section: 'brand',
 			field: 'Barra de anuncio',
-			kind: 'quita',
-			antes: 'Envío gratis hoy'
+			kind: 'remove',
+			before: 'Envío gratis hoy'
 		});
 	});
 
@@ -126,10 +126,10 @@ describe('describeDesignChanges', () => {
 		);
 
 		expect(change).toMatchObject({
-			section: 'portada',
+			section: 'cover',
 			field: 'Colección destacada',
-			kind: 'agrega',
-			antes: 'Ninguna',
+			kind: 'add',
+			before: 'Ninguna',
 			after: 'Negras',
 			featured: true
 		});
@@ -147,7 +147,7 @@ describe('describeDesignChanges', () => {
 			(change) => change.section
 		);
 
-		expect(sections).toEqual(['estilo', 'estilo', 'marca', 'portada']);
+		expect(sections).toEqual(['style', 'style', 'brand', 'cover']);
 	});
 });
 
@@ -159,48 +159,48 @@ describe('recortar', () => {
 
 describe('textoDelCambio', () => {
 	const change: DesignChange = {
-		section: 'estilo',
+		section: 'style',
 		field: 'Plantilla',
-		kind: 'cambia',
-		antes: 'Moda',
+		kind: 'change',
+		before: 'Moda',
 		after: 'Minimal',
 		featured: true
 	};
 
 	it('al guardar, un cambio dice «Cambia» con antes y después', () => {
-		expect(changeText(change, 'guardar')).toBe('Cambia Plantilla: «Moda» → «Minimal»');
+		expect(changeText(change, 'save')).toBe('Cambia Plantilla: «Moda» → «Minimal»');
 	});
 
 	it('al guardar, un agregado dice «Agrega» con el valor nuevo', () => {
-		const addItem: DesignChange = { ...change, kind: 'agrega', antes: '', after: 'Envíos gratis' };
+		const addItem: DesignChange = { ...change, kind: 'add', before: '', after: 'Envíos gratis' };
 
-		expect(changeText(addItem, 'guardar')).toBe('Agrega Plantilla: «Envíos gratis»');
+		expect(changeText(addItem, 'save')).toBe('Agrega Plantilla: «Envíos gratis»');
 	});
 
 	it('al guardar, un quitado con nota dice la nota', () => {
 		const removeItem: DesignChange = {
 			...change,
-			kind: 'quita',
-			antes: 'Moda',
+			kind: 'remove',
+			before: 'Moda',
 			after: '',
 			note: 'Vuelve a lo que trae la plantilla'
 		};
 
-		expect(changeText(removeItem, 'guardar')).toBe(
+		expect(changeText(removeItem, 'save')).toBe(
 			'Quita Plantilla · Vuelve a lo que trae la plantilla'
 		);
 	});
 
 	it('al descartar, dice lo que se pierde con el valor guardado y el borrador', () => {
 		const color: DesignChange = {
-			section: 'estilo',
+			section: 'style',
 			field: 'Color',
-			kind: 'cambia',
-			antes: '#111111',
+			kind: 'change',
+			before: '#111111',
 			after: '#6D28D9',
 			featured: false
 		};
 
-		expect(changeText(color, 'descartar')).toBe('Se pierde: Color #111111 → #6D28D9');
+		expect(changeText(color, 'discard')).toBe('Se pierde: Color #111111 → #6D28D9');
 	});
 });

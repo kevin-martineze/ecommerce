@@ -21,30 +21,31 @@ const draftInput: DesignDraft = {
 
 describe('seccionDe', () => {
 	it('sin `seccion` se ve Estilo', () => {
-		expect(sectionFrom('')).toBe('estilo');
+		expect(sectionFrom('')).toBe('style');
 	});
 
 	it('lee la sección de la URL', () => {
-		expect(sectionFrom('?section=marca')).toBe('marca');
-		expect(sectionFrom('?section=portada')).toBe('portada');
+		expect(sectionFrom('?section=brand')).toBe('brand');
+		expect(sectionFrom('?section=cover')).toBe('cover');
+		expect(sectionFrom('?section=portada')).toBe('cover');
 	});
 
 	it('una sección desconocida cae en Estilo', () => {
-		expect(sectionFrom('?section=otra')).toBe('estilo');
+		expect(sectionFrom('?section=otra')).toBe('style');
 	});
 });
 
 describe('focoDe', () => {
 	it('Marca resalta el encabezado y el anuncio', () => {
-		expect(focusFor('marca')).toBe('store-header');
+		expect(focusFor('brand')).toBe('store-header');
 	});
 
 	it('Portada resalta la imagen de arriba', () => {
-		expect(focusFor('portada')).toBe('hero');
+		expect(focusFor('cover')).toBe('hero');
 	});
 
 	it('Estilo no resalta ninguna zona', () => {
-		expect(focusFor('estilo')).toBeNull();
+		expect(focusFor('style')).toBeNull();
 	});
 });
 

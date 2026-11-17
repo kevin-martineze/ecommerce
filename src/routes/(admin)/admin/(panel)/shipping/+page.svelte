@@ -193,7 +193,7 @@
 								<Label for="nombre-{zone.id}">Zona</Label>
 								<Input
 									id="nombre-{zone.id}"
-									form="zona-{zone.id}"
+									form="zone-{zone.id}"
 									name="name"
 									value={zone.name}
 									oninput={(event) => editZone(zone.id, { name: event.currentTarget.value })}
@@ -204,7 +204,7 @@
 								<Label for="costo-{zone.id}">Costo</Label>
 								<MoneyField
 									id="costo-{zone.id}"
-									form="zona-{zone.id}"
+									form="zone-{zone.id}"
 									name="cost"
 									value={zone.cost}
 									onchange={(value) => editZone(zone.id, { cost: value })}
@@ -217,7 +217,7 @@
 								<Label for="dias-{zone.id}">Días</Label>
 								<NumberField
 									id="dias-{zone.id}"
-									form="zona-{zone.id}"
+									form="zone-{zone.id}"
 									name="etaDays"
 									value={zone.etaDays ?? 0}
 									onchange={(value) => editZone(zone.id, { etaDays: value })}
@@ -228,8 +228,8 @@
 
 							<div class="pb-2">
 								<CheckboxField
-									id="zona-activa-{zone.id}"
-									form="zona-{zone.id}"
+									id="zone-active-{zone.id}"
+									form="zone-{zone.id}"
 									name="active"
 									label="Disponible"
 									checked={zone.active}
@@ -244,14 +244,14 @@
 						</div>
 
 						{#snippet actionList()}
-							<Button type="submit" form="zona-{zone.id}" size="sm" variant="outline">
+							<Button type="submit" form="zone-{zone.id}" size="sm" variant="outline">
 								Guardar
 							</Button>
 
 							<Button
 								type="button"
 								onclick={() =>
-									deletion.ask(`borrar-zona-${zone.id}`, `¿Borrar ${zone.name}?`, {
+									deletion.ask(`delete-zone-${zone.id}`, `¿Borrar ${zone.name}?`, {
 										description: 'Si ya se usó en pedidos, se desactiva en vez de borrarse.'
 									})}
 								size="sm"
@@ -274,7 +274,7 @@
 <div hidden>
 	{#each data.zones as zone (zone.id)}
 		<form
-			id="zona-{zone.id}"
+			id="zone-{zone.id}"
 			method="POST"
 			action="?/update"
 			use:enhance={reorder.submit({ onSuccess: () => delete zoneEdits[zone.id] })}
@@ -283,7 +283,7 @@
 			<input type="hidden" name="sortOrder" value={zone.sort_order} />
 		</form>
 
-		<form id="borrar-zona-{zone.id}" method="POST" action="?/delete" use:enhance={onDelete}>
+		<form id="delete-zone-{zone.id}" method="POST" action="?/delete" use:enhance={onDelete}>
 			<input type="hidden" name="id" value={zone.id} />
 		</form>
 	{/each}

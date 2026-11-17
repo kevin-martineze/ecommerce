@@ -22,12 +22,12 @@
 		mode?: ChangesMode;
 	}
 
-	let { changes, mode = 'guardar' }: Props = $props();
+	let { changes, mode = 'save' }: Props = $props();
 
 	const SECTIONS = [
-		{ id: 'estilo', label: 'Estilo' },
-		{ id: 'marca', label: 'Marca' },
-		{ id: 'portada', label: 'Portada' }
+		{ id: 'style', label: 'Estilo' },
+		{ id: 'brand', label: 'Marca' },
+		{ id: 'cover', label: 'Portada' }
 	] as const;
 
 	const groups = $derived(
@@ -48,9 +48,9 @@
 			<ul class="space-y-2">
 				{#each group.items as change, index (`${group.id}-${index}`)}
 					<li class={cn('flex items-start gap-2 text-sm', change.featured && 'font-semibold')}>
-						{#if change.kind === 'agrega'}
+						{#if change.kind === 'add'}
 							<Plus class="text-success mt-0.5 size-4 flex-none" />
-						{:else if change.kind === 'quita'}
+						{:else if change.kind === 'remove'}
 							<Minus class="text-muted-foreground mt-0.5 size-4 flex-none" />
 						{:else}
 							<Pencil class="text-muted-foreground mt-0.5 size-4 flex-none" />

@@ -32,10 +32,10 @@ describe('EDITABLE_ZONES', () => {
 	});
 
 	it('los destinos son los que dice el mapa', () => {
-		expect(EDITABLE_ZONES['store-header']).toMatchObject({ section: 'marca', field: 'storeName' });
-		expect(EDITABLE_ZONES.announcement).toMatchObject({ section: 'marca', field: 'announcement' });
-		expect(EDITABLE_ZONES.hero).toMatchObject({ section: 'portada' });
-		expect(EDITABLE_ZONES.highlights).toMatchObject({ section: 'portada' });
+		expect(EDITABLE_ZONES['store-header']).toMatchObject({ section: 'brand', field: 'storeName' });
+		expect(EDITABLE_ZONES.announcement).toMatchObject({ section: 'brand', field: 'announcement' });
+		expect(EDITABLE_ZONES.hero).toMatchObject({ section: 'cover' });
+		expect(EDITABLE_ZONES.highlights).toMatchObject({ section: 'cover' });
 	});
 });
 
@@ -50,12 +50,12 @@ describe('isEditableZone', () => {
 
 describe('mapeo zona → URL de sección', () => {
 	it('cada sección tiene su ?section=', () => {
-		expect(sectionUrl('marca')).toBe('?section=marca');
-		expect(sectionUrl('portada')).toBe('?section=portada');
+		expect(sectionUrl('brand')).toBe('?section=brand');
+		expect(sectionUrl('cover')).toBe('?section=cover');
 	});
 
 	it('una zona lleva a su sección y a su campo', () => {
-		expect(zoneTarget('store-header')).toEqual({ url: '?section=marca', field: 'storeName' });
-		expect(zoneTarget('hero')).toEqual({ url: '?section=portada', field: 'heroCollectionId' });
+		expect(zoneTarget('store-header')).toEqual({ url: '?section=brand', field: 'storeName' });
+		expect(zoneTarget('hero')).toEqual({ url: '?section=cover', field: 'heroCollectionId' });
 	});
 });

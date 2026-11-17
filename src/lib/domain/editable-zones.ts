@@ -22,10 +22,10 @@ export interface EditableZone {
 }
 
 export const EDITABLE_ZONES: Record<EditableZoneName, EditableZone> = {
-	'store-header': { section: 'marca', field: 'storeName', tagLabel: 'Editar marca' },
-	announcement: { section: 'marca', field: 'announcement', tagLabel: 'Editar anuncio' },
-	hero: { section: 'portada', field: 'heroCollectionId', tagLabel: 'Editar imagen de arriba' },
-	highlights: { section: 'portada', field: 'mensajes-de-abajo', tagLabel: 'Editar mensajes' }
+	'store-header': { section: 'brand', field: 'storeName', tagLabel: 'Editar marca' },
+	announcement: { section: 'brand', field: 'announcement', tagLabel: 'Editar anuncio' },
+	hero: { section: 'cover', field: 'heroCollectionId', tagLabel: 'Editar imagen de arriba' },
+	highlights: { section: 'cover', field: 'bottom-messages', tagLabel: 'Editar mensajes' }
 };
 
 export function isEditableZone(value: unknown): value is EditableZoneName {
