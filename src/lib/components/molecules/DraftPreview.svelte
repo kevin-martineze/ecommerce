@@ -1,6 +1,8 @@
 <script lang="ts">
+	import type { EditableZoneName } from '$lib/domain/editable-zones';
 	import type { StorefrontDraft } from '$lib/storefront-draft';
 	import { draftMessage, isReadyMessage } from '$lib/storefront-draft';
+	import { readPreviewEdit } from '$lib/schemas/preview-edit';
 	import { cn } from '$lib/utils';
 
 	/**
@@ -19,9 +21,11 @@
 		draft: StorefrontDraft;
 		device: 'desktop' | 'mobile';
 		title: string;
+		/** Qué zona de la vista previa pidió editar la dueña con un clic. */
+		onedit?: (zona: EditableZoneName) => void;
 	}
 
-	let { src, draft, device, title }: Props = $props();
+	let { src, draft, device, title, onedit }: Props = $props();
 
 	let frame = $state<HTMLIFrameElement>();
 
@@ -48,10 +52,18 @@
 	// La tienda avisa cuando ya escucha: se le contesta con el borrador.
 	$effect(() => {
 		function onMessage(event: MessageEvent) {
-			if (event.source !== frame?.contentWindow || !isReadyMessage(event.data)) return;
+			if (event.source !== frame?.contentWindow || event.origin !== targetOrigin) return;
 
-			listening = frame?.contentWindow ?? null;
-			send();
+			if (isReadyMessage(event.data)) {
+				listening = frame?.contentWindow ?? null;
+				send();
+				return;
+			}
+
+			// Un clic en una zona editable de la tienda: el editor decide a dónde llevarlo.
+			const zona = readPreviewEdit(event.data);
+
+			if (zona) onedit?.(zona);
 		}
 
 		window.addEventListener('message', onMessage);
