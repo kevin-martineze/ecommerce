@@ -1,6 +1,5 @@
 <script lang="ts">
 	// Tipos
-	import type { StorefrontDraft } from '$lib/domain/preview';
 	import type { PageData } from './$types';
 
 	// Iconos
@@ -24,10 +23,9 @@
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
-	import { FormState } from '$lib/utils/form-state.svelte';
+	import { CouponDraft } from './coupon-draft.svelte';
 
 	// Utilidades
-	import { themePreviewUrl } from '$lib/template-preview';
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {
@@ -36,48 +34,9 @@
 
 	let { data }: Props = $props();
 
-	let type = $state<'percent' | 'fixed'>('percent');
-
-	// Copia editable del cupón que se está creando, para la vista previa.
-	let code = $state('');
-	let value = $state<number | null>(null);
-	let minSubtotal = $state<number | null>(0);
-	let active = $state(true);
-
-	const draft = $derived<StorefrontDraft>({
-		template: data.settings.template,
-		theme: data.settings.theme,
-		content: {
-			kind: 'coupon',
-			code,
-			type,
-			value: typeof value === 'number' && Number.isFinite(value) ? value : 0,
-			minSubtotal:
-				typeof minSubtotal === 'number' && Number.isFinite(minSubtotal) ? minSubtotal : 0,
-			active
-		},
-		focus: 'cart-coupon'
-	});
-
-	const previewSrc = $derived(
-		themePreviewUrl(
-			new URL('/preview/cart', data.previewUrl).toString(),
-			data.settings.template,
-			data.settings.theme
-		)
-	);
+	const newCoupon = new CouponDraft(() => data);
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
-	const createForm = new FormState();
-
-	/** Después de crear, el borrador de la vista previa vuelve a vacío. */
-	function resetDraft() {
-		code = '';
-		type = 'percent';
-		value = null;
-		minSubtotal = 0;
-		active = true;
-	}
 	const deletion = new DeleteConfirm();
 	const onDelete = deletion.enhance();
 </script>
@@ -93,13 +52,13 @@
 	</p>
 </header>
 
-<LivePreviewLayout src={previewSrc} {draft} title="Así se ve tu cupón">
+<LivePreviewLayout src={newCoupon.src} draft={newCoupon.draft} title="Así se ve tu cupón">
 	<FormSection title="Nuevo cupón" class="mb-8">
 		<form
 			method="POST"
 			action="?/create"
 			class="grid gap-4 sm:grid-cols-3"
-			use:enhance={createForm.submit({ onSuccess: resetDraft })}
+			use:enhance={newCoupon.create}
 		>
 			<FormField name="code" label="Código">
 				{#snippet children(field)}
@@ -108,7 +67,7 @@
 						required
 						placeholder="BIENVENIDA10"
 						class="uppercase"
-						bind:value={code}
+						bind:value={newCoupon.code}
 					/>
 				{/snippet}
 			</FormField>
@@ -118,7 +77,7 @@
 					<SelectField
 						id={field.id}
 						name={field.name}
-						bind:value={type}
+						bind:value={newCoupon.type}
 						options={[
 							{ value: 'percent', label: 'Porcentaje' },
 							{ value: 'fixed', label: 'Monto fijo' }
@@ -127,19 +86,29 @@
 				{/snippet}
 			</FormField>
 
-			<FormField name="value" label={type === 'percent' ? 'Porcentaje (1-100)' : 'Monto en pesos'}>
+			<FormField
+				name="value"
+				label={newCoupon.type === 'percent' ? 'Porcentaje (1-100)' : 'Monto en pesos'}
+			>
 				{#snippet children(field)}
-					{#if type === 'percent'}
-						<Input {...field} type="number" min="1" max={100} required bind:value />
+					{#if newCoupon.type === 'percent'}
+						<Input
+							{...field}
+							type="number"
+							min="1"
+							max={100}
+							required
+							bind:value={newCoupon.value}
+						/>
 					{:else}
-						<MoneyField id={field.id} name={field.name} required bind:value />
+						<MoneyField id={field.id} name={field.name} required bind:value={newCoupon.value} />
 					{/if}
 				{/snippet}
 			</FormField>
 
 			<FormField name="minSubtotal" label="Mínimo de compra">
 				{#snippet children(field)}
-					<MoneyField id={field.id} name={field.name} bind:value={minSubtotal} />
+					<MoneyField id={field.id} name={field.name} bind:value={newCoupon.minSubtotal} />
 				{/snippet}
 			</FormField>
 
@@ -156,12 +125,17 @@
 			</FormField>
 
 			<div class="sm:col-span-3">
-				<CheckboxField id="active" name="active" label="Activo desde ya" bind:checked={active} />
+				<CheckboxField
+					id="active"
+					name="active"
+					label="Activo desde ya"
+					bind:checked={newCoupon.active}
+				/>
 			</div>
 
 			<div class="sm:col-span-3">
-				<Button type="submit" disabled={createForm.pending}>
-					{createForm.pending ? 'Creando…' : 'Crear cupón'}
+				<Button type="submit" disabled={newCoupon.createForm.pending}>
+					{newCoupon.createForm.pending ? 'Creando…' : 'Crear cupón'}
 				</Button>
 			</div>
 		</form>

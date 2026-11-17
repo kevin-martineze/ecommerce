@@ -130,7 +130,7 @@
 						</Accordion.Item>
 					{/each}
 
-					<Accordion.Item value="envios" data-preview-zone="prodhipping">
+					<Accordion.Item value="envios" data-preview-zone="shipping-info">
 						<Accordion.Trigger>Envíos y pedido</Accordion.Trigger>
 						<Accordion.Content>
 							El pedido se confirma por WhatsApp. Elegimos juntos la forma de pago y el envío según

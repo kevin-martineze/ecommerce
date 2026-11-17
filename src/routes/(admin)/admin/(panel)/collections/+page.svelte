@@ -1,6 +1,5 @@
 <script lang="ts">
 	// Tipos
-	import type { StorefrontDraft } from '$lib/domain/preview';
 	import type { PageData } from './$types';
 
 	// Iconos
@@ -26,10 +25,9 @@
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	import { CollectionDraft } from './collection-draft.svelte';
 
 	// Utilidades
-	import { themePreviewUrl } from '$lib/template-preview';
-	import { slugify } from '$lib/utils/slug';
 
 	interface Props {
 		data: PageData;
@@ -41,36 +39,7 @@
 		data.products.map((product) => ({ value: product.id, label: product.name }))
 	);
 
-	// Copia editable de la colección que se está creando.
-	let name = $state('');
-	let slug = $state('');
-	let description = $state('');
-	let active = $state(true);
-	let image = $state<Blob | null>(null);
-
-	const draft = $derived<StorefrontDraft>({
-		template: data.settings.template,
-		theme: data.settings.theme,
-		content: {
-			kind: 'collection',
-			name,
-			slug: slug || slugify(name),
-			description,
-			active,
-			image,
-			// Una colección nueva todavía no tiene productos etiquetados.
-			items: []
-		},
-		focus: 'collection-header'
-	});
-
-	const previewSrc = $derived(
-		themePreviewUrl(
-			new URL('/preview/collection', data.previewUrl).toString(),
-			data.settings.template,
-			data.settings.theme
-		)
-	);
+	const newCollection = new CollectionDraft(() => data);
 
 	function linksOf(collectionId: string) {
 		return data.links.filter((link) => link.collection_id === collectionId);
@@ -90,7 +59,11 @@
 	</p>
 </header>
 
-<LivePreviewLayout src={previewSrc} {draft} title="Así se ve tu colección">
+<LivePreviewLayout
+	src={newCollection.src}
+	draft={newCollection.draft}
+	title="Así se ve tu colección"
+>
 	<Card.Root class="mb-8">
 		<Card.Header>
 			<Card.Title>Nueva colección</Card.Title>
@@ -102,11 +75,17 @@
 				action="?/create"
 				enctype="multipart/form-data"
 				class="grid gap-4 sm:grid-cols-2"
-				use:enhance
+				use:enhance={newCollection.create}
 			>
 				<div class="space-y-2">
 					<Label for="name">Nombre</Label>
-					<Input id="name" name="name" required placeholder="Temporada clara" bind:value={name} />
+					<Input
+						id="name"
+						name="name"
+						required
+						placeholder="Temporada clara"
+						bind:value={newCollection.name}
+					/>
 				</div>
 
 				<div class="space-y-2">
@@ -116,7 +95,7 @@
 						name="slug"
 						placeholder="temporada-clara"
 						pattern="[a-z0-9-]+"
-						bind:value={slug}
+						bind:value={newCollection.slug}
 					/>
 				</div>
 
@@ -127,7 +106,7 @@
 						name="file"
 						type="file"
 						accept="image/*"
-						onchange={(event) => (image = event.currentTarget.files?.[0] ?? null)}
+						onchange={(event) => (newCollection.image = event.currentTarget.files?.[0] ?? null)}
 					/>
 					<p class="text-muted-foreground text-xs">
 						Se guarda en tres tamaños para que cargue rápido. Máximo 12 MB.
@@ -136,15 +115,27 @@
 
 				<div class="space-y-2 sm:col-span-2">
 					<Label for="description">Descripción</Label>
-					<Textarea id="description" name="description" rows={2} bind:value={description} />
+					<Textarea
+						id="description"
+						name="description"
+						rows={2}
+						bind:value={newCollection.description}
+					/>
 				</div>
 
 				<div class="sm:col-span-2">
-					<CheckboxField id="active" name="active" label="Publicada" bind:checked={active} />
+					<CheckboxField
+						id="active"
+						name="active"
+						label="Publicada"
+						bind:checked={newCollection.active}
+					/>
 				</div>
 
 				<div class="sm:col-span-2">
-					<Button type="submit">Crear colección</Button>
+					<Button type="submit" disabled={newCollection.createForm.pending}>
+						{newCollection.createForm.pending ? 'Creando…' : 'Crear colección'}
+					</Button>
 				</div>
 			</form>
 		</Card.Content>

@@ -282,7 +282,7 @@
 
 					<Accordion.Item
 						value="envios"
-						data-preview-zone={data.draftPreview ? 'prodhipping' : undefined}
+						data-preview-zone={data.draftPreview ? 'shipping-info' : undefined}
 					>
 						<Accordion.Trigger>Envíos y pedido</Accordion.Trigger>
 						<Accordion.Content>

@@ -1,6 +1,5 @@
 <script lang="ts">
 	// Tipos
-	import type { StorefrontDraft } from '$lib/domain/preview';
 	import type { PageData } from './$types';
 
 	// Iconos
@@ -24,9 +23,9 @@
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import { FormState } from '$lib/utils/form-state.svelte';
+	import { ShippingEditor } from './shipping-editor.svelte';
 
 	// Utilidades
-	import { themePreviewUrl } from '$lib/template-preview';
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {
@@ -35,93 +34,10 @@
 
 	let { data }: Props = $props();
 
-	interface ZoneEdit {
-		name?: string;
-		cost?: number | null;
-		etaDays?: number;
-		active?: boolean;
-	}
+	const editor = new ShippingEditor(() => data);
+	/** La fila que se guarda: al terminar, lo guardado ya trae sus cambios. */
+	const update = new FormState();
 
-	/**
-	 * Los cambios de cada fila viven aquí, por id. Así la lista sigue pintando
-	 * lo guardado y el borrador se arma con lo que la dueña escribe encima.
-	 */
-	let zoneEdits = $state<Record<string, ZoneEdit>>({});
-
-	// La zona que se está creando también se ve, sin esperar a guardarla.
-	let newName = $state('');
-	let newCost = $state<number | null>(0);
-	let newEtaDays = $state(2);
-	let newActive = $state(true);
-
-	const create = new FormState();
-	const reorder = new FormState();
-
-	function resetDraft() {
-		newName = '';
-		newCost = 0;
-		newEtaDays = 2;
-		newActive = true;
-	}
-
-	/** El costo que la dueña escribió en la fila, o el guardado si no lo tocó. */
-	function costOf(id: string, saved: number): number | null {
-		const edited = zoneEdits[id]?.cost;
-
-		return edited === undefined ? saved : edited;
-	}
-
-	const rows = $derived(
-		data.zones.map((zone) => ({
-			id: zone.id,
-			name: zoneEdits[zone.id]?.name ?? zone.name,
-			cost: costOf(zone.id, zone.cost),
-			etaDays: zoneEdits[zone.id]?.etaDays ?? zone.eta_days,
-			active: zoneEdits[zone.id]?.active ?? zone.active,
-			sortOrder: zone.sort_order
-		}))
-	);
-
-	const draftZones = $derived([
-		...rows.map((zone) => ({
-			id: zone.id,
-			name: zone.name,
-			// Un campo vacío llega como null: el borrador lo pinta en cero.
-			cost: zone.cost ?? 0,
-			etaDays: zone.etaDays,
-			active: zone.active
-		})),
-		...(newName.trim()
-			? [
-					{
-						id: 'nueva',
-						name: newName,
-						cost: newCost ?? 0,
-						etaDays: Number.isFinite(newEtaDays) ? newEtaDays : null,
-						active: newActive
-					}
-				]
-			: [])
-	]);
-
-	const draft = $derived<StorefrontDraft>({
-		template: data.settings.template,
-		theme: data.settings.theme,
-		content: { kind: 'shipping', zones: draftZones },
-		focus: 'prodhipping'
-	});
-
-	const previewSrc = $derived(
-		themePreviewUrl(
-			new URL('/preview/cart', data.previewUrl).toString(),
-			data.settings.template,
-			data.settings.theme
-		)
-	);
-
-	function editZone(id: string, patch: ZoneEdit) {
-		zoneEdits[id] = { ...zoneEdits[id], ...patch };
-	}
 	const deletion = new DeleteConfirm();
 	const onDelete = deletion.enhance();
 </script>
@@ -137,7 +53,7 @@
 	</p>
 </header>
 
-<LivePreviewLayout src={previewSrc} {draft} title="Así se ve tu envío">
+<LivePreviewLayout src={editor.src} draft={editor.draft} title="Así se ve tu envío">
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>Zonas</Card.Title>
@@ -149,7 +65,7 @@
 				method="POST"
 				action="?/create"
 				class="bg-muted/50 flex flex-wrap items-end gap-3 rounded-lg p-4"
-				use:enhance={create.submit({ onSuccess: resetDraft })}
+				use:enhance={editor.create}
 			>
 				<div class="space-y-1.5">
 					<Label class="text-xs" for="name">Nombre</Label>
@@ -159,18 +75,24 @@
 						required
 						placeholder="Bogotá"
 						class="w-56"
-						bind:value={newName}
+						bind:value={editor.newName}
 					/>
 				</div>
 
 				<div class="space-y-1.5">
 					<Label class="text-xs" for="cost">Costo</Label>
-					<MoneyField id="cost" name="cost" bind:value={newCost} class="w-40" />
+					<MoneyField id="cost" name="cost" bind:value={editor.newCost} class="w-40" />
 				</div>
 
 				<div class="space-y-1.5">
 					<Label class="text-xs" for="etaDays">Días</Label>
-					<NumberField id="etaDays" name="etaDays" bind:value={newEtaDays} max={60} class="w-32" />
+					<NumberField
+						id="etaDays"
+						name="etaDays"
+						bind:value={editor.newEtaDays}
+						max={60}
+						class="w-32"
+					/>
 				</div>
 
 				<div class="pb-2">
@@ -178,15 +100,15 @@
 						id="nueva-zona"
 						name="active"
 						label="Disponible"
-						bind:checked={newActive}
+						bind:checked={editor.newActive}
 					/>
 				</div>
 
-				<Button type="submit" size="sm" disabled={create.pending}>Agregar zona</Button>
+				<Button type="submit" size="sm" disabled={editor.createForm.pending}>Agregar zona</Button>
 			</form>
 
 			<div class="space-y-4">
-				{#each rows as zone (zone.id)}
+				{#each editor.rows as zone (zone.id)}
 					<EditableRowCard>
 						<div class="grid gap-4 md:grid-cols-2">
 							<div class="space-y-1.5">
@@ -196,7 +118,7 @@
 									form="zone-{zone.id}"
 									name="name"
 									value={zone.name}
-									oninput={(event) => editZone(zone.id, { name: event.currentTarget.value })}
+									oninput={(event) => editor.edit(zone.id, { name: event.currentTarget.value })}
 								/>
 							</div>
 
@@ -207,7 +129,7 @@
 									form="zone-{zone.id}"
 									name="cost"
 									value={zone.cost}
-									onchange={(value) => editZone(zone.id, { cost: value })}
+									onchange={(value) => editor.edit(zone.id, { cost: value })}
 								/>
 							</div>
 						</div>
@@ -220,7 +142,7 @@
 									form="zone-{zone.id}"
 									name="etaDays"
 									value={zone.etaDays ?? 0}
-									onchange={(value) => editZone(zone.id, { etaDays: value })}
+									onchange={(value) => editor.edit(zone.id, { etaDays: value })}
 									max={60}
 									class="w-32"
 								/>
@@ -233,7 +155,7 @@
 									name="active"
 									label="Disponible"
 									checked={zone.active}
-									onchange={(checked) => editZone(zone.id, { active: checked })}
+									onchange={(checked) => editor.edit(zone.id, { active: checked })}
 								/>
 							</div>
 
@@ -277,7 +199,7 @@
 			id="zone-{zone.id}"
 			method="POST"
 			action="?/update"
-			use:enhance={reorder.submit({ onSuccess: () => delete zoneEdits[zone.id] })}
+			use:enhance={update.submit({ onSuccess: () => editor.forget(zone.id) })}
 		>
 			<input type="hidden" name="id" value={zone.id} />
 			<input type="hidden" name="sortOrder" value={zone.sort_order} />

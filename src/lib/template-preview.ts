@@ -65,3 +65,8 @@ export function themePreviewUrl(
 export function exitPreviewUrl(): string {
 	return `/?${PREVIEW_PARAM}=${PREVIEW_EXIT}`;
 }
+
+/** La dirección completa de una página de la tienda, para la vista previa del panel. */
+export function storePage(path: string, base: string): string {
+	return new URL(path, base).toString();
+}

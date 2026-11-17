@@ -140,7 +140,7 @@
 
 				<Separator />
 
-				<div class="space-y-2" data-preview-zone="prodhipping">
+				<div class="space-y-2" data-preview-zone="shipping-info">
 					<Label for="zone">Zona de envío</Label>
 					<select
 						id="zone"

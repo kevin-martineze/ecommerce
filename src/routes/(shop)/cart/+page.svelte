@@ -285,7 +285,10 @@
 						{/if}
 					</div>
 
-					<div class="space-y-2" data-preview-zone={data.draftPreview ? 'prodhipping' : undefined}>
+					<div
+						class="space-y-2"
+						data-preview-zone={data.draftPreview ? 'shipping-info' : undefined}
+					>
 						<Label for="zone">Zona de envío</Label>
 						<select
 							id="zone"

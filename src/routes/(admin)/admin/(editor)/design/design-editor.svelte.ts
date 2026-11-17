@@ -14,7 +14,7 @@ import { describeDesignChanges } from '$lib/domain/design-changes';
 import { accentProblem } from '$lib/domain/theme';
 
 // Utilidades
-import { themePreviewUrl } from '$lib/template-preview';
+import { storePage, themePreviewUrl } from '$lib/template-preview';
 
 /** Lo que el editor necesita de la carga de la página. */
 export interface DesignData {
@@ -46,11 +46,6 @@ export function snapshotOf(settings: StoreSettings): DesignSnapshot {
 		heroTitle: settings.hero_title ?? '',
 		heroSubtitle: settings.hero_subtitle ?? ''
 	};
-}
-
-/** La dirección completa de una página de la tienda para la vista previa. */
-function resolvePage(path: string, base: string): string {
-	return new URL(path, base).toString();
 }
 
 /** «1 cambio», «3 cambios». */
@@ -138,7 +133,7 @@ export class DesignEditor {
 		);
 		this.previewSrc = $derived(
 			themePreviewUrl(
-				resolvePage(this.path, data().previewUrl),
+				storePage(this.path, data().previewUrl),
 				data().settings.template,
 				data().settings.theme
 			)
