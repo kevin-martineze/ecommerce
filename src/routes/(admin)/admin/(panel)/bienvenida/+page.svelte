@@ -34,7 +34,12 @@
 		Lo decido después
 	</a>
 	· Tu tienda ya está en
-	<a href={data.storeUrl} class="hover:text-foreground underline">
+	<a
+		href={data.storeUrl}
+		target="_blank"
+		rel="noopener noreferrer"
+		class="hover:text-foreground underline"
+	>
 		{data.storeUrl.replace(/^https?:\/\//, '')}
 	</a>
 </p>

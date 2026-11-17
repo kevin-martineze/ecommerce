@@ -88,6 +88,8 @@
 						</p>
 						<a
 							href={store.url}
+							target="_blank"
+							rel="noopener noreferrer"
 							class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
 						>
 							{MEMBER_ROLE_LABEL[store.role]} · ver tienda

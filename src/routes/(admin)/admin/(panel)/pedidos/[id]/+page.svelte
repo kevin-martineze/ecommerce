@@ -89,7 +89,12 @@
 					{#each order.items as item (item.id)}
 						<li class="flex justify-between gap-4 py-3 text-sm">
 							<div>
-								<a href="/tienda/{item.product_slug}" class="font-medium">{item.product_name}</a>
+								<a
+									href="{data.storeUrl}/tienda/{item.product_slug}"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="font-medium">{item.product_name}</a
+								>
 								<p class="text-muted-foreground text-xs">
 									{item.variant_label}
 									{#if item.sku}· {item.sku}{/if}

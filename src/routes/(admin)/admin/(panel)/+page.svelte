@@ -41,7 +41,12 @@
 		<Alert.Description>
 			<p>
 				Quedó en
-				<a href={data.welcomeUrl} class="font-medium underline underline-offset-4">
+				<a
+					href={data.welcomeUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="font-medium underline underline-offset-4"
+				>
 					{data.welcomeUrl.replace(/^https?:\/\//, '')}
 				</a>. Empieza creando tus productos en
 				<a href="/admin/productos/nuevo" class="underline underline-offset-4">Productos</a>: se
