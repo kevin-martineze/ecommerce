@@ -9,6 +9,7 @@
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import { Textarea } from '$lib/components/atoms/textarea';
+	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import LivePreviewLayout from '$lib/components/organisms/LivePreviewLayout.svelte';
 	import { themePreviewUrl } from '$lib/template-preview';
 
@@ -55,13 +56,6 @@
 			data.current.theme
 		)
 	);
-
-	function readThreshold(value: string) {
-		const raw = value.trim();
-		const parsed = Number(raw);
-
-		freeShippingThreshold = raw === '' || !Number.isFinite(parsed) ? null : parsed;
-	}
 </script>
 
 <svelte:head>
@@ -144,14 +138,10 @@
 
 			<div class="space-y-2">
 				<Label for="freeShippingThreshold">Envío gratis desde</Label>
-				<Input
+				<MoneyField
 					id="freeShippingThreshold"
 					name="freeShippingThreshold"
-					type="number"
-					min="0"
-					step="1000"
-					value={freeShippingThreshold ?? ''}
-					oninput={(event) => readThreshold(event.currentTarget.value)}
+					bind:value={freeShippingThreshold}
 					onfocusin={() => (focus = 'store-footer')}
 					placeholder="Sin envío gratis"
 				/>

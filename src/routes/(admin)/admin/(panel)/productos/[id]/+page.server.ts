@@ -2,6 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { Actions, PageServerLoad } from './$types';
 import {
+	priceOverrideSchema,
 	productAttributesSchema,
 	productOptionsSchema,
 	productSchema,
@@ -190,11 +191,15 @@ export const actions: Actions = {
 		}
 
 		const priceRaw = String(formData.get('priceOverride') ?? '').trim();
-		const priceOverride = priceRaw === '' ? null : Number(priceRaw);
+		const priceParsed = priceOverrideSchema.safeParse(priceRaw === '' ? null : priceRaw);
 
-		if (priceOverride !== null && (!Number.isInteger(priceOverride) || priceOverride < 0)) {
-			return fail(400, { error: 'Precio de variante inválido.' });
+		if (!priceParsed.success) {
+			return fail(400, {
+				error: priceParsed.error.issues.at(0)?.message ?? 'Precio de variante inválido.'
+			});
 		}
+
+		const priceOverride = priceParsed.data;
 
 		const result = await updateVariant(ctx, parsed.data.variantId, {
 			stock: parsed.data.stock,

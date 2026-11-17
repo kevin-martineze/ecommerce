@@ -20,8 +20,8 @@
 		slug: '',
 		description: '',
 		categoryId: '',
-		basePrice: '',
-		compareAtPrice: '',
+		basePrice: null,
+		compareAtPrice: null,
 		status: 'draft',
 		featured: false
 	});

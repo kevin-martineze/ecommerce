@@ -10,6 +10,7 @@
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import CheckboxField from '$lib/components/molecules/CheckboxField.svelte';
+	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import NumberField from '$lib/components/molecules/NumberField.svelte';
 	import { formatMoney } from '$lib/utils/money';
 
@@ -167,12 +168,10 @@
 									</Table.Cell>
 
 									<Table.Cell data-label="Precio propio">
-										<NumberField
+										<MoneyField
 											form="variante-{variant.id}"
 											name="priceOverride"
 											value={variant.price_override ?? basePrice}
-											step={1000}
-											max={100000000}
 											aria-label="Precio propio"
 										/>
 									</Table.Cell>

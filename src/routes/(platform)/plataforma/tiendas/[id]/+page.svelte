@@ -12,6 +12,7 @@
 	import { Label } from '$lib/components/atoms/label';
 	import * as Table from '$lib/components/atoms/table';
 	import { Textarea } from '$lib/components/atoms/textarea';
+	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import StoreStatusBadge from '$lib/components/molecules/StoreStatusBadge.svelte';
 	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
@@ -158,12 +159,11 @@
 			<form method="POST" action="?/pago" class="space-y-3" use:enhance>
 				<div class="space-y-1.5">
 					<Label for="amountCop">Monto (pesos)</Label>
-					<Input
+					<MoneyField
 						id="amountCop"
 						name="amountCop"
-						inputmode="numeric"
 						required
-						value={currentPlan ? String(currentPlan.price_cop) : ''}
+						value={currentPlan?.price_cop ?? null}
 					/>
 				</div>
 

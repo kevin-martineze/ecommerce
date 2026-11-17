@@ -41,7 +41,7 @@
 			description: product.description ?? '',
 			categoryId: product.category_id ?? '',
 			basePrice: product.base_price,
-			compareAtPrice: product.compare_at_price ?? '',
+			compareAtPrice: product.compare_at_price,
 			status: product.status,
 			featured: product.featured
 		}))
