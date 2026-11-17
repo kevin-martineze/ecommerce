@@ -1,11 +1,18 @@
 // Tipos
-import type { SubmitFunction } from '@sveltejs/kit';
+import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
 
 export interface SubmitOptions {
 	/** Vaciar el formulario cuando sale bien. Por omisión sí, como `use:enhance`. */
 	reset?: boolean;
+	/**
+	 * Justo antes de enviar: agregar al `FormData` lo que no está en el HTML
+	 * (el carrito y los favoritos viven en localStorage, regla 13).
+	 */
+	prepare?: (formData: FormData) => void;
 	/** Lo que pasa después de un envío que salió bien (limpiar un borrador, cerrar un diálogo). */
 	onSuccess?: () => void;
+	/** Lo que pasa después de cualquier envío, salga bien o mal. */
+	onSettled?: () => void;
 }
 
 /**
@@ -23,19 +30,38 @@ export interface SubmitOptions {
 export class FormState {
 	pending = $state(false);
 
+	/** `pending` arranca en true cuando el formulario se envía solo al montar (la cotización del carrito). */
+	constructor(options: { pending?: boolean } = {}) {
+		this.pending = options.pending ?? false;
+	}
+
 	submit(options: SubmitOptions = {}): SubmitFunction {
-		return () => {
-			this.pending = true;
+		return ({ formData }) => {
+			this.begin(options, formData);
 
-			return async ({ result, update }) => {
-				try {
-					await update({ reset: options.reset ?? true });
-				} finally {
-					this.pending = false;
-				}
-
-				if (result.type === 'success') options.onSuccess?.();
-			};
+			return ({ result, update }) => this.settle(options, result.type, update);
 		};
+	}
+
+	/** El inicio del envío: completa el `FormData` y deshabilita el submit. */
+	begin(options: SubmitOptions, formData: FormData) {
+		options.prepare?.(formData);
+		this.pending = true;
+	}
+
+	/** El final del envío: aplica el resultado y vuelve a habilitar el submit. */
+	async settle(
+		options: SubmitOptions,
+		outcome: ActionResult['type'],
+		update: (opts: { reset: boolean }) => Promise<void>
+	) {
+		try {
+			await update({ reset: options.reset ?? true });
+		} finally {
+			this.pending = false;
+		}
+
+		if (outcome === 'success') options.onSuccess?.();
+		options.onSettled?.();
 	}
 }

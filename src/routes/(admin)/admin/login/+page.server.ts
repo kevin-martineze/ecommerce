@@ -7,6 +7,7 @@ import { fail, redirect } from '@sveltejs/kit';
 // Servidor
 import { login, logout, me, switchStore } from '$lib/server/api/auth';
 import { clientAddress, displayStatus, storeSlugFor } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 import { toAdminSession, writeSession } from '$lib/server/session';
 
 // Dominio
@@ -24,18 +25,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 export const actions: Actions = {
 	default: async (event) => {
 		const { request, cookies, url } = event;
-		const formData = await request.formData();
-		const parsed = loginSchema.safeParse({
-			email: formData.get('email'),
-			password: formData.get('password')
-		});
+		const form = await parseForm({ request }, loginSchema);
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
+		if (!form.ok) return form.failure;
 
 		const ip = clientAddress(event);
-		const result = await login(parsed.data.email, parsed.data.password, ip);
+		const result = await login(form.data.email, form.data.password, ip);
 
 		if (!result.ok) {
 			// Los 4xx (credenciales, cuenta bloqueada, demasiados intentos) traen

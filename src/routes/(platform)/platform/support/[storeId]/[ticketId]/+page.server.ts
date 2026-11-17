@@ -11,6 +11,7 @@ import {
 	setPlatformSupportStatus
 } from '$lib/server/api/platform-support';
 import { accountContext, failWith, orFail } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
 import { supportReplySchema, supportStatusSchema } from '$lib/schemas/support';
@@ -25,18 +26,15 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	reply: async (event) => {
 		const ctx = accountContext(event);
-		const formData = await event.request.formData();
-		const parsed = supportReplySchema.safeParse({ body: formData.get('body') });
+		const form = await parseForm(event, supportReplySchema);
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Escribe tu mensaje.' });
-		}
+		if (!form.ok) return form.failure;
 
 		const result = await replyPlatformSupport(
 			ctx,
 			event.params.storeId,
 			event.params.ticketId,
-			parsed.data.body
+			form.data.body
 		);
 
 		if (!result.ok) return failWith(result);

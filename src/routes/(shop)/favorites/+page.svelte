@@ -14,6 +14,7 @@
 
 	// Estado
 	import { favorites } from '$lib/stores/favorites.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	interface Props {
 		data: PageData;
@@ -23,7 +24,7 @@
 	let { data, form }: Props = $props();
 
 	let loadForm = $state<HTMLFormElement | null>(null);
-	let loading = $state(true);
+	const lookup = new FormState({ pending: true });
 
 	// Se piden las fichas al servidor cada vez que cambia la lista guardada.
 	$effect(() => {
@@ -49,17 +50,12 @@
 		method="POST"
 		bind:this={loadForm}
 		class="hidden"
-		use:enhance={({ formData }) => {
+		use:enhance={lookup.submit({
+			reset: false,
 			// Igual que el carrito: la lista vive en localStorage, así que se adjunta
 			// al enviar y no como valor renderizado en el servidor.
-			formData.set('slugs', favorites.slugs.join(','));
-			loading = true;
-
-			return async ({ update }) => {
-				await update({ reset: false });
-				loading = false;
-			};
-		}}
+			prepare: (formData) => formData.set('slugs', favorites.slugs.join(','))
+		})}
 	>
 		<input type="hidden" name="slugs" value="" />
 	</form>
@@ -75,7 +71,7 @@
 			</p>
 			<Button href="/shop">Ver la tienda</Button>
 		</div>
-	{:else if loading && products.length === 0}
+	{:else if lookup.pending && products.length === 0}
 		<p class="text-muted-foreground text-sm">Cargando tus productos…</p>
 	{:else}
 		<ProductGrid {products} columns={4} />

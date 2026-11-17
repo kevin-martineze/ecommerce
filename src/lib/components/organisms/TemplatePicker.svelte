@@ -13,6 +13,9 @@
 	import { Button } from '$lib/components/atoms/button';
 	import StorefrontFrame from '$lib/components/molecules/StorefrontFrame.svelte';
 
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
 	// Dominio
 	import { TEMPLATES } from '$lib/domain/templates';
 
@@ -43,7 +46,9 @@
 
 	let { current, storeUrl, action, cta = 'Usar esta plantilla' }: Props = $props();
 
-	let submitting = $state('');
+	const submission = new FormState();
+	/** La plantilla que se está aplicando, para poner «Aplicando…» solo en su botón. */
+	let applying = $state('');
 </script>
 
 <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -96,23 +101,16 @@
 				method="POST"
 				{action}
 				class="mt-auto pt-5"
-				use:enhance={() => {
-					submitting = template.code;
-
-					return async ({ update }) => {
-						await update();
-						submitting = '';
-					};
-				}}
+				use:enhance={submission.submit({ prepare: () => (applying = template.code) })}
 			>
 				<input type="hidden" name="template" value={template.code} />
 				<Button
 					type="submit"
 					class="w-full"
 					variant={selected ? 'outline' : 'default'}
-					disabled={selected || submitting !== ''}
+					disabled={selected || submission.pending}
 				>
-					{#if submitting === template.code}
+					{#if submission.pending && applying === template.code}
 						Aplicando…
 					{:else if selected}
 						En uso

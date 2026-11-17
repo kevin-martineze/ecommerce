@@ -23,6 +23,7 @@
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
@@ -52,6 +53,16 @@
 	let newCost = $state<number | null>(0);
 	let newEtaDays = $state(2);
 	let newActive = $state(true);
+
+	const create = new FormState();
+	const reorder = new FormState();
+
+	function resetDraft() {
+		newName = '';
+		newCost = 0;
+		newEtaDays = 2;
+		newActive = true;
+	}
 
 	/** El costo que la dueña escribió en la fila, o el guardado si no lo tocó. */
 	function costOf(id: string, saved: number): number | null {
@@ -138,17 +149,7 @@
 				method="POST"
 				action="?/create"
 				class="bg-muted/50 flex flex-wrap items-end gap-3 rounded-lg p-4"
-				use:enhance={() => {
-					return async ({ result, update }) => {
-						await update();
-						if (result.type === 'success') {
-							newName = '';
-							newCost = 0;
-							newEtaDays = 2;
-							newActive = true;
-						}
-					};
-				}}
+				use:enhance={create.submit({ onSuccess: resetDraft })}
 			>
 				<div class="space-y-1.5">
 					<Label class="text-xs" for="name">Nombre</Label>
@@ -181,7 +182,7 @@
 					/>
 				</div>
 
-				<Button type="submit" size="sm">Agregar zona</Button>
+				<Button type="submit" size="sm" disabled={create.pending}>Agregar zona</Button>
 			</form>
 
 			<div class="space-y-4">
@@ -276,14 +277,7 @@
 			id="zona-{zone.id}"
 			method="POST"
 			action="?/update"
-			use:enhance={() => {
-				return async ({ result, update }) => {
-					await update();
-					if (result.type === 'success') {
-						delete zoneEdits[zone.id];
-					}
-				};
-			}}
+			use:enhance={reorder.submit({ onSuccess: () => delete zoneEdits[zone.id] })}
 		>
 			<input type="hidden" name="id" value={zone.id} />
 			<input type="hidden" name="sortOrder" value={zone.sort_order} />

@@ -23,6 +23,7 @@
 
 	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	// Dominio
 	import { COUPON_REJECTION_LABEL } from '$lib/domain/settings';
@@ -40,8 +41,8 @@
 	let prepareForm = $state<HTMLFormElement | null>(null);
 	let couponCode = $state('');
 	let zoneId = $state(untrack(() => data.zones.at(0)?.id ?? ''));
-	let preparing = $state(true);
-	let submitting = $state(false);
+	const quote = new FormState({ pending: true });
+	const checkout = new FormState();
 
 	const priced = $derived(form && 'priced' in form ? form.priced : null);
 	const totals = $derived(form && 'totals' in form ? form.totals : null);
@@ -85,19 +86,16 @@
 		action="?/prepare"
 		bind:this={prepareForm}
 		class="hidden"
-		use:enhance={({ formData }) => {
+		use:enhance={quote.submit({
+			reset: false,
 			// El carrito se serializa aquí, no en un input: el HTML del servidor se
 			// renderiza sin localStorage y llegaría vacío.
-			formData.set('cart', cart.serialize());
-			formData.set('couponCode', couponCode);
-			formData.set('shippingZoneId', zoneId);
-			preparing = true;
-
-			return async ({ update }) => {
-				await update({ reset: false });
-				preparing = false;
-			};
-		}}
+			prepare: (formData) => {
+				formData.set('cart', cart.serialize());
+				formData.set('couponCode', couponCode);
+				formData.set('shippingZoneId', zoneId);
+			}
+		})}
 	>
 		<input type="hidden" name="cart" value="[]" />
 		<input type="hidden" name="couponCode" value="" />
@@ -207,15 +205,10 @@
 					method="POST"
 					action="?/confirm"
 					class="border-border space-y-5 border p-5"
-					use:enhance={({ formData }) => {
-						formData.set('cart', cart.serialize());
-						submitting = true;
-
-						return async ({ update }) => {
-							await update({ reset: false });
-							submitting = false;
-						};
-					}}
+					use:enhance={checkout.submit({
+						reset: false,
+						prepare: (formData) => formData.set('cart', cart.serialize())
+					})}
 				>
 					<input type="hidden" name="cart" value="[]" />
 
@@ -256,7 +249,7 @@
 							</span>
 						</div>
 
-						{#if preparing}
+						{#if quote.pending}
 							<p class="text-muted-foreground text-xs">Actualizando precios…</p>
 						{/if}
 					</div>
@@ -277,7 +270,7 @@
 								type="button"
 								variant="outline"
 								onclick={() => prepareForm?.requestSubmit()}
-								disabled={preparing}
+								disabled={quote.pending}
 							>
 								Aplicar
 							</Button>
@@ -348,8 +341,13 @@
 						<p class="text-destructive text-sm">{checkoutError}</p>
 					{/if}
 
-					<Button type="submit" size="lg" class="w-full" disabled={submitting || preparing}>
-						{submitting ? 'Creando pedido…' : 'Confirmar y abrir WhatsApp'}
+					<Button
+						type="submit"
+						size="lg"
+						class="w-full"
+						disabled={checkout.pending || quote.pending}
+					>
+						{checkout.pending ? 'Creando pedido…' : 'Confirmar y abrir WhatsApp'}
 					</Button>
 
 					<p class="text-muted-foreground text-center text-xs">

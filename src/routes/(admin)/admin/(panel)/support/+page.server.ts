@@ -2,11 +2,12 @@
 import type { Actions, PageServerLoad } from './$types';
 
 // Svelte
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 
 // Servidor
 import { listSupportTickets, openSupportTicket } from '$lib/server/api/panel-support';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
 import { supportTicketSchema } from '$lib/schemas/support';
@@ -18,19 +19,11 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	create: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, supportTicketSchema);
 
-		const parsed = supportTicketSchema.safeParse({
-			subject: formData.get('subject'),
-			category: formData.get('category'),
-			body: formData.get('body')
-		});
+		if (!form.ok) return form.failure;
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
-
-		const result = await openSupportTicket(ctx, parsed.data);
+		const result = await openSupportTicket(ctx, form.data);
 
 		if (!result.ok) return failWith(result);
 

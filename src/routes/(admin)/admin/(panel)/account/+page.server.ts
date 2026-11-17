@@ -15,6 +15,7 @@ import {
 	panelContext,
 	storeUrl
 } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 import { toAdminSession, writeSession } from '$lib/server/session';
 
 // Dominio
@@ -38,20 +39,13 @@ export const actions: Actions = {
 
 		if (!session) redirect(303, '/admin/login');
 
-		const formData = await event.request.formData();
-		const parsed = changePasswordSchema.safeParse({
-			currentPassword: formData.get('currentPassword'),
-			password: formData.get('password'),
-			confirm: formData.get('confirm')
-		});
+		const form = await parseForm(event, changePasswordSchema);
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
+		if (!form.ok) return form.failure;
 
 		const result = await changePassword(ctx, {
-			currentPassword: parsed.data.currentPassword,
-			newPassword: parsed.data.password,
+			currentPassword: form.data.currentPassword,
+			newPassword: form.data.password,
 			refreshToken: session.refreshToken
 		});
 

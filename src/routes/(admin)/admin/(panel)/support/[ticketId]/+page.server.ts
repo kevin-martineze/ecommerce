@@ -1,12 +1,10 @@
 // Tipos
 import type { Actions, PageServerLoad } from './$types';
 
-// Svelte
-import { fail } from '@sveltejs/kit';
-
 // Servidor
 import { getSupportThread, replySupport } from '$lib/server/api/panel-support';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
 import { supportReplySchema } from '$lib/schemas/support';
@@ -20,15 +18,11 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	reply: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, supportReplySchema);
 
-		const parsed = supportReplySchema.safeParse({ body: formData.get('body') });
+		if (!form.ok) return form.failure;
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Escribe tu mensaje.' });
-		}
-
-		const result = await replySupport(ctx, event.params.ticketId, parsed.data.body);
+		const result = await replySupport(ctx, event.params.ticketId, form.data.body);
 
 		if (!result.ok) return failWith(result);
 

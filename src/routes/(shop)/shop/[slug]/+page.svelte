@@ -27,6 +27,7 @@
 	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	// Utilidades
 	import { cn } from '$lib/utils';
@@ -45,7 +46,7 @@
 	/** Un valor elegido por eje, indexado por id del eje. */
 	let selected = $state<Record<string, string>>({});
 	let restockContact = $state('');
-	let submittingRestock = $state(false);
+	const restock = new FormState();
 
 	/**
 	 * Al cambiar de producto se arranca en la primera variante con existencias.
@@ -214,15 +215,7 @@
 									method="POST"
 									action="?/notifyMe"
 									class="flex gap-2"
-									use:enhance={() => {
-										submittingRestock = true;
-
-										return async ({ update }) => {
-											await update();
-											submittingRestock = false;
-											restockContact = '';
-										};
-									}}
+									use:enhance={restock.submit({ onSettled: () => (restockContact = '') })}
 								>
 									<input type="hidden" name="variantId" value={selectedVariant?.id ?? ''} />
 									<Input
@@ -232,7 +225,7 @@
 										aria-label="Contacto para avisarte"
 										required
 									/>
-									<Button type="submit" variant="outline" disabled={submittingRestock}>
+									<Button type="submit" variant="outline" disabled={restock.pending}>
 										Avísame
 									</Button>
 								</form>

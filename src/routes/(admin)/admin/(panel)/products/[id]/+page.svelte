@@ -31,6 +31,7 @@
 
 	// Estado
 	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
 
 	// Utilidades
 	import { themePreviewUrl } from '$lib/template-preview';
@@ -117,7 +118,7 @@
 
 		return '';
 	}
-	let uploading = $state(false);
+	const upload = new FormState();
 	const deletion = new DeleteConfirm();
 	const onDelete = deletion.enhance();
 </script>
@@ -211,14 +212,7 @@
 				action="?/uploadImage"
 				enctype="multipart/form-data"
 				class="flex flex-wrap items-end gap-3"
-				use:enhance={() => {
-					uploading = true;
-
-					return async ({ update }) => {
-						await update({ reset: true });
-						uploading = false;
-					};
-				}}
+				use:enhance={upload.submit()}
 			>
 				<div class="space-y-2">
 					<Label for="file">Nueva foto</Label>
@@ -245,8 +239,8 @@
 					/>
 				</div>
 
-				<Button type="submit" disabled={uploading}>
-					{uploading ? 'Procesando…' : 'Subir'}
+				<Button type="submit" disabled={upload.pending}>
+					{upload.pending ? 'Procesando…' : 'Subir'}
 				</Button>
 
 				<p class="text-muted-foreground w-full text-xs">

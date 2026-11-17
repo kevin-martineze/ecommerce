@@ -7,6 +7,7 @@ import { fail, redirect } from '@sveltejs/kit';
 // Servidor
 import { resetPassword } from '$lib/server/api/auth';
 import { clientAddress, displayStatus } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 import { clearSession } from '$lib/server/session';
 
 // Dominio
@@ -18,22 +19,11 @@ export const load: PageServerLoad = ({ url }) => {
 
 export const actions: Actions = {
 	default: async (event) => {
-		const formData = await event.request.formData();
-		const parsed = resetPasswordSchema.safeParse({
-			token: formData.get('token'),
-			password: formData.get('password'),
-			confirm: formData.get('confirm')
-		});
+		const form = await parseForm(event, resetPasswordSchema);
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
+		if (!form.ok) return form.failure;
 
-		const result = await resetPassword(
-			parsed.data.token,
-			parsed.data.password,
-			clientAddress(event)
-		);
+		const result = await resetPassword(form.data.token, form.data.password, clientAddress(event));
 
 		if (!result.ok) return fail(displayStatus(result), { error: result.message });
 

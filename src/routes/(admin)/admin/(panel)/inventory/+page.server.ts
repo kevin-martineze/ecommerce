@@ -1,12 +1,10 @@
 // Tipos
 import type { Actions, PageServerLoad } from './$types';
 
-// Svelte
-import { fail } from '@sveltejs/kit';
-
 // Servidor
 import { listInventory, removeVariant, updateVariant } from '$lib/server/api/panel-catalog';
 import { failWith, orFail, panelContext } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 
 // Dominio
 import { stockUpdateSchema } from '$lib/schemas/admin';
@@ -22,18 +20,11 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	stock: async (event) => {
 		const ctx = panelContext(event);
-		const formData = await event.request.formData();
+		const form = await parseForm(event, stockUpdateSchema);
 
-		const parsed = stockUpdateSchema.safeParse({
-			variantId: formData.get('variantId'),
-			stock: formData.get('stock')
-		});
+		if (!form.ok) return form.failure;
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Cantidad inválida.' });
-		}
-
-		const result = await updateVariant(ctx, parsed.data.variantId, { stock: parsed.data.stock });
+		const result = await updateVariant(ctx, form.data.variantId, { stock: form.data.stock });
 
 		if (!result.ok) return failWith(result);
 
