@@ -1,7 +1,10 @@
+// Tipos
 import type { AdminSession } from '$lib/server/session-crypto';
 
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Servidor
 import {
 	REFRESH_MARGIN_MS,
 	needsRefresh,

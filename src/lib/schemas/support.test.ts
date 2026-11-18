@@ -1,12 +1,14 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import {
 	parsePlatformSupportFilters,
 	supportReplySchema,
 	supportTicketSchema
 } from '$lib/schemas/support';
 
-const CASO_VALIDO = {
+const VALID_CASE = {
 	subject: 'No me llega el correo de pago',
 	category: 'PAYMENTS',
 	body: 'Hice un pago de prueba y la cuenta no se refleja.'
@@ -14,14 +16,14 @@ const CASO_VALIDO = {
 
 describe('supportTicketSchema', () => {
 	it('acepta un caso completo y recorta los espacios', () => {
-		const ok = supportTicketSchema.safeParse({ ...CASO_VALIDO, subject: '  Pagos raros  ' });
+		const ok = supportTicketSchema.safeParse({ ...VALID_CASE, subject: '  Pagos raros  ' });
 
 		expect(ok.success).toBe(true);
 		expect(ok.success && ok.data.subject).toBe('Pagos raros');
 	});
 
 	it('pide un asunto de al menos tres letras', () => {
-		const parsed = supportTicketSchema.safeParse({ ...CASO_VALIDO, subject: 'ab' });
+		const parsed = supportTicketSchema.safeParse({ ...VALID_CASE, subject: 'ab' });
 
 		expect(parsed.success).toBe(false);
 		expect(!parsed.success && parsed.error.issues[0]?.message).toBe(
@@ -30,11 +32,11 @@ describe('supportTicketSchema', () => {
 	});
 
 	it('rechaza una categoría que no está en la lista', () => {
-		expect(supportTicketSchema.safeParse({ ...CASO_VALIDO, category: 'OTRO' }).success).toBe(false);
+		expect(supportTicketSchema.safeParse({ ...VALID_CASE, category: 'OTRO' }).success).toBe(false);
 	});
 
 	it('pide una descripción de al menos diez letras', () => {
-		expect(supportTicketSchema.safeParse({ ...CASO_VALIDO, body: 'no sirve' }).success).toBe(false);
+		expect(supportTicketSchema.safeParse({ ...VALID_CASE, body: 'no sirve' }).success).toBe(false);
 	});
 });
 
@@ -47,19 +49,19 @@ describe('supportReplySchema', () => {
 
 describe('parsePlatformSupportFilters', () => {
 	it('lee estado, búsqueda y página de la URL', () => {
-		const filtros = parsePlatformSupportFilters(
-			new URLSearchParams('estado=OPEN&q=pagos&pagina=3')
+		const activeFilters = parsePlatformSupportFilters(
+			new URLSearchParams('status=OPEN&q=pagos&page=3')
 		);
 
-		expect(filtros).toEqual({ status: 'OPEN', q: 'pagos', page: 3 });
+		expect(activeFilters).toEqual({ status: 'OPEN', q: 'pagos', page: 3 });
 	});
 
 	it('ignora lo que no entiende en vez de romper la bandeja', () => {
-		const filtros = parsePlatformSupportFilters(
-			new URLSearchParams('estado=INVENTADO&pagina=-4&q=')
+		const activeFilters = parsePlatformSupportFilters(
+			new URLSearchParams('status=INVENTADO&page=-4&q=')
 		);
 
-		expect(filtros).toEqual({ status: null, q: null, page: 1 });
+		expect(activeFilters).toEqual({ status: null, q: null, page: 1 });
 	});
 
 	it('sin parámetros, muestra todo desde la primera página', () => {

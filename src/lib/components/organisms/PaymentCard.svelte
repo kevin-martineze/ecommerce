@@ -1,17 +1,27 @@
 <script lang="ts">
-	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
-	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
-	import { onMount } from 'svelte';
-
-	import CreditCard from '@lucide/svelte/icons/credit-card';
-
-	import { enhance } from '$app/forms';
-
+	// Tipos
+	import type { BillingSetup } from '$lib/server/api/billing';
 	import type { PaymentMethod } from '$lib/domain/account';
 	import type { CardErrors, CardInput } from '$lib/domain/card';
-	import type { BillingSetup } from '$lib/server/api/billing';
+
+	// Svelte
+	import { onMount } from 'svelte';
+
+	// Iconos
+	import CreditCard from '@lucide/svelte/icons/credit-card';
+
+	// App
+	import { enhance } from '$app/forms';
+
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import CardFields from '$lib/components/molecules/CardFields.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+
+	// Dominio
 	import { cardIsEmpty, tokenizeCard, validateCard } from '$lib/domain/card';
 
 	/**
@@ -32,12 +42,12 @@
 		canPay: boolean;
 		/** Hasta cuándo está pago o dura la prueba, ya escrito. */
 		periodEnd: string;
-		enPrueba: boolean;
+		inTrial: boolean;
 	}
 
-	let { method, billing, canPay, periodEnd, enPrueba }: Props = $props();
+	let { method, billing, canPay, periodEnd, inTrial }: Props = $props();
 
-	let abierto = $state(false);
+	let isOpen = $state(false);
 	let submitting = $state(false);
 	let card = $state<CardInput>({ number: '', expiry: '', cvc: '', holder: '' });
 	let cardErrors = $state<CardErrors>({});
@@ -45,13 +55,13 @@
 
 	// `onMount` y no `$effect`: no se reacciona a nada, se constata que hay
 	// JavaScript corriendo, que es lo único que puede tokenizar la tarjeta.
-	let hidratado = $state(false);
+	let hydrated = $state(false);
 
 	onMount(() => {
-		hidratado = true;
+		hydrated = true;
 	});
-	const borrado = new DeleteConfirm();
-	const alBorrar = borrado.enhance();
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
 </script>
 
 <section class="border-border bg-card space-y-4 rounded-lg border p-6">
@@ -65,7 +75,7 @@
 			<span class="font-mono">{method.brand ?? 'Tarjeta'} ···· {method.last4 ?? '····'}</span>
 		</p>
 		<p class="text-muted-foreground text-sm">
-			{#if enPrueba}
+			{#if inTrial}
 				No se te ha cobrado nada. El primer cobro es el {periodEnd}, cuando termina tu prueba.
 			{:else}
 				El próximo cobro es el {periodEnd}. No tienes que hacer nada.
@@ -78,25 +88,25 @@
 		</p>
 	{/if}
 
-	{#if canPay && billing.available && hidratado}
-		{#if abierto}
+	{#if canPay && billing.available && hydrated}
+		{#if isOpen}
 			<form
 				method="POST"
-				action="?/tarjeta"
+				action="?/card"
 				class="border-border space-y-4 border-t pt-4"
 				use:enhance={async ({ cancel, formData }) => {
 					// El número no viaja: se borra del envío antes de nada.
-					for (const campo of ['cardNumber', 'cardExpiry', 'cardCvc', 'cardHolder']) {
-						formData.delete(campo);
+					for (const field of ['cardNumber', 'cardExpiry', 'cardCvc', 'cardHolder']) {
+						formData.delete(field);
 					}
 
-					const fallos = cardIsEmpty(card)
+					const failures = cardIsEmpty(card)
 						? { number: 'Escribe los datos de tu tarjeta.' }
 						: validateCard(card);
 
-					cardErrors = fallos;
+					cardErrors = failures;
 
-					if (Object.keys(fallos).length > 0) {
+					if (Object.keys(failures).length > 0) {
 						cancel();
 
 						return;
@@ -123,7 +133,7 @@
 						await update();
 						submitting = false;
 						card = { number: '', expiry: '', cvc: '', holder: '' };
-						abierto = false;
+						isOpen = false;
 					};
 				}}
 			>
@@ -137,7 +147,7 @@
 					<Button type="submit" disabled={submitting}>
 						{submitting ? 'Guardando…' : 'Guardar tarjeta'}
 					</Button>
-					<Button type="button" variant="ghost" onclick={() => (abierto = false)}>Cancelar</Button>
+					<Button type="button" variant="ghost" onclick={() => (isOpen = false)}>Cancelar</Button>
 				</div>
 
 				<p class="text-muted-foreground text-xs">
@@ -158,18 +168,18 @@
 				<Button
 					type="button"
 					variant={method.connected ? 'outline' : 'default'}
-					onclick={() => (abierto = true)}
+					onclick={() => (isOpen = true)}
 				>
 					{method.connected ? 'Cambiar tarjeta' : 'Guardar una tarjeta'}
 				</Button>
 
 				{#if method.connected}
-					<form id="quitar-tarjeta" method="POST" action="?/quitarTarjeta" use:enhance={alBorrar}>
+					<form id="quitar-tarjeta" method="POST" action="?/removeCard" use:enhance={onDelete}>
 						<Button
 							type="button"
 							variant="ghost"
 							onclick={() =>
-								borrado.ask('quitar-tarjeta', '¿Quitar la tarjeta?', {
+								deletion.ask('quitar-tarjeta', '¿Quitar la tarjeta?', {
 									description: 'Se quita la tarjeta guardada de la tienda.',
 									confirmLabel: 'Quitar',
 									pendingLabel: 'Quitando…'
@@ -187,11 +197,11 @@
 </section>
 
 <ConfirmDeleteDialog
-	bind:open={borrado.open}
-	title={borrado.target?.title ?? ''}
-	description={borrado.target?.description}
-	form={borrado.target?.formId ?? ''}
-	confirmLabel={borrado.target?.confirmLabel}
-	pendingLabel={borrado.target?.pendingLabel}
-	pending={borrado.pending}
+	bind:open={deletion.open}
+	title={deletion.target?.title ?? ''}
+	description={deletion.target?.description}
+	form={deletion.target?.formId ?? ''}
+	confirmLabel={deletion.target?.confirmLabel}
+	pendingLabel={deletion.target?.pendingLabel}
+	pending={deletion.pending}
 />

@@ -1,3 +1,6 @@
+// Tipos
+import type { ApiResult } from '$lib/server/api/client';
+import type { PublicContext } from '$lib/server/context';
 import type {
 	CatalogFacets,
 	Category,
@@ -7,16 +10,18 @@ import type {
 	ProductSort
 } from '$lib/domain/catalog';
 import type { Collection, HomeHighlight, StoreSettings } from '$lib/domain/settings';
-import type { ApiResult } from '$lib/server/api/client';
-import type { PublicContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
-import { DOMAIN_STATUSES } from '$lib/domain/domain';
-import { isProductSort } from '$lib/domain/catalog';
+// Servidor
 import { apiRequest } from '$lib/server/api/client';
 import { publicRequest, segment } from '$lib/server/api/request';
 import { templateSchema, themeSchema } from '$lib/server/api/statuses';
+
+// Dominio
+import { isProductSort } from '$lib/domain/catalog';
+import { DOMAIN_STATUSES } from '$lib/domain/domain';
 
 /**
  * Tienda pública (`/public/:storeSlug/*` de la API).
@@ -334,22 +339,22 @@ const MAX_PRICE = 100_000_000;
 
 /** Lee los filtros desde la URL: son la fuente de verdad, no el estado local. */
 export function parseFilters(url: URL): ProductFilters {
-	const sortParam = url.searchParams.get('orden');
-	const page = Math.floor(Number(url.searchParams.get('pagina') ?? '1'));
+	const sortParam = url.searchParams.get('sort');
+	const page = Math.floor(Number(url.searchParams.get('page') ?? '1'));
 	const min = Math.floor(Number(url.searchParams.get('min') ?? ''));
 	const max = Math.floor(Number(url.searchParams.get('max') ?? ''));
 
 	// Se recorta a los límites que valida la API: un enlace manipulado muestra
 	// un listado razonable en vez de un error.
 	return {
-		category: url.searchParams.get('categoria')?.slice(0, 80) || null,
-		// `?opcion=Color:Rojo`. Se descarta lo que no tenga esa forma: un enlace
+		category: url.searchParams.get('category')?.slice(0, 80) || null,
+		// `?option=Color:Rojo`. Se descarta lo que no tenga esa forma: un enlace
 		// manipulado muestra el listado completo en vez de un error.
 		options: url.searchParams
-			.getAll('opcion')
+			.getAll('option')
 			.slice(0, 20)
-			.map((entrada) => entrada.slice(0, 120))
-			.filter((entrada) => /^[^:]+:[^:]+$/.test(entrada)),
+			.map((entry) => entry.slice(0, 120))
+			.filter((entry) => /^[^:]+:[^:]+$/.test(entry)),
 		minPrice: Number.isFinite(min) && min > 0 ? Math.min(min, MAX_PRICE) : null,
 		maxPrice: Number.isFinite(max) && max > 0 ? Math.min(max, MAX_PRICE) : null,
 		sort: isProductSort(sortParam) ? sortParam : 'nuevo',
@@ -385,7 +390,7 @@ export function searchProducts(
 	const params = new URLSearchParams();
 
 	if (filters.category) params.set('category', filters.category);
-	for (const opcion of filters.options) params.append('options', opcion);
+	for (const option of filters.options) params.append('options', option);
 	if (filters.minPrice !== null) params.set('minPrice', String(filters.minPrice));
 	if (filters.maxPrice !== null) params.set('maxPrice', String(filters.maxPrice));
 	if (filters.q) params.set('q', filters.q);

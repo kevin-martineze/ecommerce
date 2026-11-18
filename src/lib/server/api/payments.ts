@@ -1,7 +1,10 @@
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { apiRequest } from '$lib/server/api/client';
 
 /**

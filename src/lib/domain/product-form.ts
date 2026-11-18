@@ -1,3 +1,4 @@
+// Tipos
 import type { ProductStatus } from '$lib/domain/catalog';
 
 /**

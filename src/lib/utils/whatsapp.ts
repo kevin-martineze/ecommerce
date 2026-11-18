@@ -1,5 +1,7 @@
+// Tipos
 import type { PublicOrderView } from '$lib/domain/orders';
 
+// Utilidades
 import { formatMoney } from '$lib/utils/money';
 
 /** Margen de seguridad: wa.me tolera más, pero los enlaces largos se rompen al compartirse. */

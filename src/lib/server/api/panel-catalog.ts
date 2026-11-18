@@ -1,9 +1,12 @@
-import type { Category, ProductStatus } from '$lib/domain/catalog';
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PanelContext } from '$lib/server/context';
+import type { Category, ProductStatus } from '$lib/domain/catalog';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { panelRequest, segment } from '$lib/server/api/request';
 import { productStatusSchema, toApiProductStatus } from '$lib/server/api/statuses';
 
@@ -158,7 +161,7 @@ const variantSchema = z
 		label: variant.label,
 		values: variant.values,
 		/** Los ids de sus valores, para casar la selección con la variante. */
-		value_ids: variant.values.map((valor) => valor.id)
+		value_ids: variant.values.map((attributeValue) => attributeValue.id)
 	}));
 
 const detailSchema = z

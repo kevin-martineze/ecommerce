@@ -1,6 +1,8 @@
+// Tipos
 import type { ApiResult, RequestOptions, ResponseSchema } from '$lib/server/api/client';
 import type { PanelContext, PublicContext } from '$lib/server/context';
 
+// Servidor
 import { apiRequest } from '$lib/server/api/client';
 
 type Options = Omit<RequestOptions, 'accessToken' | 'clientIp'>;

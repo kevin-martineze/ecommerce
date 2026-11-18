@@ -1,13 +1,16 @@
+// Tipos
+import type { ApiResult } from '$lib/server/api/client';
+import type { PanelContext } from '$lib/server/context';
 import type { Collection, HomeHighlight, StoreSettings } from '$lib/domain/settings';
 import type { StorefrontTemplate } from '$lib/domain/templates';
 import type { StoreTheme } from '$lib/domain/theme';
-import type { ApiResult } from '$lib/server/api/client';
-import type { PanelContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
-import { templateSchema, themeSchema } from '$lib/server/api/statuses';
+// Servidor
 import { panelRequest, segment } from '$lib/server/api/request';
+import { templateSchema, themeSchema } from '$lib/server/api/statuses';
 
 /** Contenido del panel: ajustes, bloques de portada y colecciones. */
 

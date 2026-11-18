@@ -1,28 +1,30 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
-import { esperaDesde } from '$lib/domain/support';
+// Dominio
+import { waitingSince } from '$lib/domain/support';
 
-const AHORA = new Date('2026-11-03T12:00:00.000Z');
+const NOW = new Date('2026-11-03T12:00:00.000Z');
 
-function hace(minutos: number): string {
-	return new Date(AHORA.getTime() - minutos * 60_000).toISOString();
+function ago(minutes: number): string {
+	return new Date(NOW.getTime() - minutes * 60_000).toISOString();
 }
 
 describe('esperaDesde', () => {
 	it('habla en minutos mientras no pasa la hora', () => {
-		expect(esperaDesde(hace(0), AHORA)).toBe('hace 0 min');
-		expect(esperaDesde(hace(45), AHORA)).toBe('hace 45 min');
+		expect(waitingSince(ago(0), NOW)).toBe('hace 0 min');
+		expect(waitingSince(ago(45), NOW)).toBe('hace 45 min');
 	});
 
 	it('pasa a horas y luego a días', () => {
-		expect(esperaDesde(hace(120), AHORA)).toBe('hace 2 h');
-		expect(esperaDesde(hace(60 * 23), AHORA)).toBe('hace 23 h');
-		expect(esperaDesde(hace(60 * 24), AHORA)).toBe('hace 1 día');
-		expect(esperaDesde(hace(60 * 24 * 3), AHORA)).toBe('hace 3 días');
+		expect(waitingSince(ago(120), NOW)).toBe('hace 2 h');
+		expect(waitingSince(ago(60 * 23), NOW)).toBe('hace 23 h');
+		expect(waitingSince(ago(60 * 24), NOW)).toBe('hace 1 día');
+		expect(waitingSince(ago(60 * 24 * 3), NOW)).toBe('hace 3 días');
 	});
 
 	it('una fecha futura no da una espera negativa', () => {
-		expect(esperaDesde(new Date(AHORA.getTime() + 5 * 60_000).toISOString(), AHORA)).toBe(
+		expect(waitingSince(new Date(NOW.getTime() + 5 * 60_000).toISOString(), NOW)).toBe(
 			'hace 0 min'
 		);
 	});

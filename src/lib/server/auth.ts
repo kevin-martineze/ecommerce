@@ -1,9 +1,12 @@
+// Tipos
 import type { RequestEvent } from '@sveltejs/kit';
 import type { ApiMe, ApiSessionStore } from '$lib/server/api/auth';
 import type { AdminSession } from '$lib/server/session-crypto';
 
+// Svelte
 import { error, redirect } from '@sveltejs/kit';
 
+// Servidor
 import { me, switchStore } from '$lib/server/api/auth';
 import { accountContext, clientAddress, storeSlugFor } from '$lib/server/context';
 import { clearSession, toAdminSession, writeSession } from '$lib/server/session';
@@ -69,17 +72,17 @@ export async function requireAdmin(event: GuardEvent): Promise<PanelAccess> {
 	}
 
 	if (!session.storeId) {
-		if (account.isPlatformAdmin) redirect(303, '/plataforma');
+		if (account.isPlatformAdmin) redirect(303, '/platform');
 
 		clearSession(event.cookies);
-		redirect(303, '/admin/login?error=sin-permiso');
+		redirect(303, '/admin/login?error=no-access');
 	}
 
 	const store = account.stores.find((candidate) => candidate.id === session.storeId);
 
 	if (!store) {
 		clearSession(event.cookies);
-		redirect(303, '/admin/login?error=sin-permiso');
+		redirect(303, '/admin/login?error=no-access');
 	}
 
 	return { account, store };

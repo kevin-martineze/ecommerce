@@ -1,19 +1,26 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-
+	// Tipos
 	import type { ProductOption } from '$lib/server/api/panel-catalog';
 
+	// Svelte
+	import { untrack } from 'svelte';
+
+	// Iconos
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
+	// App
 	import { enhance } from '$app/forms';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import ColorField from '$lib/components/molecules/ColorField.svelte';
-	import { RUBROS } from '$lib/domain/rubros';
+
+	// Dominio
+	import { INDUSTRIES } from '$lib/domain/industries';
 
 	/**
 	 * Los ejes por los que se divide un producto.
@@ -36,14 +43,14 @@
 
 	let { options, submitting = false }: Props = $props();
 
-	interface ValorEditable {
+	interface EditableValue {
 		value: string;
 		hex: string;
 	}
 
-	interface EjeEditable {
+	interface EditableAxis {
 		name: string;
-		values: ValorEditable[];
+		values: EditableValue[];
 	}
 
 	/**
@@ -53,40 +60,47 @@
 	 * responde, la página se recarga y el componente se monta de nuevo con los
 	 * ejes ya guardados. Sin él, lo tecleado se perdería en cada respuesta.
 	 */
-	let ejes = $state<EjeEditable[]>(
+	let axes = $state<EditableAxis[]>(
 		untrack(() =>
-			options.map((opcion) => ({
-				name: opcion.name,
-				values: opcion.values.map((valor) => ({ value: valor.value, hex: valor.hex ?? '' }))
+			options.map((option) => ({
+				name: option.name,
+				values: option.values.map((optionValue) => ({
+					value: optionValue.value,
+					hex: optionValue.hex ?? ''
+				}))
 			}))
 		)
 	);
 
-	const MAX_EJES = 3;
+	const MAX_AXES = 3;
 
 	/** Lo que viaja: sin valores vacíos y sin hex cuando no es un color. */
 	const payload = $derived(
 		JSON.stringify(
-			ejes
-				.filter((eje) => eje.name.trim().length > 0)
-				.map((eje) => ({
-					name: eje.name.trim(),
-					values: eje.values
-						.filter((valor) => valor.value.trim().length > 0)
-						.map((valor) => ({
-							value: valor.value.trim(),
-							...(valor.hex ? { hex: valor.hex } : {})
+			axes
+				.filter((axis) => axis.name.trim().length > 0)
+				.map((axis) => ({
+					name: axis.name.trim(),
+					values: axis.values
+						.filter((optionValue) => optionValue.value.trim().length > 0)
+						.map((optionValue) => ({
+							value: optionValue.value.trim(),
+							...(optionValue.hex ? { hex: optionValue.hex } : {})
 						}))
 				}))
-				.filter((eje) => eje.values.length > 0)
+				.filter((axis) => axis.values.length > 0)
 		)
 	);
 
 	/** Cuántas combinaciones saldrían. Sirve para avisar antes de crear ciento veinte. */
-	const combinaciones = $derived(
-		ejes.reduce(
-			(total, eje) =>
-				total * Math.max(1, eje.values.filter((valor) => valor.value.trim().length > 0).length),
+	const combinations = $derived(
+		axes.reduce(
+			(total, axis) =>
+				total *
+				Math.max(
+					1,
+					axis.values.filter((optionValue) => optionValue.value.trim().length > 0).length
+				),
 			1
 		)
 	);
@@ -97,36 +111,39 @@
 	 * Solo se ofrece cuando no hay ninguno: un atajo que pisara lo ya escrito
 	 * sería una trampa, no una ayuda.
 	 */
-	function usarRubro(id: string) {
-		const rubro = RUBROS.find((candidato) => candidato.id === id);
+	function applyIndustry(id: string) {
+		const industry = INDUSTRIES.find((candidate) => candidate.id === id);
 
-		if (!rubro) return;
+		if (!industry) return;
 
-		ejes = rubro.options.map((opcion) => ({
-			name: opcion.name,
-			values: opcion.values.map((valor) => ({ value: valor.value, hex: valor.hex ?? '' }))
+		axes = industry.options.map((option) => ({
+			name: option.name,
+			values: option.values.map((optionValue) => ({
+				value: optionValue.value,
+				hex: optionValue.hex ?? ''
+			}))
 		}));
 	}
 
-	function agregarEje() {
-		ejes = [...ejes, { name: '', values: [{ value: '', hex: '' }] }];
+	function addAxis() {
+		axes = [...axes, { name: '', values: [{ value: '', hex: '' }] }];
 	}
 
-	function quitarEje(indice: number) {
-		ejes = ejes.filter((_, actual) => actual !== indice);
+	function removeAxis(index: number) {
+		axes = axes.filter((_, actual) => actual !== index);
 	}
 
-	function agregarValor(indice: number) {
-		ejes = ejes.map((eje, actual) =>
-			actual === indice ? { ...eje, values: [...eje.values, { value: '', hex: '' }] } : eje
+	function addValue(index: number) {
+		axes = axes.map((axis, actual) =>
+			actual === index ? { ...axis, values: [...axis.values, { value: '', hex: '' }] } : axis
 		);
 	}
 
-	function quitarValor(indiceEje: number, indiceValor: number) {
-		ejes = ejes.map((eje, actual) =>
-			actual === indiceEje
-				? { ...eje, values: eje.values.filter((_, i) => i !== indiceValor) }
-				: eje
+	function removeValue(axisIndex: number, valueIndex: number) {
+		axes = axes.map((axis, actual) =>
+			actual === axisIndex
+				? { ...axis, values: axis.values.filter((_, i) => i !== valueIndex) }
+				: axis
 		);
 	}
 </script>
@@ -141,35 +158,35 @@
 	</Card.Header>
 
 	<Card.Content>
-		<form method="POST" action="?/ejes" class="space-y-6" use:enhance>
+		<form method="POST" action="?/axes" class="space-y-6" use:enhance>
 			<input type="hidden" name="options" value={payload} />
 
-			{#if ejes.length === 0}
+			{#if axes.length === 0}
 				<div class="space-y-2">
 					<p class="text-muted-foreground text-xs">¿Qué vendes? Te dejo los ejes típicos.</p>
 
 					<div class="flex flex-wrap gap-2">
-						{#each RUBROS as rubro (rubro.id)}
+						{#each INDUSTRIES as industry (industry.id)}
 							<Button
 								type="button"
 								variant="outline"
 								size="sm"
-								title={rubro.hint}
-								onclick={() => usarRubro(rubro.id)}
+								title={industry.hint}
+								onclick={() => applyIndustry(industry.id)}
 							>
-								{rubro.label}
+								{industry.label}
 							</Button>
 						{/each}
 					</div>
 				</div>
 			{/if}
 
-			{#each ejes as eje, indiceEje (indiceEje)}
+			{#each axes as axis, axisIndex (axisIndex)}
 				<div class="border-border space-y-3 rounded-lg border p-4">
 					<div class="flex items-end gap-3">
 						<div class="flex-1 space-y-1.5">
-							<Label class="text-xs" for="eje-{indiceEje}">Nombre del eje</Label>
-							<Input id="eje-{indiceEje}" bind:value={eje.name} placeholder="Variación" />
+							<Label class="text-xs" for="eje-{axisIndex}">Nombre del eje</Label>
+							<Input id="eje-{axisIndex}" bind:value={axis.name} placeholder="Variación" />
 						</div>
 
 						<Button
@@ -177,7 +194,7 @@
 							variant="ghost"
 							size="icon"
 							aria-label="Quitar este eje"
-							onclick={() => quitarEje(indiceEje)}
+							onclick={() => removeAxis(axisIndex)}
 						>
 							<Trash2 class="size-4" />
 						</Button>
@@ -186,15 +203,15 @@
 					<div class="space-y-2">
 						<p class="text-muted-foreground text-xs">Valores</p>
 
-						{#each eje.values as valor, indiceValor (indiceValor)}
+						{#each axis.values as optionValue, valueIndex (valueIndex)}
 							<div class="flex items-end gap-2">
-								<Input bind:value={valor.value} placeholder="M" class="flex-1" />
+								<Input bind:value={optionValue.value} placeholder="M" class="flex-1" />
 
 								<!-- El tono es opcional: solo tiene sentido en un eje de color, y
 								     la vitrina lo usa para pintar la muestra en la tarjeta. -->
 								<ColorField
-									id="eje-{indiceEje}-valor-{indiceValor}-hex"
-									bind:value={valor.hex}
+									id="eje-{axisIndex}-valor-{valueIndex}-hex"
+									bind:value={optionValue.hex}
 									optional
 								/>
 
@@ -203,19 +220,14 @@
 									variant="ghost"
 									size="icon"
 									aria-label="Quitar este valor"
-									onclick={() => quitarValor(indiceEje, indiceValor)}
+									onclick={() => removeValue(axisIndex, valueIndex)}
 								>
 									<Trash2 class="size-4" />
 								</Button>
 							</div>
 						{/each}
 
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onclick={() => agregarValor(indiceEje)}
-						>
+						<Button type="button" variant="outline" size="sm" onclick={() => addValue(axisIndex)}>
 							<Plus class="size-4" />
 							Añadir valor
 						</Button>
@@ -224,8 +236,8 @@
 			{/each}
 
 			<div class="flex flex-wrap items-center gap-3">
-				{#if ejes.length < MAX_EJES}
-					<Button type="button" variant="outline" onclick={agregarEje}>
+				{#if axes.length < MAX_AXES}
+					<Button type="button" variant="outline" onclick={addAxis}>
 						<Plus class="size-4" />
 						Añadir eje
 					</Button>
@@ -235,10 +247,10 @@
 					{submitting ? 'Guardando…' : 'Guardar ejes'}
 				</Button>
 
-				{#if ejes.length > 0}
+				{#if axes.length > 0}
 					<p class="text-muted-foreground text-xs">
-						{combinaciones}
-						{combinaciones === 1 ? 'combinación posible' : 'combinaciones posibles'}
+						{combinations}
+						{combinations === 1 ? 'combinación posible' : 'combinaciones posibles'}
 					</p>
 				{/if}
 			</div>

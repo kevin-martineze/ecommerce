@@ -1,33 +1,36 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { loginSchema } from '$lib/schemas/admin';
+// Servidor
 import { login, logout, me, switchStore } from '$lib/server/api/auth';
 import { clientAddress, displayStatus, storeSlugFor } from '$lib/server/context';
+import { parseForm } from '$lib/server/form';
 import { toAdminSession, writeSession } from '$lib/server/session';
+
+// Dominio
+import { loginSchema } from '$lib/schemas/admin';
+
+// Utilidades
 import { safeRedirectTarget } from '$lib/utils/redirect';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (locals.session) redirect(303, safeRedirectTarget(url.searchParams.get('redirectTo')));
 
-	return { notice: url.searchParams.get('aviso') ?? url.searchParams.get('error') };
+	return { notice: url.searchParams.get('notice') ?? url.searchParams.get('error') };
 };
 
 export const actions: Actions = {
 	default: async (event) => {
 		const { request, cookies, url } = event;
-		const formData = await request.formData();
-		const parsed = loginSchema.safeParse({
-			email: formData.get('email'),
-			password: formData.get('password')
-		});
+		const form = await parseForm({ request }, loginSchema);
 
-		if (!parsed.success) {
-			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa los datos.' });
-		}
+		if (!form.ok) return form.failure;
 
 		const ip = clientAddress(event);
-		const result = await login(parsed.data.email, parsed.data.password, ip);
+		const result = await login(form.data.email, form.data.password, ip);
 
 		if (!result.ok) {
 			// Los 4xx (credenciales, cuenta bloqueada, demasiados intentos) traen
@@ -58,7 +61,7 @@ export const actions: Actions = {
 
 			if (account.ok && account.data.isPlatformAdmin) {
 				writeSession(cookies, session);
-				redirect(303, '/plataforma');
+				redirect(303, '/platform');
 			}
 
 			await logout(session.refreshToken, ip);

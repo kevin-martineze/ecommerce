@@ -1,3 +1,4 @@
+// Tipos
 import type { DomainStatus } from '$lib/domain/domain';
 
 /** Cuenta, equipo, plan y plataforma. Los estados van en minúsculas, como el resto del dominio. */
@@ -148,7 +149,7 @@ function days(count: number): string {
 }
 
 /** Qué se le pide a la dueña para volver a estar al día, según haya pasarela o no. */
-function comoPagar(summary: SubscriptionSummary): string {
+function howToPay(summary: SubscriptionSummary): string {
 	return summary.self_service_billing
 		? 'Actívalo desde Tu plan y vuelves a editar al instante.'
 		: 'Escríbenos para registrar el pago.';
@@ -170,7 +171,7 @@ export function subscriptionNotice(summary: SubscriptionSummary): SubscriptionNo
 		return {
 			tone: 'warning',
 			// Vencida sigue vendiendo: lo que se pierde es poder editar.
-			text: `Tu plan venció: la tienda sigue vendiendo, pero el panel quedó en solo lectura. ${comoPagar(summary)}`
+			text: `Tu plan venció: la tienda sigue vendiendo, pero el panel quedó en solo lectura. ${howToPay(summary)}`
 		};
 	}
 
@@ -178,7 +179,7 @@ export function subscriptionNotice(summary: SubscriptionSummary): SubscriptionNo
 		if (summary.days_left < 0) {
 			return {
 				tone: 'warning',
-				text: `Tu prueba terminó. ${comoPagar(summary)}`
+				text: `Tu prueba terminó. ${howToPay(summary)}`
 			};
 		}
 
@@ -262,15 +263,15 @@ export const TRIAL_DAYS = 14;
 export function planFeatures(plan: Plan): string[] {
 	// Todas las líneas empiezan en mayúscula: puestas en lista, una que empieza
 	// en minúscula parece la continuación de la anterior.
-	const cantidad = (limite: number | null, singular: string, plural: string) =>
-		limite === null
+	const quantity = (quota: number | null, singular: string, plural: string) =>
+		quota === null
 			? `${plural.charAt(0).toUpperCase()}${plural.slice(1)} sin límite`
-			: `Hasta ${limite} ${limite === 1 ? singular : plural}`;
+			: `Hasta ${quota} ${quota === 1 ? singular : plural}`;
 
 	return [
-		cantidad(plan.max_products, 'producto', 'productos'),
-		`${cantidad(plan.max_orders_per_month, 'pedido', 'pedidos')} al mes`,
-		cantidad(plan.max_images_per_product, 'foto', 'fotos') + ' por producto',
+		quantity(plan.max_products, 'producto', 'productos'),
+		`${quantity(plan.max_orders_per_month, 'pedido', 'pedidos')} al mes`,
+		quantity(plan.max_images_per_product, 'foto', 'fotos') + ' por producto',
 		plan.custom_domain ? 'Tu propio dominio' : 'Dirección propia en globerce.store',
 		// El pago en línea no depende del plan —el Plan no tiene bandera para
 		// eso—, así que va en los tres. WhatsApp sigue existiendo como opción.

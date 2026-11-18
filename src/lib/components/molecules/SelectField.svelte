@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Componentes
 	import * as Select from '$lib/components/atoms/select';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	export interface SelectOption {

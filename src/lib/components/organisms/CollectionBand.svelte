@@ -1,8 +1,11 @@
 <script lang="ts">
+	// Tipos
 	import type { Collection } from '$lib/domain/settings';
 
+	// Iconos
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 
+	// Utilidades
 	import { parallax } from '$lib/actions/parallax';
 	import { reveal } from '$lib/actions/reveal';
 	import { cn } from '$lib/utils';
@@ -19,7 +22,7 @@
 </script>
 
 <a
-	href="/colecciones/{collection.slug}"
+	href="/collections/{collection.slug}"
 	class="group grid items-center gap-6 md:grid-cols-12 md:gap-12"
 	use:reveal
 >

@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Utilidades
 import {
 	hostServesStore,
 	parsePlatformHosts,
@@ -45,9 +47,9 @@ describe('resolveHost', () => {
 	});
 
 	it('los hosts de PUBLIC_PLATFORM_HOSTS son la plataforma', () => {
-		const plataforma = parsePlatformHosts('globerce.store, Otro.dev.');
+		const platform = parsePlatformHosts('globerce.store, Otro.dev.');
 
-		expect(resolveHost('otro.dev:443', 'globerce.com', plataforma)).toEqual({ kind: 'platform' });
+		expect(resolveHost('otro.dev:443', 'globerce.com', platform)).toEqual({ kind: 'platform' });
 	});
 
 	it('cualquier otro host es un dominio propio, normalizado', () => {

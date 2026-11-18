@@ -1,10 +1,14 @@
 <script lang="ts">
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
 	import * as Popover from '$lib/components/atoms/popover';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {
@@ -39,7 +43,7 @@
 	 * Neutros arriba porque son la base de casi cualquier producto, y debajo la
 	 * rejilla de color con cinco luminosidades por matiz.
 	 */
-	const NEUTROS = [
+	const NEUTRALS = [
 		'#FFFFFF',
 		'#F5F5F4',
 		'#E7E5E4',
@@ -52,7 +56,7 @@
 		'#000000'
 	];
 
-	const MATICES = [
+	const HUES = [
 		['#FEE2E2', '#FCA5A5', '#EF4444', '#B91C1C', '#7F1D1D'],
 		['#FFEDD5', '#FDBA74', '#F97316', '#C2410C', '#7C2D12'],
 		['#FEF3C7', '#FCD34D', '#F59E0B', '#B45309', '#78350F'],
@@ -67,10 +71,10 @@
 	];
 
 	const hex = $derived(value.toUpperCase());
-	const sinTono = $derived(optional && value === '');
+	const withoutTone = $derived(optional && value === '');
 
-	function elegir(tono: string) {
-		value = tono;
+	function choose(tone: string) {
+		value = tone;
 	}
 </script>
 
@@ -85,29 +89,29 @@
 	>
 		<span
 			class="border-border size-5 rounded-sm border"
-			class:bg-muted={sinTono}
-			style={sinTono ? undefined : `background-color: ${value}`}
+			class:bg-muted={withoutTone}
+			style={withoutTone ? undefined : `background-color: ${value}`}
 		></span>
-		<span class="text-muted-foreground font-mono text-xs">{sinTono ? 'sin tono' : hex}</span>
+		<span class="text-muted-foreground font-mono text-xs">{withoutTone ? 'sin tono' : hex}</span>
 	</Popover.Trigger>
 
 	<Popover.Content class="w-auto space-y-3">
 		<div class="space-y-1.5">
 			<p class="text-muted-foreground text-xs">Neutros</p>
 			<div class="flex gap-1">
-				{#each NEUTROS as tono (tono)}
+				{#each NEUTRALS as tone (tone)}
 					<button
 						type="button"
 						class={cn(
 							'border-border grid size-6 place-items-center rounded-sm border transition-transform hover:scale-110',
-							hex === tono && 'ring-ring ring-2 ring-offset-1'
+							hex === tone && 'ring-ring ring-2 ring-offset-1'
 						)}
-						style="background-color: {tono}"
-						onclick={() => elegir(tono)}
-						aria-label="Usar {tono}"
+						style="background-color: {tone}"
+						onclick={() => choose(tone)}
+						aria-label="Usar {tone}"
 					>
-						{#if hex === tono}
-							<Check class="size-3" style="color: {tono === '#FFFFFF' ? '#000' : '#fff'}" />
+						{#if hex === tone}
+							<Check class="size-3" style="color: {tone === '#FFFFFF' ? '#000' : '#fff'}" />
 						{/if}
 					</button>
 				{/each}
@@ -117,20 +121,20 @@
 		<div class="space-y-1.5">
 			<p class="text-muted-foreground text-xs">Color</p>
 			<div class="flex gap-1">
-				{#each MATICES as columna, indice (indice)}
+				{#each HUES as column, index (index)}
 					<div class="flex flex-col gap-1">
-						{#each columna as tono (tono)}
+						{#each column as tone (tone)}
 							<button
 								type="button"
 								class={cn(
 									'border-border grid size-6 place-items-center rounded-sm border transition-transform hover:scale-110',
-									hex === tono && 'ring-ring ring-2 ring-offset-1'
+									hex === tone && 'ring-ring ring-2 ring-offset-1'
 								)}
-								style="background-color: {tono}"
-								onclick={() => elegir(tono)}
-								aria-label="Usar {tono}"
+								style="background-color: {tone}"
+								onclick={() => choose(tone)}
+								aria-label="Usar {tone}"
 							>
-								{#if hex === tono}
+								{#if hex === tone}
 									<Check class="size-3 text-white mix-blend-difference" />
 								{/if}
 							</button>

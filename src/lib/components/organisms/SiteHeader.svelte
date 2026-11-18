@@ -1,22 +1,32 @@
 <script lang="ts">
+	// Tipos
 	import type { Category } from '$lib/domain/catalog';
 	import type { Collection, StoreSettings } from '$lib/domain/settings';
 
+	// Iconos
 	import Heart from '@lucide/svelte/icons/heart';
 	import Menu from '@lucide/svelte/icons/menu';
 	import Search from '@lucide/svelte/icons/search';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 
+	// App
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import * as Sheet from '$lib/components/atoms/sheet';
-	import { templateOf } from '$lib/domain/templates';
 	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
+
+	// Dominio
+	import { templateOf } from '$lib/domain/templates';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {
@@ -68,23 +78,14 @@
 		const term = query.trim();
 		searchOpen = false;
 
-		goto(term ? `/tienda?q=${encodeURIComponent(term)}` : '/tienda');
+		goto(term ? `/shop?q=${encodeURIComponent(term)}` : '/shop');
 	}
 </script>
 
-{#if settings.announcement}
-	<div
-		class="bg-primary text-primary-foreground px-4 py-2 text-center text-xs tracking-wide"
-		data-preview-zone={draftPreview ? 'announcement' : undefined}
-	>
-		{settings.announcement}
-	</div>
-{/if}
-
-<header
+<div
 	data-preview-zone={draftPreview ? 'store-header' : undefined}
 	class={cn(
-		'bg-background/95 border-border sticky top-0 z-40 border-b backdrop-blur transition-transform duration-500 ease-[var(--ease-editorial)]',
+		'bg-background/95 border-border border-b backdrop-blur transition-transform duration-500 ease-[var(--ease-editorial)]',
 		hidden && '-translate-y-full'
 	)}
 >
@@ -125,10 +126,10 @@
 			)}
 		>
 			<a
-				href="/tienda"
+				href="/shop"
 				class={cn(
 					'hover:text-foreground text-sm transition-colors',
-					currentPath === '/tienda' ? 'text-foreground' : 'text-muted-foreground'
+					currentPath === '/shop' ? 'text-foreground' : 'text-muted-foreground'
 				)}
 			>
 				Todo
@@ -136,7 +137,7 @@
 
 			{#each categories as category (category.id)}
 				<a
-					href="/tienda?categoria={category.slug}"
+					href="/shop?category={category.slug}"
 					class="text-muted-foreground hover:text-foreground text-sm transition-colors"
 				>
 					{category.name}
@@ -145,7 +146,7 @@
 
 			{#if collections.length > 0}
 				<a
-					href="/colecciones"
+					href="/collections"
 					class="text-muted-foreground hover:text-foreground text-sm transition-colors"
 				>
 					Colecciones
@@ -164,7 +165,7 @@
 				<Search class="size-5" />
 			</Button>
 
-			<Button href="/favoritos" variant="ghost" size="icon" aria-label="Favoritos" class="relative">
+			<Button href="/favorites" variant="ghost" size="icon" aria-label="Favoritos" class="relative">
 				<Heart class="size-5" />
 				{#if favorites.count > 0}
 					<span
@@ -208,7 +209,7 @@
 			</form>
 		</div>
 	{/if}
-</header>
+</div>
 
 <Sheet.Root bind:open={menuOpen}>
 	<Sheet.Content side="left" class="w-80">
@@ -219,17 +220,13 @@
 		</Sheet.Header>
 
 		<nav class="flex flex-col gap-1 px-4 pb-8">
-			<a
-				href="/tienda"
-				class="hover:bg-accent px-2 py-3 text-sm"
-				onclick={() => (menuOpen = false)}
-			>
+			<a href="/shop" class="hover:bg-accent px-2 py-3 text-sm" onclick={() => (menuOpen = false)}>
 				Todo
 			</a>
 
 			{#each categories as category (category.id)}
 				<a
-					href="/tienda?categoria={category.slug}"
+					href="/shop?category={category.slug}"
 					class="hover:bg-accent px-2 py-3 text-sm"
 					onclick={() => (menuOpen = false)}
 				>
@@ -239,7 +236,7 @@
 
 			{#each collections as collection (collection.id)}
 				<a
-					href="/colecciones/{collection.slug}"
+					href="/collections/{collection.slug}"
 					class="hover:bg-accent px-2 py-3 text-sm"
 					onclick={() => (menuOpen = false)}
 				>
@@ -248,7 +245,7 @@
 			{/each}
 
 			<a
-				href="/favoritos"
+				href="/favorites"
 				class="hover:bg-accent px-2 py-3 text-sm"
 				onclick={() => (menuOpen = false)}
 			>

@@ -1,7 +1,11 @@
 <script lang="ts">
+	// Tipos
 	import type { PublicProductImage as ProductImageType } from '$lib/domain/catalog';
 
+	// Componentes
 	import ProductImage from '$lib/components/molecules/ProductImage.svelte';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

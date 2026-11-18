@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { buildCategoryTree, type Category } from '$lib/domain/catalog';
 
 function category(id: string, parent: string | null, sortOrder: number, name = id): Category {

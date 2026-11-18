@@ -1,9 +1,17 @@
 <script lang="ts">
+	// Tipos
+	import type { StorefrontTemplate } from '$lib/domain/templates';
+
+	// Iconos
 	import Eye from '@lucide/svelte/icons/eye';
 
-	import type { StorefrontTemplate } from '$lib/domain/templates';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
+
+	// Dominio
 	import { templateOf } from '$lib/domain/templates';
+
+	// Utilidades
 	import { exitPreviewUrl } from '$lib/template-preview';
 
 	/**
@@ -41,9 +49,7 @@
 		</p>
 
 		<div class="ml-auto flex items-center gap-2">
-			<Button href="/admin/personalizar?seccion=estilo" size="sm" class="rounded-full px-4"
-				>Usarla</Button
-			>
+			<Button href="/admin/design?section=style" size="sm" class="rounded-full px-4">Usarla</Button>
 			<Button href={exitPreviewUrl()} variant="ghost" size="sm" class="rounded-full px-4">
 				Salir
 			</Button>

@@ -1,8 +1,11 @@
+// Librerías
 import { z } from 'zod';
 
+// App
 import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
 
+// Utilidades
 import { parsePlatformHosts } from '$lib/tenant';
 
 /**

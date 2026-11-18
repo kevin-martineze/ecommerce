@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import {
 	cardBrand,
 	cardIsEmpty,
@@ -15,7 +17,7 @@ import {
 const VISA = '4242424242424242';
 const AMEX = '378282246310005';
 
-const ahora = new Date('2026-09-23T00:00:00Z');
+const now = new Date('2026-09-23T00:00:00Z');
 
 describe('cardBrand', () => {
 	it('reconoce las marcas por su prefijo', () => {
@@ -76,37 +78,37 @@ describe('luhn', () => {
 describe('parseExpiry', () => {
 	it('vence al final de su mes, no al principio', () => {
 		// Estamos en septiembre de 2026: una tarjeta de 09/26 todavía sirve.
-		expect(parseExpiry('09/26', ahora)).toEqual({ month: 9, year: 26 });
-		expect(parseExpiry('08/26', ahora)).toBeNull();
+		expect(parseExpiry('09/26', now)).toEqual({ month: 9, year: 26 });
+		expect(parseExpiry('08/26', now)).toBeNull();
 	});
 
 	it('un mes que no existe no es una fecha', () => {
-		expect(parseExpiry('13/28', ahora)).toBeNull();
-		expect(parseExpiry('00/28', ahora)).toBeNull();
+		expect(parseExpiry('13/28', now)).toBeNull();
+		expect(parseExpiry('00/28', now)).toBeNull();
 	});
 
 	it('incompleta no es válida', () => {
-		expect(parseExpiry('9/28', ahora)).toBeNull();
-		expect(parseExpiry('', ahora)).toBeNull();
+		expect(parseExpiry('9/28', now)).toBeNull();
+		expect(parseExpiry('', now)).toBeNull();
 	});
 });
 
 describe('validateCard', () => {
-	const buena = { number: VISA, expiry: '09/29', cvc: '123', holder: 'Maria Restrepo' };
+	const good = { number: VISA, expiry: '09/29', cvc: '123', holder: 'Maria Restrepo' };
 
 	it('una tarjeta bien escrita no tiene nada que decir', () => {
-		expect(validateCard(buena, ahora)).toEqual({});
+		expect(validateCard(good, now)).toEqual({});
 	});
 
 	it('señala cada campo por separado', () => {
-		const errors = validateCard({ number: '4242', expiry: '01/20', cvc: '1', holder: 'M' }, ahora);
+		const errors = validateCard({ number: '4242', expiry: '01/20', cvc: '1', holder: 'M' }, now);
 
 		expect(Object.keys(errors).sort()).toEqual(['cvc', 'expiry', 'holder', 'number']);
 	});
 
 	it('el código de American Express son cuatro dígitos', () => {
-		expect(validateCard({ ...buena, number: AMEX, cvc: '123' }, ahora).cvc).toContain('4');
-		expect(validateCard({ ...buena, number: AMEX, cvc: '1234' }, ahora).cvc).toBeUndefined();
+		expect(validateCard({ ...good, number: AMEX, cvc: '123' }, now).cvc).toContain('4');
+		expect(validateCard({ ...good, number: AMEX, cvc: '1234' }, now).cvc).toBeUndefined();
 	});
 });
 
@@ -118,19 +120,19 @@ describe('cardIsEmpty', () => {
 });
 
 describe('tokenizeCard', () => {
-	const buena = { number: VISA, expiry: '09/29', cvc: '123', holder: 'Maria Restrepo' };
+	const good = { number: VISA, expiry: '09/29', cvc: '123', holder: 'Maria Restrepo' };
 
 	it('sin pasarela no llama a nadie y arma el token con los cuatro últimos', async () => {
 		// `api_url` vacío es la pasarela simulada. Si esto llamara a alguien, en
 		// desarrollo la petición se iría contra nuestro propio sitio.
-		await expect(tokenizeCard({ api_url: '', public_key: 'pub_simulado' }, buena)).resolves.toBe(
+		await expect(tokenizeCard({ api_url: '', public_key: 'pub_simulado' }, good)).resolves.toBe(
 			'sim_4242'
 		);
 	});
 
 	it('una fecha imposible ni se manda', async () => {
 		await expect(
-			tokenizeCard({ api_url: '', public_key: 'pub_simulado' }, { ...buena, expiry: '13/99' })
+			tokenizeCard({ api_url: '', public_key: 'pub_simulado' }, { ...good, expiry: '13/99' })
 		).rejects.toThrow('vencimiento');
 	});
 });

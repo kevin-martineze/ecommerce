@@ -79,7 +79,7 @@ esquema y los datos viven en la API.
   `tienda_session`. Toda carga del panel pasa por `requireAdmin`, que además
   verifica contra la API que la membresía siga viva. Una sesión sin tienda
   (`storeId: null`) solo la tiene quien administra la plataforma: entra a
-  `/plataforma` (`requirePlatformAdmin`), nunca al panel.
+  `/platform` (`requirePlatformAdmin`), nunca al panel.
 - **Los permisos los decide la API.** El panel oculta lo que el rol no puede
   hacer (`data.role`), pero la regla vive allá; un 403 llega con su mensaje.
 - **Todo `redirectTo` que llegue en la URL pasa por `safeRedirectTarget`.**
@@ -90,8 +90,24 @@ esquema y los datos viven en la API.
     `$lib/components/ui/*`.** Los átomos son el lugar de los overrides de marca.
     Si una primitiva no existe: `pnpm dlx shadcn-svelte@latest add <nombre>` y
     luego crea el átomo que la re-exporta.
-21. **Atomic design:** `atoms → molecules → organisms`. Un componente solo
-    importa de niveles inferiores.
+21. **Atomic design:** `atoms → molecules → organisms → templates → pages`. Un
+    componente solo importa de niveles inferiores. Los **layouts**
+    (`$lib/components/layouts/*`) son propios y deciden estructura, slots y
+    scroll: `AppShellLayout` (panel: barra lateral y solo `main` hace scroll),
+    `StackedLayout` (barra, contenido y pie con scroll de ventana; la barra es
+    `sticky`, `overlay` o `static`), `PageLayout` (encabezado, contenido y
+    columna lateral), `SplitLayout` (filtros, ficha o resumen), `AuthLayout`,
+    `CanvasLayout` (editor a pantalla completa) y `SettingsLayout`. La raíz
+    lleva `data-layout` y cada slot `data-slot` y `data-scroll`; lo pegado se
+    pone bajo la barra con `var(--layout-header-h)`.
+    Un **template** (`$lib/components/templates/*`) usa un layout, fija sus
+    slots (marca, navegación) y expone props para lo demás: `AdminTemplate`,
+    `PageTemplate`, `PreviewTemplate`, `EditorTemplate`, `StorefrontTemplate`,
+    `MarketingTemplate`, `LegalTemplate`, `PlatformTemplate`, `AuthTemplate`,
+    `ErrorTemplate`. El `<h1>` lo pone el template (`PageHeader`). Una
+    **página** solo pone el contenido que cambia: nunca alturas, `overflow`,
+    `sticky` ni `100vh`. Las cabeceras y pies (organismos) tampoco: su
+    posición y su landmark (`<header>`, `<footer>`) los pone el layout.
 22. **Solo tokens de Tailwind** (`bg-background`, `text-muted-foreground`,
     `text-sale`, `bg-whatsapp`…). Cero `bg-[#…]`, cero `text-[12px]`.
 23. **`cn()` para clases dinámicas.**
@@ -114,8 +130,30 @@ esquema y los datos viven en la API.
 ### Imports
 
 31. **Alias `$lib/`** para todo lo de `src/lib/`. Cero `../../`.
-32. **Orden:** tipos → `svelte`/`@sveltejs/*` → librerías externas → `$app/*` →
-    `$lib/*` → relativos. Línea en blanco entre grupos.
+32. **Secciones con encabezado, en este orden:** `// Tipos`, `// Svelte`,
+    `// Librerías`, `// Iconos`, `// App`, `// Servidor`, `// Componentes`,
+    `// Estado`, `// Dominio`, `// Utilidades`, `// Recursos`. Solo las que
+    tengan imports, con una línea en blanco entre ellas y ordenadas por ruta
+    dentro de cada una. La regla `local/import-sections`
+    (`eslint/import-sections.js`) decide la sección por la ruta y
+    `pnpm lint:fix` las escribe.
+
+### Nombres
+
+33. **Todo lo que es código va en inglés:** carpetas de rutas (y por lo tanto
+    las URLs), componentes, archivos, funciones, variables y nombres de form
+    actions (`?/create`, `?/delete`). Los comentarios y los textos de cara al
+    público van en español.
+34. **Una URL que cambia deja una redirección 308** en
+    `$lib/config/legacy-routes.ts`. Nunca se rompe un enlace publicado.
+
+### ViewModels
+
+35. **Una pantalla con más de ~5 `$state` o con un borrador que se
+    previsualiza tiene ViewModel:** una clase con runes en un `*.svelte.ts`
+    junto a su ruta (`design-editor.svelte.ts`), con su prueba. La vista solo
+    pinta y llama sus métodos. Un listado que carga en el servidor y muta por
+    form action no lo necesita.
 
 ---
 
@@ -141,8 +179,8 @@ arregla la causa: nunca `--no-verify`.
 
 Lee un archivo equivalente que ya exista y replica el patrón:
 
-- Página de listado con filtros → `src/routes/(shop)/tienda/+page.svelte`
-- Página con form action → `src/routes/(shop)/carrito/+page.server.ts`
-- Pantalla de administración → `src/routes/(admin)/admin/(panel)/cupones/`
+- Página de listado con filtros → `src/routes/(shop)/shop/+page.svelte`
+- Página con form action → `src/routes/(shop)/cart/+page.server.ts`
+- Pantalla de administración → `src/routes/(admin)/admin/(panel)/coupons/`
 - Llamada a la API (tienda pública) → `src/lib/server/api/storefront.ts`
 - Llamada a la API (panel) → `src/lib/server/api/panel-catalog.ts`

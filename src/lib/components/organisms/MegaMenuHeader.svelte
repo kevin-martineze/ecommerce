@@ -1,23 +1,33 @@
 <script lang="ts">
+	// Tipos
 	import type { Category, CategoryNode } from '$lib/domain/catalog';
 	import type { Collection, StoreSettings } from '$lib/domain/settings';
 
+	// Svelte
+	import { SvelteMap } from 'svelte/reactivity';
+
+	// Iconos
 	import Heart from '@lucide/svelte/icons/heart';
 	import Menu from '@lucide/svelte/icons/menu';
 	import Search from '@lucide/svelte/icons/search';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 
+	// App
 	import { goto } from '$app/navigation';
-	import { SvelteMap } from 'svelte/reactivity';
 
+	// Componentes
 	import * as Accordion from '$lib/components/atoms/accordion';
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import * as Sheet from '$lib/components/atoms/sheet';
-	import { buildCategoryTree } from '$lib/domain/catalog';
 	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
+
+	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
+
+	// Dominio
+	import { buildCategoryTree } from '$lib/domain/catalog';
 
 	interface Props {
 		settings: StoreSettings;
@@ -107,11 +117,11 @@
 		const term = query.trim();
 		searchOpen = false;
 
-		goto(term ? `/tienda?q=${encodeURIComponent(term)}` : '/tienda');
+		goto(term ? `/shop?q=${encodeURIComponent(term)}` : '/shop');
 	}
 
 	function categoryHref(category: Category): string {
-		return `/tienda?categoria=${encodeURIComponent(category.slug)}`;
+		return `/shop?category=${encodeURIComponent(category.slug)}`;
 	}
 
 	function panelId(node: CategoryNode): string {
@@ -119,18 +129,9 @@
 	}
 </script>
 
-{#if settings.announcement}
-	<div
-		class="bg-primary text-primary-foreground px-4 py-2 text-center text-xs tracking-wide"
-		data-preview-zone={draftPreview ? 'announcement' : undefined}
-	>
-		{settings.announcement}
-	</div>
-{/if}
-
-<header
+<div
 	data-preview-zone={draftPreview ? 'store-header' : undefined}
-	class="bg-background border-border sticky top-0 z-40 border-b"
+	class="bg-background border-border border-b"
 >
 	<div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
 		<Button
@@ -251,7 +252,7 @@
 								>
 									{#each collections as collection (collection.id)}
 										<a
-											href="/colecciones/{collection.slug}"
+											href="/collections/{collection.slug}"
 											class="hover:text-foreground text-sm font-semibold tracking-wide uppercase"
 										>
 											{collection.name}
@@ -259,7 +260,7 @@
 									{/each}
 
 									<a
-										href="/colecciones"
+										href="/collections"
 										class="text-muted-foreground hover:text-foreground col-span-full text-sm underline underline-offset-4"
 									>
 										Ver todas
@@ -283,7 +284,7 @@
 				<Search class="size-5" />
 			</Button>
 
-			<Button href="/favoritos" variant="ghost" size="icon" aria-label="Favoritos" class="relative">
+			<Button href="/favorites" variant="ghost" size="icon" aria-label="Favoritos" class="relative">
 				<Heart class="size-5" />
 				{#if favorites.count > 0}
 					<span
@@ -327,7 +328,7 @@
 			</form>
 		</div>
 	{/if}
-</header>
+</div>
 
 <Sheet.Root bind:open={menuOpen}>
 	<Sheet.Content side="left" class="w-80">
@@ -388,7 +389,7 @@
 								{#each collections as collection (collection.id)}
 									<li>
 										<a
-											href="/colecciones/{collection.slug}"
+											href="/collections/{collection.slug}"
 											class="hover:bg-accent block px-2 py-2 text-sm"
 											onclick={() => (menuOpen = false)}
 										>
@@ -398,7 +399,7 @@
 								{/each}
 								<li>
 									<a
-										href="/colecciones"
+										href="/collections"
 										class="hover:bg-accent text-muted-foreground block px-2 py-2 text-sm"
 										onclick={() => (menuOpen = false)}
 									>
@@ -412,7 +413,7 @@
 			</Accordion.Root>
 
 			<a
-				href="/favoritos"
+				href="/favorites"
 				class="hover:bg-accent mt-2 block px-2 py-3 text-sm"
 				onclick={() => (menuOpen = false)}
 			>

@@ -1,4 +1,7 @@
+// Tipos
 import type { RequestHandler } from './$types';
+
+// Servidor
 import { getStorefront } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
 
@@ -18,10 +21,10 @@ export const GET: RequestHandler = async (event) => {
 	const body = `User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /carrito
-Disallow: /pedido
-Disallow: /favoritos
-Disallow: /vista-previa
+Disallow: /cart
+Disallow: /order
+Disallow: /favorites
+Disallow: /preview
 
 Sitemap: ${site}/sitemap.xml
 `;

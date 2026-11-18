@@ -1,13 +1,18 @@
 <script lang="ts">
+	// Tipos
 	import type { CatalogFacets, ProductFilters } from '$lib/domain/catalog';
 
+	// App
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Checkbox } from '$lib/components/atoms/checkbox';
 	import { Label } from '$lib/components/atoms/label';
 	import { Separator } from '$lib/components/atoms/separator';
+
+	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {
@@ -25,7 +30,7 @@
 	function updateUrl(mutate: (params: URLSearchParams) => void) {
 		const url = new URL(page.url);
 		mutate(url.searchParams);
-		url.searchParams.delete('pagina');
+		url.searchParams.delete('page');
 
 		goto(url, { keepFocus: true, noScroll: true });
 		onapply?.();
@@ -43,8 +48,8 @@
 
 	function setCategory(slug: string | null) {
 		updateUrl((params) => {
-			if (slug) params.set('categoria', slug);
-			else params.delete('categoria');
+			if (slug) params.set('category', slug);
+			else params.delete('category');
 		});
 	}
 
@@ -56,7 +61,7 @@
 	}
 
 	function clearAll() {
-		goto('/tienda', { keepFocus: true, noScroll: true });
+		goto('/shop', { keepFocus: true, noScroll: true });
 		onapply?.();
 	}
 
@@ -77,7 +82,9 @@
 
 	/** Un eje se pinta como muestras si TODOS sus valores traen tono. */
 	function esColor(option: CatalogFacets['options'][number]): boolean {
-		return option.values.length > 0 && option.values.every((valor) => valor.hex !== null);
+		return (
+			option.values.length > 0 && option.values.every((optionValue) => optionValue.hex !== null)
+		);
 	}
 </script>
 
@@ -122,29 +129,29 @@
 
 			{#if esColor(option)}
 				<div class="space-y-2">
-					{#each option.values as valor (valor.value)}
-						{@const clave = `${option.name}:${valor.value}`}
+					{#each option.values as optionValue (optionValue.value)}
+						{@const clave = `${option.name}:${optionValue.value}`}
 						{@const selected = filters.options.includes(clave)}
 						<div class="flex items-center gap-2">
 							<Checkbox
 								id="opcion-{clave}"
 								checked={selected}
-								onCheckedChange={(checked) => toggleMulti('opcion', clave, checked === true)}
+								onCheckedChange={(checked) => toggleMulti('option', clave, checked === true)}
 							/>
 							<Label for="opcion-{clave}" class="flex cursor-pointer items-center gap-2 text-sm">
 								<span
 									class="border-border size-3.5 rounded-full border"
-									style="background-color: {valor.hex}"
+									style="background-color: {optionValue.hex}"
 								></span>
-								{valor.value}
+								{optionValue.value}
 							</Label>
 						</div>
 					{/each}
 				</div>
 			{:else}
 				<div class="flex flex-wrap gap-2">
-					{#each option.values as valor (valor.value)}
-						{@const clave = `${option.name}:${valor.value}`}
+					{#each option.values as optionValue (optionValue.value)}
+						{@const clave = `${option.name}:${optionValue.value}`}
 						{@const selected = filters.options.includes(clave)}
 						<button
 							type="button"
@@ -152,9 +159,9 @@
 								? 'bg-primary text-primary-foreground border-primary'
 								: 'hover:bg-accent'}"
 							aria-pressed={selected}
-							onclick={() => toggleMulti('opcion', clave, !selected)}
+							onclick={() => toggleMulti('option', clave, !selected)}
 						>
-							{valor.value}
+							{optionValue.value}
 						</button>
 					{/each}
 				</div>

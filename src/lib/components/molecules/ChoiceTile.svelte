@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
 
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**
@@ -31,7 +33,7 @@
 		class: className
 	}: Props = $props();
 
-	const elegida = $derived(group === value);
+	const selected = $derived(group === value);
 </script>
 
 <label class={cn('relative block h-full', className)}>
@@ -41,7 +43,7 @@
 		class={cn(
 			'border-border bg-background flex h-full cursor-pointer flex-col gap-2 rounded-lg border p-3 transition-colors',
 			'peer-focus-visible:ring-ring peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2',
-			elegida ? 'border-foreground bg-muted/40' : 'hover:border-foreground/40'
+			selected ? 'border-foreground bg-muted/40' : 'hover:border-foreground/40'
 		)}
 	>
 		{#if preview}

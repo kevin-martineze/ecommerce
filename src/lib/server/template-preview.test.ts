@@ -1,9 +1,16 @@
+// Tipos
 import type { StoreTheme } from '$lib/domain/theme';
 
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Servidor
 import { resolveTemplatePreview } from '$lib/server/template-preview';
+
+// Dominio
 import { EMPTY_THEME } from '$lib/domain/theme';
+
+// Utilidades
 import { exitPreviewUrl, previewUrl, themePreviewUrl } from '$lib/template-preview';
 
 /** Un frasco de cookies de mentira: lo justo que usa la vista previa. */
@@ -36,10 +43,10 @@ describe('resolveTemplatePreview', () => {
 		expect(cookies.jar.size).toBe(0);
 	});
 
-	it('?plantilla=boutique la viste, la guarda y la anuncia', () => {
+	it('?template=boutique la viste, la guarda y la anuncia', () => {
 		const cookies = cookieJar();
 
-		expect(resolveTemplatePreview(url('?plantilla=boutique'), cookies)).toEqual({
+		expect(resolveTemplatePreview(url('?template=boutique'), cookies)).toEqual({
 			template: 'boutique',
 			announce: true,
 			theme: null
@@ -57,10 +64,10 @@ describe('resolveTemplatePreview', () => {
 		});
 	});
 
-	it('?plantilla=salir la apaga y borra la cookie', () => {
+	it('?template=exit la apaga y borra la cookie', () => {
 		const cookies = cookieJar({ globerce_plantilla: 'boutique' });
 
-		expect(resolveTemplatePreview(url('?plantilla=salir'), cookies)).toEqual({
+		expect(resolveTemplatePreview(url('?template=exit'), cookies)).toEqual({
 			template: null,
 			announce: false,
 			theme: null
@@ -68,10 +75,10 @@ describe('resolveTemplatePreview', () => {
 		expect(cookies.jar.has('globerce_plantilla')).toBe(false);
 	});
 
-	it('con &solo=1 viste solo esta petición: ni cookie ni aviso', () => {
+	it('con &once=1 viste solo esta petición: ni cookie ni aviso', () => {
 		const cookies = cookieJar();
 
-		expect(resolveTemplatePreview(url('?plantilla=boutique&solo=1'), cookies)).toEqual({
+		expect(resolveTemplatePreview(url('?template=boutique&once=1'), cookies)).toEqual({
 			template: 'boutique',
 			announce: false,
 			theme: null
@@ -82,7 +89,7 @@ describe('resolveTemplatePreview', () => {
 	it('con solo=1 y ajustes=1 trae los ajustes del borrador, sin los que no reconoce', () => {
 		const cookies = cookieJar();
 		const preview = resolveTemplatePreview(
-			url('?plantilla=boutique&solo=1&ajustes=1&color=%231d4ed8&letras=comic&esquinas=round'),
+			url('?template=boutique&once=1&theme=1&color=%231d4ed8&fonts=comic&corners=round'),
 			cookies
 		);
 
@@ -97,13 +104,12 @@ describe('resolveTemplatePreview', () => {
 
 	it('los ajustes de la URL no valen fuera de la miniatura', () => {
 		expect(
-			resolveTemplatePreview(url('?plantilla=boutique&ajustes=1&color=%23000000'), cookieJar())
-				.theme
+			resolveTemplatePreview(url('?template=boutique&theme=1&color=%23000000'), cookieJar()).theme
 		).toBeNull();
 	});
 
 	it('un código que no existe, en la URL o en la cookie, se ignora', () => {
-		expect(resolveTemplatePreview(url('?plantilla=retirada'), cookieJar()).template).toBeNull();
+		expect(resolveTemplatePreview(url('?template=retirada'), cookieJar()).template).toBeNull();
 		expect(
 			resolveTemplatePreview(url(''), cookieJar({ globerce_plantilla: 'retirada' })).template
 		).toBeNull();
@@ -113,12 +119,12 @@ describe('resolveTemplatePreview', () => {
 describe('previewUrl', () => {
 	it('arma la dirección de la tienda con la plantilla, y con solo=1 si es miniatura', () => {
 		expect(previewUrl('https://casaoliva.globerce.store', 'boutique')).toBe(
-			'https://casaoliva.globerce.store/?plantilla=boutique'
+			'https://casaoliva.globerce.store/?template=boutique'
 		);
 		expect(previewUrl('https://casaoliva.globerce.store', 'editorial', true)).toBe(
-			'https://casaoliva.globerce.store/?plantilla=editorial&solo=1'
+			'https://casaoliva.globerce.store/?template=editorial&once=1'
 		);
-		expect(exitPreviewUrl()).toBe('/?plantilla=salir');
+		expect(exitPreviewUrl()).toBe('/?template=exit');
 	});
 });
 
@@ -127,9 +133,9 @@ describe('themePreviewUrl', () => {
 		const theme: StoreTheme = { ...EMPTY_THEME, accent: '#1D4ED8', hero: 'split' };
 		const built = new URL(themePreviewUrl('https://casaoliva.globerce.store', 'galeria', theme));
 
-		expect(built.searchParams.get('plantilla')).toBe('galeria');
-		expect(built.searchParams.get('solo')).toBe('1');
-		expect(built.searchParams.get('letras')).toBeNull();
+		expect(built.searchParams.get('template')).toBe('galeria');
+		expect(built.searchParams.get('once')).toBe('1');
+		expect(built.searchParams.get('fonts')).toBeNull();
 		expect(resolveTemplatePreview(built, cookieJar()).theme).toEqual(theme);
 	});
 });

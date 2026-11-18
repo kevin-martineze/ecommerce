@@ -1,11 +1,16 @@
 <script lang="ts">
+	// Tipos
 	import type { Category } from '$lib/domain/catalog';
 	import type { StoreSettings } from '$lib/domain/settings';
 
+	// Iconos
 	import Camera from '@lucide/svelte/icons/camera';
 	import MessageCircle from '@lucide/svelte/icons/message-circle';
 
+	// Componentes
 	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
+
+	// Utilidades
 	import { buildWhatsAppUrl } from '$lib/utils/whatsapp';
 
 	interface Props {
@@ -27,7 +32,7 @@
 	const year = new Date().getFullYear();
 </script>
 
-<footer
+<div
 	data-preview-zone={draftPreview ? 'store-footer' : undefined}
 	class="border-border mt-24 border-t"
 >
@@ -68,11 +73,11 @@
 		<div class="space-y-3">
 			<p class="eyebrow">Tienda</p>
 			<ul class="space-y-2 text-sm">
-				<li><a href="/tienda" class="text-muted-foreground hover:text-foreground">Todo</a></li>
+				<li><a href="/shop" class="text-muted-foreground hover:text-foreground">Todo</a></li>
 				{#each categories as category (category.id)}
 					<li>
 						<a
-							href="/tienda?categoria={category.slug}"
+							href="/shop?category={category.slug}"
 							class="text-muted-foreground hover:text-foreground"
 						>
 							{category.name}
@@ -89,7 +94,7 @@
 				{#if settings.free_shipping_threshold}
 					<li>Envío gratis desde ${settings.free_shipping_threshold.toLocaleString('es-CO')}.</li>
 				{/if}
-				<li><a href="/favoritos" class="hover:text-foreground">Mis favoritos</a></li>
+				<li><a href="/favorites" class="hover:text-foreground">Mis favoritos</a></li>
 			</ul>
 		</div>
 	</div>
@@ -98,4 +103,4 @@
 		© {year}
 		{settings.store_name}. Todos los derechos reservados.
 	</div>
-</footer>
+</div>

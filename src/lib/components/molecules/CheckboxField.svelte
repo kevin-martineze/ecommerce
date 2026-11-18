@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Componentes
 	import { Checkbox } from '$lib/components/atoms/checkbox';
 	import { Label } from '$lib/components/atoms/label';
 

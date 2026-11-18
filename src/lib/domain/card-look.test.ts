@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { cardLookOf } from '$lib/domain/card-look';
 import { templateOf } from '$lib/domain/templates';
 

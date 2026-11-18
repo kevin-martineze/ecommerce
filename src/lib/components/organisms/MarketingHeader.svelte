@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
 
@@ -15,7 +16,7 @@
 
 	let { signedIn }: Props = $props();
 
-	const secciones = [
+	const sections = [
 		{ href: '#como-funciona', label: 'Cómo funciona' },
 		{ href: '#que-vendes', label: 'Para quién es' },
 		{ href: '#precios', label: 'Precios' },
@@ -23,8 +24,8 @@
 	];
 </script>
 
-<header
-	class="marketing-dark border-border bg-background/80 text-foreground fixed inset-x-0 top-0 z-30 border-b backdrop-blur-md"
+<div
+	class="marketing-dark border-border bg-background/80 text-foreground border-b backdrop-blur-md"
 >
 	<div class="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3.5 sm:px-6">
 		<a href="/" class="flex items-center gap-2" aria-label="Globerce, inicio">
@@ -33,12 +34,12 @@
 		</a>
 
 		<nav class="text-muted-foreground mx-auto hidden items-center gap-1 text-sm md:flex">
-			{#each secciones as seccion (seccion.href)}
+			{#each sections as section (section.href)}
 				<a
-					href={seccion.href}
+					href={section.href}
 					class="hover:text-foreground rounded-full px-3 py-1.5 transition-colors"
 				>
-					{seccion.label}
+					{section.label}
 				</a>
 			{/each}
 		</nav>
@@ -50,8 +51,8 @@
 				<Button href="/admin/login" variant="ghost" class="hidden h-9 px-4 sm:inline-flex">
 					Entrar
 				</Button>
-				<Button href="/registro" class="h-9 px-4">Empieza gratis</Button>
+				<Button href="/signup" class="h-9 px-4">Empieza gratis</Button>
 			{/if}
 		</div>
 	</div>
-</header>
+</div>

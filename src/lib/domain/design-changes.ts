@@ -1,8 +1,10 @@
-import type { Seccion } from '$lib/domain/diseno';
+// Tipos
+import type { Section } from '$lib/domain/design';
 import type { StorefrontTemplate } from '$lib/domain/templates';
 
-import { CORNER_OPTIONS, FONT_OPTIONS, HERO_OPTIONS } from '$lib/domain/theme';
+// Dominio
 import { templateOf } from '$lib/domain/templates';
+import { CORNER_OPTIONS, FONT_OPTIONS, HERO_OPTIONS } from '$lib/domain/theme';
 
 /** Lo que el editor de Diseño guarda para una tienda: el estado escalar completo. */
 export interface DesignSnapshot {
@@ -25,31 +27,31 @@ export interface DesignCollection {
 
 /** Un cambio entre lo guardado y el borrador, en palabras de la dueña. */
 export interface DesignChange {
-	seccion: Seccion;
-	campo: string;
-	tipo: 'cambia' | 'agrega' | 'quita';
-	antes: string;
-	despues: string;
+	section: Section;
+	field: string;
+	kind: 'change' | 'add' | 'remove';
+	before: string;
+	after: string;
 	/** Frase extra, por ejemplo «Vuelve a lo que trae la plantilla». */
-	nota?: string;
+	note?: string;
 	/** Hex a mostrar como muestra de color. */
 	swatch?: string;
 	/** Cambios que se notan mucho en la tienda: la plantilla y la colección destacada. */
-	destacado: boolean;
+	featured: boolean;
 }
 
 /** Lo que se muestra de un texto largo: 60 caracteres y «…» si se corta. */
 const LARGO = 60;
 
-export function recortar(texto: string): string {
-	if (texto.length <= LARGO) return texto;
+export function truncate(text: string): string {
+	if (text.length <= LARGO) return text;
 
-	return `${texto.slice(0, LARGO - 1).trimEnd()}…`;
+	return `${text.slice(0, LARGO - 1).trimEnd()}…`;
 }
 
-const VOLVER = 'Vuelve a lo que trae la plantilla';
+const RETURN_TO = 'Vuelve a lo que trae la plantilla';
 
-function nombreDe(options: { code: string; name: string }[], code: string): string {
+function nameOf(options: { code: string; name: string }[], code: string): string {
 	return options.find((option) => option.code === code)?.name ?? code;
 }
 
@@ -62,149 +64,145 @@ function nombreDe(options: { code: string; name: string }[], code: string): stri
  * vuelven a «De la plantilla» llevan la nota de «Quitar mis ajustes».
  */
 export function describeDesignChanges(
-	guardado: DesignSnapshot,
-	borrador: DesignSnapshot,
-	colecciones: DesignCollection[]
+	saved: DesignSnapshot,
+	draft: DesignSnapshot,
+	collections: DesignCollection[]
 ): DesignChange[] {
-	const cambios: DesignChange[] = [];
+	const changes: DesignChange[] = [];
 
-	const nombreColeccion = (id: string) =>
-		id === '' ? 'Ninguna' : (colecciones.find((coleccion) => coleccion.id === id)?.name ?? id);
+	const collectionName = (id: string) =>
+		id === '' ? 'Ninguna' : (collections.find((collection) => collection.id === id)?.name ?? id);
 
 	/** Un campo de texto libre (nombre, anuncio, título, texto). */
-	function texto(seccion: Seccion, campo: string, antes: string, despues: string): void {
-		if (antes === despues) return;
+	function text(section: Section, field: string, before: string, after: string): void {
+		if (before === after) return;
 
-		const tipo = antes === '' ? 'agrega' : despues === '' ? 'quita' : 'cambia';
+		const kind = before === '' ? 'add' : after === '' ? 'remove' : 'change';
 
-		cambios.push({
-			seccion,
-			campo,
-			tipo,
-			antes: recortar(antes),
-			despues: recortar(despues),
-			destacado: false
+		changes.push({
+			section,
+			field,
+			kind,
+			before: truncate(before),
+			after: truncate(after),
+			featured: false
 		});
 	}
 
 	/** Un ajuste de estilo con opciones: '' es «De la plantilla». */
-	function estilo(
-		campo: string,
-		antes: string,
-		despues: string,
-		etiqueta: (code: string) => string
+	function style(
+		field: string,
+		before: string,
+		after: string,
+		tagLabel: (code: string) => string
 	): void {
-		if (antes === despues) return;
+		if (before === after) return;
 
-		if (despues === '') {
-			cambios.push({
-				seccion: 'estilo',
-				campo,
-				tipo: 'quita',
-				antes: etiqueta(antes),
-				despues: '',
-				nota: VOLVER,
-				destacado: false
+		if (after === '') {
+			changes.push({
+				section: 'style',
+				field,
+				kind: 'remove',
+				before: tagLabel(before),
+				after: '',
+				note: RETURN_TO,
+				featured: false
 			});
 			return;
 		}
 
-		cambios.push({
-			seccion: 'estilo',
-			campo,
-			tipo: antes === '' ? 'agrega' : 'cambia',
-			antes: antes === '' ? '' : etiqueta(antes),
-			despues: etiqueta(despues),
-			destacado: false
+		changes.push({
+			section: 'style',
+			field,
+			kind: before === '' ? 'add' : 'change',
+			before: before === '' ? '' : tagLabel(before),
+			after: tagLabel(after),
+			featured: false
 		});
 	}
 
 	// 1. Estilo: plantilla, color, letras, esquinas y el estilo de la imagen de arriba.
-	if (guardado.template !== borrador.template) {
-		cambios.push({
-			seccion: 'estilo',
-			campo: 'Plantilla',
-			tipo: 'cambia',
-			antes: templateOf(guardado.template).name,
-			despues: templateOf(borrador.template).name,
-			destacado: true
+	if (saved.template !== draft.template) {
+		changes.push({
+			section: 'style',
+			field: 'Plantilla',
+			kind: 'change',
+			before: templateOf(saved.template).name,
+			after: templateOf(draft.template).name,
+			featured: true
 		});
 	}
 
-	if (guardado.accent !== borrador.accent) {
-		const tipo = guardado.accent === '' ? 'agrega' : borrador.accent === '' ? 'quita' : 'cambia';
+	if (saved.accent !== draft.accent) {
+		const kind = saved.accent === '' ? 'add' : draft.accent === '' ? 'remove' : 'change';
 
-		cambios.push({
-			seccion: 'estilo',
-			campo: 'Color',
-			tipo,
-			antes: guardado.accent,
-			despues: borrador.accent,
-			...(borrador.accent === '' ? { nota: VOLVER } : {}),
-			swatch: borrador.accent || undefined,
-			destacado: false
+		changes.push({
+			section: 'style',
+			field: 'Color',
+			kind,
+			before: saved.accent,
+			after: draft.accent,
+			...(draft.accent === '' ? { note: RETURN_TO } : {}),
+			swatch: draft.accent || undefined,
+			featured: false
 		});
 	}
 
-	estilo('Letras', guardado.fonts, borrador.fonts, (code) => nombreDe(FONT_OPTIONS, code));
-	estilo('Esquinas', guardado.corners, borrador.corners, (code) => nombreDe(CORNER_OPTIONS, code));
-	estilo('Estilo de la imagen de arriba', guardado.hero, borrador.hero, (code) =>
-		nombreDe(HERO_OPTIONS, code)
+	style('Letras', saved.fonts, draft.fonts, (code) => nameOf(FONT_OPTIONS, code));
+	style('Esquinas', saved.corners, draft.corners, (code) => nameOf(CORNER_OPTIONS, code));
+	style('Estilo de la imagen de arriba', saved.hero, draft.hero, (code) =>
+		nameOf(HERO_OPTIONS, code)
 	);
 
 	// 2. Marca: nombre de la tienda y barra de anuncio.
-	texto('marca', 'Nombre de la tienda', guardado.storeName, borrador.storeName);
-	texto('marca', 'Barra de anuncio', guardado.announcement, borrador.announcement);
+	text('brand', 'Nombre de la tienda', saved.storeName, draft.storeName);
+	text('brand', 'Barra de anuncio', saved.announcement, draft.announcement);
 
 	// 3. Portada: colección destacada, título y texto de apoyo.
-	if (guardado.heroCollectionId !== borrador.heroCollectionId) {
-		const tipo =
-			guardado.heroCollectionId === ''
-				? 'agrega'
-				: borrador.heroCollectionId === ''
-					? 'quita'
-					: 'cambia';
+	if (saved.heroCollectionId !== draft.heroCollectionId) {
+		const kind =
+			saved.heroCollectionId === '' ? 'add' : draft.heroCollectionId === '' ? 'remove' : 'change';
 
-		cambios.push({
-			seccion: 'portada',
-			campo: 'Colección destacada',
-			tipo,
-			antes: nombreColeccion(guardado.heroCollectionId),
-			despues: nombreColeccion(borrador.heroCollectionId),
-			destacado: true
+		changes.push({
+			section: 'cover',
+			field: 'Colección destacada',
+			kind,
+			before: collectionName(saved.heroCollectionId),
+			after: collectionName(draft.heroCollectionId),
+			featured: true
 		});
 	}
 
-	texto('portada', 'Título de la portada', guardado.heroTitle, borrador.heroTitle);
-	texto('portada', 'Texto de la portada', guardado.heroSubtitle, borrador.heroSubtitle);
+	text('cover', 'Título de la portada', saved.heroTitle, draft.heroTitle);
+	text('cover', 'Texto de la portada', saved.heroSubtitle, draft.heroSubtitle);
 
-	return cambios;
+	return changes;
 }
 
-export type ModoCambios = 'guardar' | 'descartar';
+export type ChangesMode = 'save' | 'discard';
 
 /** Lo que se muestra de un valor; si está vacío, la nota o «vacío». */
-function valorDe(valor: string, nota?: string): string {
-	if (valor !== '') return valor;
+function displayValue(value: string, note?: string): string {
+	if (value !== '') return value;
 
-	return nota ?? 'vacío';
+	return note ?? 'vacío';
 }
 
 /**
  * La frase de un cambio. Al guardar: «Cambia», «Agrega» o «Quita». Al descartar,
  * lo que se pierde: «Se pierde: Color #111111 → #6D28D9».
  */
-export function textoDelCambio(cambio: DesignChange, modo: ModoCambios): string {
-	if (modo === 'descartar') {
-		return `Se pierde: ${cambio.campo} ${valorDe(cambio.antes)} → ${valorDe(cambio.despues, cambio.nota)}`;
+export function changeText(change: DesignChange, mode: ChangesMode): string {
+	if (mode === 'discard') {
+		return `Se pierde: ${change.field} ${displayValue(change.before)} → ${displayValue(change.after, change.note)}`;
 	}
 
-	switch (cambio.tipo) {
-		case 'cambia':
-			return `Cambia ${cambio.campo}: «${cambio.antes}» → «${cambio.despues}»`;
-		case 'agrega':
-			return `Agrega ${cambio.campo}: «${cambio.despues}»`;
-		case 'quita':
-			return cambio.nota ? `Quita ${cambio.campo} · ${cambio.nota}` : `Quita ${cambio.campo}`;
+	switch (change.kind) {
+		case 'change':
+			return `Cambia ${change.field}: «${change.before}» → «${change.after}»`;
+		case 'add':
+			return `Agrega ${change.field}: «${change.after}»`;
+		case 'remove':
+			return change.note ? `Quita ${change.field} · ${change.note}` : `Quita ${change.field}`;
 	}
 }

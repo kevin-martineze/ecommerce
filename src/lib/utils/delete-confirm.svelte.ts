@@ -1,3 +1,4 @@
+// Tipos
 import type { SubmitFunction } from '@sveltejs/kit';
 
 /** Lo que el diálogo de confirmación muestra y el form que va a enviar. */
@@ -46,9 +47,9 @@ export class DeleteConfirm {
 	 * espera la respuesta, cierra el diálogo y, si salió bien, avisa con el
 	 * objetivo que se confirmó.
 	 */
-	enhance(alBorrar?: (target: DeleteTarget) => void): SubmitFunction {
+	enhance(onDelete?: (target: DeleteTarget) => void): SubmitFunction {
 		return () => {
-			const objetivo = this.target;
+			const goal = this.target;
 
 			this.pending = true;
 
@@ -57,7 +58,7 @@ export class DeleteConfirm {
 				this.pending = false;
 				this.open = false;
 
-				if (result.type === 'success' && objetivo) alBorrar?.(objetivo);
+				if (result.type === 'success' && goal) onDelete?.(goal);
 			};
 		};
 	}

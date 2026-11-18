@@ -1,11 +1,13 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
-import { customDomainRedirect, esVistaPrevia, redirectToCustomDomain } from '$lib/custom-domain';
+// Utilidades
+import { customDomainRedirect, isPreview, redirectToCustomDomain } from '$lib/custom-domain';
 
 const base = {
 	slug: 'boutique',
-	pathname: '/tienda/vestidos',
-	search: '?orden=precio',
+	pathname: '/shop/vestidos',
+	search: '?sort=precio',
 	isSharedPath: false,
 	rootDomain: 'globerce.store',
 	siteUrl: 'https://globerce.store'
@@ -20,17 +22,17 @@ describe('customDomainRedirect', () => {
 		for (const domainStatus of ['pending', 'failed', 'disabled'] as const) {
 			expect(customDomainRedirect({ ...base, domainStatus })).toEqual({
 				status: 302,
-				location: 'https://boutique.globerce.store/tienda/vestidos?orden=precio'
+				location: 'https://boutique.globerce.store/shop/vestidos?sort=precio'
 			});
 		}
 	});
 
 	it('el panel, el login y el registro van al subdominio con 308, sea cual sea el estado', () => {
-		const panel = { ...base, pathname: '/admin/pedidos', search: '', isSharedPath: true };
+		const panel = { ...base, pathname: '/admin/orders', search: '', isSharedPath: true };
 
 		expect(customDomainRedirect({ ...panel, domainStatus: 'active' })).toEqual({
 			status: 308,
-			location: 'https://boutique.globerce.store/admin/pedidos'
+			location: 'https://boutique.globerce.store/admin/orders'
 		});
 		expect(customDomainRedirect({ ...panel, domainStatus: 'pending' })?.status).toBe(308);
 	});
@@ -45,7 +47,7 @@ describe('customDomainRedirect', () => {
 			})
 		).toEqual({
 			status: 302,
-			location: 'http://localhost:5173/tienda/vestidos?orden=precio'
+			location: 'http://localhost:5173/shop/vestidos?sort=precio'
 		});
 	});
 });
@@ -53,7 +55,7 @@ describe('customDomainRedirect', () => {
 describe('redirectToCustomDomain', () => {
 	const args = {
 		currentHost: 'boutique.globerce.store',
-		pathname: '/tienda',
+		pathname: '/shop',
 		search: '?q=1',
 		rootDomain: 'globerce.store',
 		platformHosts: []
@@ -61,7 +63,7 @@ describe('redirectToCustomDomain', () => {
 
 	it('un subdominio con dominio propio activo va al dominio propio, con 302', () => {
 		expect(redirectToCustomDomain({ ...args, publicUrl: 'https://www.sutienda.com' })).toBe(
-			'https://www.sutienda.com/tienda?q=1'
+			'https://www.sutienda.com/shop?q=1'
 		);
 	});
 
@@ -83,25 +85,25 @@ describe('redirectToCustomDomain', () => {
 });
 
 describe('esVistaPrevia', () => {
-	const sinPreview = { secFetchDest: null, pathname: '/tienda', preview: false };
+	const withoutPreview = { secFetchDest: null, pathname: '/shop', preview: false };
 
 	it('una visita normal no es vista previa', () => {
-		expect(esVistaPrevia(sinPreview)).toBe(false);
+		expect(isPreview(withoutPreview)).toBe(false);
 	});
 
 	it('un iframe es vista previa, aunque la ruta sea de la tienda', () => {
-		expect(esVistaPrevia({ ...sinPreview, secFetchDest: 'iframe' })).toBe(true);
-		expect(esVistaPrevia({ ...sinPreview, secFetchDest: 'document' })).toBe(false);
+		expect(isPreview({ ...withoutPreview, secFetchDest: 'iframe' })).toBe(true);
+		expect(isPreview({ ...withoutPreview, secFetchDest: 'document' })).toBe(false);
 	});
 
-	it('las rutas /vista-previa son vista previa', () => {
-		expect(esVistaPrevia({ ...sinPreview, pathname: '/vista-previa' })).toBe(true);
-		expect(esVistaPrevia({ ...sinPreview, pathname: '/vista-previa/carrito' })).toBe(true);
-		expect(esVistaPrevia({ ...sinPreview, pathname: '/vista-previas' })).toBe(false);
+	it('las rutas /preview son vista previa', () => {
+		expect(isPreview({ ...withoutPreview, pathname: '/preview' })).toBe(true);
+		expect(isPreview({ ...withoutPreview, pathname: '/preview/cart' })).toBe(true);
+		expect(isPreview({ ...withoutPreview, pathname: '/vista-previas' })).toBe(false);
 	});
 
 	it('una plantilla o tema en prueba es vista previa', () => {
-		expect(esVistaPrevia({ ...sinPreview, preview: true })).toBe(true);
+		expect(isPreview({ ...withoutPreview, preview: true })).toBe(true);
 	});
 });
 
@@ -109,7 +111,7 @@ describe('redirectToCustomDomain con skip', () => {
 	const args = {
 		currentHost: 'boutique.globerce.store',
 		publicUrl: 'https://www.sutienda.com',
-		pathname: '/tienda',
+		pathname: '/shop',
 		search: '',
 		rootDomain: 'globerce.store',
 		platformHosts: []
@@ -120,8 +122,6 @@ describe('redirectToCustomDomain con skip', () => {
 	});
 
 	it('sin skip redirige', () => {
-		expect(redirectToCustomDomain({ ...args, skip: false })).toBe(
-			'https://www.sutienda.com/tienda'
-		);
+		expect(redirectToCustomDomain({ ...args, skip: false })).toBe('https://www.sutienda.com/shop');
 	});
 });

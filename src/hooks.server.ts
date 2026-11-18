@@ -1,15 +1,23 @@
+// Tipos
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import type { StoreByDomain } from '$lib/server/domain-cache';
 
+// Svelte
 import { redirect } from '@sveltejs/kit';
 
-import { customDomainRedirect } from '$lib/custom-domain';
-import { isSharedPath } from '$lib/marketing-host';
+// Servidor
 import { findStoreByDomain } from '$lib/server/api/storefront';
 import { clientAddress } from '$lib/server/context';
-import { serverEnv } from '$lib/server/env';
 import { getCachedDomain, setCachedDomain } from '$lib/server/domain-cache';
+import { serverEnv } from '$lib/server/env';
 import { resolveSession } from '$lib/server/session';
+
+// Dominio
+import { legacyRedirect } from '$lib/config/legacy-routes';
+
+// Utilidades
+import { customDomainRedirect } from '$lib/custom-domain';
+import { isSharedPath } from '$lib/marketing-host';
 import { parsePlatformHosts, resolveHost } from '$lib/tenant';
 
 type DomainLookup = { ok: true; store: StoreByDomain | null } | { ok: false; message: string };
@@ -40,6 +48,12 @@ async function lookupCustomDomain(event: RequestEvent, host: string): Promise<Do
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
+	// Las URLs en español de antes del refactor: 308 para que el método y el
+	// cuerpo de un POST viejo lleguen igual a la ruta nueva.
+	const legacy = legacyRedirect(event.url);
+
+	if (legacy) redirect(308, legacy);
+
 	// Valida la configuración en cada petición: si falta una variable, el error
 	// dice cuál, en vez de aparecer más tarde como un fallo de la API.
 	const env = serverEnv();

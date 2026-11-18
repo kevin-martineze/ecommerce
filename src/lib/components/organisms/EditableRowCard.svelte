@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
 
 	/**
@@ -10,16 +11,16 @@
 	 */
 	interface Props {
 		children: Snippet;
-		acciones: Snippet;
+		actionList: Snippet;
 	}
 
-	let { children, acciones }: Props = $props();
+	let { children, actionList }: Props = $props();
 </script>
 
 <div class="border-border space-y-4 rounded-lg border p-4">
 	{@render children()}
 
 	<div class="border-border flex flex-wrap items-center justify-end gap-2 border-t pt-4">
-		{@render acciones()}
+		{@render actionList()}
 	</div>
 </div>

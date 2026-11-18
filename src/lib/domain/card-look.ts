@@ -1,3 +1,4 @@
+// Tipos
 import type { TemplateInfo } from '$lib/domain/templates';
 
 /**

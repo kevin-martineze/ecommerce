@@ -1,3 +1,4 @@
+// Tipos
 import type { StorefrontTemplate } from '$lib/domain/templates';
 import type { StoreTheme } from '$lib/domain/theme';
 

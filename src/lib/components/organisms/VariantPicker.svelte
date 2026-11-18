@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { ProductOption, VariantOption } from '$lib/domain/catalog';
 
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**
@@ -32,80 +34,82 @@
 	 * variación que ya se descartó. Mirar todo lo elegido, incluido este eje, diría
 	 * que nada está disponible en cuanto se elige algo agotado.
 	 */
-	function disponible(optionId: string, valueId: string): boolean {
-		const otros = Object.entries(selected).filter(([eje]) => eje !== optionId);
+	function available(optionId: string, valueId: string): boolean {
+		const others = Object.entries(selected).filter(([axis]) => axis !== optionId);
 
 		return variants.some(
-			(variante) =>
-				variante.stock > 0 &&
-				variante.valueIds.includes(valueId) &&
-				otros.every(([, elegido]) => variante.valueIds.includes(elegido))
+			(variant) =>
+				variant.stock > 0 &&
+				variant.valueIds.includes(valueId) &&
+				others.every(([, chosen]) => variant.valueIds.includes(chosen))
 		);
 	}
 
 	/** Un eje se pinta como muestras si TODOS sus valores traen tono. */
 	function esColor(option: ProductOption): boolean {
-		return option.values.length > 0 && option.values.every((valor) => valor.hex !== null);
+		return (
+			option.values.length > 0 && option.values.every((optionValue) => optionValue.hex !== null)
+		);
 	}
 
-	function elegir(optionId: string, valueId: string) {
+	function choose(optionId: string, valueId: string) {
 		onselect({ ...selected, [optionId]: valueId });
 	}
 </script>
 
 <div class="space-y-6">
 	{#each options as option (option.id)}
-		{@const elegido = selected[option.id]}
+		{@const chosen = selected[option.id]}
 
 		<section class="space-y-3">
 			<div class="flex items-baseline justify-between">
 				<p class="eyebrow">{option.name}</p>
 				<p class="text-muted-foreground text-xs">
-					{option.values.find((valor) => valor.id === elegido)?.value ??
+					{option.values.find((optionValue) => optionValue.id === chosen)?.value ??
 						`Elige ${option.name.toLowerCase()}`}
 				</p>
 			</div>
 
 			{#if esColor(option)}
 				<div class="flex flex-wrap gap-3">
-					{#each option.values as valor (valor.id)}
-						{@const hay = disponible(option.id, valor.id)}
+					{#each option.values as optionValue (optionValue.id)}
+						{@const hay = available(option.id, optionValue.id)}
 						<button
 							type="button"
-							onclick={() => elegir(option.id, valor.id)}
-							aria-label={valor.value}
-							aria-pressed={elegido === valor.id}
-							title={hay ? valor.value : `${valor.value} — agotado`}
+							onclick={() => choose(option.id, optionValue.id)}
+							aria-label={optionValue.value}
+							aria-pressed={chosen === optionValue.id}
+							title={hay ? optionValue.value : `${optionValue.value} — agotado`}
 							class={cn(
 								'relative size-8 rounded-full border transition-all',
-								elegido === valor.id
+								chosen === optionValue.id
 									? 'ring-foreground ring-1 ring-offset-2'
 									: 'border-border hover:ring-border hover:ring-1 hover:ring-offset-2',
 								!hay && 'opacity-40'
 							)}
-							style="background-color: {valor.hex}"
+							style="background-color: {optionValue.hex}"
 						></button>
 					{/each}
 				</div>
 			{:else}
 				<div class="flex flex-wrap gap-2">
-					{#each option.values as valor (valor.id)}
-						{@const hay = disponible(option.id, valor.id)}
+					{#each option.values as optionValue (optionValue.id)}
+						{@const hay = available(option.id, optionValue.id)}
 						<button
 							type="button"
-							onclick={() => elegir(option.id, valor.id)}
+							onclick={() => choose(option.id, optionValue.id)}
 							disabled={!hay}
-							aria-pressed={elegido === valor.id}
-							title={hay ? valor.value : `${valor.value} — agotado`}
+							aria-pressed={chosen === optionValue.id}
+							title={hay ? optionValue.value : `${optionValue.value} — agotado`}
 							class={cn(
 								'min-w-12 rounded-md border px-3 py-2 text-sm transition-colors',
-								elegido === valor.id
+								chosen === optionValue.id
 									? 'border-foreground bg-foreground text-background'
 									: 'border-border hover:border-foreground/40',
 								!hay && 'text-muted-foreground line-through opacity-50'
 							)}
 						>
-							{valor.value}
+							{optionValue.value}
 						</button>
 					{/each}
 				</div>

@@ -1,8 +1,11 @@
 <script lang="ts">
+	// Librerías
 	import { toast } from 'svelte-sonner';
 
+	// App
 	import { page } from '$app/state';
 
+	// Dominio
 	import { actionFeedback } from '$lib/domain/action-feedback';
 
 	/**

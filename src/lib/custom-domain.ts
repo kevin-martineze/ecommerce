@@ -1,5 +1,7 @@
+// Tipos
 import type { DomainStatus } from '$lib/domain/domain';
 
+// Utilidades
 import { resolveHost, storefrontUrl } from '$lib/tenant';
 
 /**
@@ -89,7 +91,7 @@ export function redirectToCustomDomain({
  * moviera, el borrador se mandaría a un origen que el panel no espera y el
  * navegador lo descartaría en silencio.
  */
-export function esVistaPrevia({
+export function isPreview({
 	secFetchDest,
 	pathname,
 	preview
@@ -100,8 +102,8 @@ export function esVistaPrevia({
 }): boolean {
 	return (
 		secFetchDest === 'iframe' ||
-		pathname === '/vista-previa' ||
-		pathname.startsWith('/vista-previa/') ||
+		pathname === '/preview' ||
+		pathname.startsWith('/preview/') ||
 		preview
 	);
 }

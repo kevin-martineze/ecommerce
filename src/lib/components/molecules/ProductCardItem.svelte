@@ -1,14 +1,24 @@
 <script lang="ts">
+	// Tipos
 	import type { ProductCard } from '$lib/domain/catalog';
 
+	// Svelte
 	import { getContext } from 'svelte';
 
+	// Iconos
 	import Heart from '@lucide/svelte/icons/heart';
 
-	import ProductImage from '$lib/components/molecules/ProductImage.svelte';
+	// Componentes
 	import PriceTag from '$lib/components/molecules/PriceTag.svelte';
-	import { CARD_LOOK, type CardLook } from '$lib/domain/card-look';
+	import ProductImage from '$lib/components/molecules/ProductImage.svelte';
+
+	// Estado
 	import { favorites } from '$lib/stores/favorites.svelte';
+
+	// Dominio
+	import { CARD_LOOK, type CardLook } from '$lib/domain/card-look';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 	import { discountPercent } from '$lib/utils/money';
 
@@ -36,7 +46,7 @@
      `app.css` (marco, sticker de precio): la tarjeta no sabe en qué plantilla
      está y no tiene por qué saberlo. -->
 <article class="product-card group relative">
-	<a href="/tienda/{product.slug}" class="block focus-visible:outline-none">
+	<a href="/shop/{product.slug}" class="block focus-visible:outline-none">
 		<div
 			class="relative overflow-hidden"
 			style="view-transition-name: producto-{product.slug.replace(/[^a-z0-9]/g, '-')}"

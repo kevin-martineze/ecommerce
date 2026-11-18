@@ -36,3 +36,19 @@ export function actionFeedback(form: unknown): ActionFeedback | null {
 
 	return null;
 }
+
+/**
+ * El error de un campo que devolvió la última action (`fields` de
+ * `parseForm`), o null si el campo está bien o la action no validó campos.
+ */
+export function actionFieldError(form: unknown, name: string): string | null {
+	if (typeof form !== 'object' || form === null || !('fields' in form)) return null;
+
+	const fields = form.fields;
+
+	if (typeof fields !== 'object' || fields === null || !(name in fields)) return null;
+
+	const entry = Object.entries(fields).find(([key]) => key === name);
+
+	return entry ? readText(entry[1]) : null;
+}

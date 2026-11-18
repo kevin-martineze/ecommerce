@@ -1,0 +1,64 @@
+<script lang="ts">
+	// Tipos
+	import type { ActionData } from './$types';
+
+	// App
+	import { enhance } from '$app/forms';
+
+	// Componentes
+	import { Button } from '$lib/components/atoms/button';
+	import { Input } from '$lib/components/atoms/input';
+	import { Label } from '$lib/components/atoms/label';
+	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
+
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
+	interface Props {
+		form: ActionData;
+	}
+
+	let { form }: Props = $props();
+
+	const submission = new FormState();
+</script>
+
+<svelte:head>
+	<title>Recuperar contraseña — Globerce</title>
+	<meta name="robots" content="noindex" />
+</svelte:head>
+
+<AuthTemplate title="Recuperar contraseña">
+	{#if form?.sent}
+		<div class="space-y-4 text-center">
+			<p class="text-sm">
+				Si <strong>{form.email}</strong> tiene cuenta, te llegará un correo con un enlace para elegir
+				una contraseña nueva. Sirve una sola vez, durante una hora.
+			</p>
+			<p class="text-muted-foreground text-xs">¿No llega? Revisa el correo no deseado.</p>
+		</div>
+	{:else}
+		<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
+			<p class="text-muted-foreground text-sm">
+				Escribe el correo con el que entras al panel y te enviaremos un enlace.
+			</p>
+
+			<div class="space-y-2">
+				<Label for="email">Correo</Label>
+				<Input id="email" name="email" type="email" required autocomplete="username" />
+			</div>
+
+			{#if form?.error}
+				<p class="text-destructive text-sm">{form.error}</p>
+			{/if}
+
+			<Button type="submit" class="w-full" disabled={submission.pending}>
+				{submission.pending ? 'Enviando…' : 'Enviar enlace'}
+			</Button>
+		</form>
+	{/if}
+
+	{#snippet footer()}
+		<a href="/admin/login" class="hover:text-foreground underline">Volver a iniciar sesión</a>
+	{/snippet}
+</AuthTemplate>

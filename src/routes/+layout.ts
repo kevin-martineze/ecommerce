@@ -1,5 +1,7 @@
+// Librerías
 import { injectAnalytics } from '@vercel/analytics/sveltekit';
 
+// App
 import { dev } from '$app/environment';
 
 // Vercel Web Analytics: cuenta visitas y páginas vistas. En desarrollo solo

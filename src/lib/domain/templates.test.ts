@@ -1,8 +1,9 @@
+// Librerías
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import {
 	DEFAULT_TEMPLATE,
 	STOREFRONT_TEMPLATES,
@@ -36,11 +37,11 @@ describe('plantilla moda', () => {
 	});
 
 	it('usa la cabecera mega, la tarjeta retail y filas en carrusel', () => {
-		const moda = templateOf('moda');
+		const fashion = templateOf('moda');
 
-		expect(moda.header).toBe('mega');
-		expect(moda.card).toBe('retail');
-		expect(moda.shelves).toBe('carousel');
+		expect(fashion.header).toBe('mega');
+		expect(fashion.card).toBe('retail');
+		expect(fashion.shelves).toBe('carousel');
 	});
 
 	it('todas las plantillas existentes siguen con la portada en grilla', () => {

@@ -1,5 +1,8 @@
 <script lang="ts">
+	// Componentes
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
+
+	// Dominio
 	import { TRIAL_DAYS } from '$lib/domain/account';
 
 	/**
@@ -9,9 +12,9 @@
 	 */
 	const año = new Date().getFullYear();
 
-	const columnas = [
+	const columns = [
 		{
-			titulo: 'Producto',
+			title: 'Producto',
 			enlaces: [
 				{ href: '#como-funciona', label: 'Cómo funciona' },
 				{ href: '#que-vendes', label: 'Para quién es' },
@@ -20,24 +23,24 @@
 			]
 		},
 		{
-			titulo: 'Tu cuenta',
+			title: 'Tu cuenta',
 			enlaces: [
-				{ href: '/registro', label: 'Empieza gratis' },
+				{ href: '/signup', label: 'Empieza gratis' },
 				{ href: '/admin/login', label: 'Entrar' }
 			]
 		},
 		{
-			titulo: 'Globerce',
+			title: 'Globerce',
 			enlaces: [
-				{ href: '/contacto', label: 'Contacto' },
-				{ href: '/terminos', label: 'Términos' },
-				{ href: '/privacidad', label: 'Privacidad' }
+				{ href: '/contact', label: 'Contacto' },
+				{ href: '/terms', label: 'Términos' },
+				{ href: '/privacy', label: 'Privacidad' }
 			]
 		}
 	];
 </script>
 
-<footer class="marketing-dark bg-background text-foreground relative overflow-hidden">
+<div class="marketing-dark bg-background text-foreground relative overflow-hidden">
 	<!-- Textura de la esquina: se desvanece hacia arriba y a la derecha para
 	     no competir con los enlaces. -->
 	<div
@@ -58,11 +61,11 @@
 				<p class="text-muted-foreground mt-5 text-sm">Para quien vende todos los días.</p>
 			</div>
 
-			{#each columnas as columna (columna.titulo)}
-				<nav aria-label={columna.titulo}>
-					<p class="text-sm font-semibold">{columna.titulo}</p>
+			{#each columns as column (column.title)}
+				<nav aria-label={column.title}>
+					<p class="text-sm font-semibold">{column.title}</p>
 					<ul class="text-muted-foreground mt-4 space-y-2.5 text-sm">
-						{#each columna.enlaces as enlace (enlace.href)}
+						{#each column.enlaces as enlace (enlace.href)}
 							<li>
 								<a href={enlace.href} class="hover:text-foreground transition-colors"
 									>{enlace.label}</a
@@ -89,4 +92,4 @@
 	>
 		Globerce
 	</p>
-</footer>
+</div>

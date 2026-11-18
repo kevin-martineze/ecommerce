@@ -1,6 +1,8 @@
+// Librerías
 import { expect, test } from '@playwright/test';
 
-import { esperarRegistroHidratado } from './hidratacion';
+// Utilidades
+import { waitForHydratedRecord } from './hydration';
 
 /**
  * Abrir una tienda de punta a punta: el formulario de registro, el onboarding
@@ -16,34 +18,34 @@ import { esperarRegistroHidratado } from './hidratacion';
  *     -c "delete from users where email like 'e2e-%@globerce.test'"
  */
 
-const CONTRASENA = 'una contrasena larga de prueba';
+const PASSWORD = 'una contrasena larga de prueba';
 
-function nuevaTienda() {
-	const marca = `e2e-${Date.now().toString(36)}`;
+function newStore() {
+	const brand = `e2e-${Date.now().toString(36)}`;
 
-	return { slug: marca, email: `${marca}@globerce.test`, nombre: 'Tienda de prueba' };
+	return { slug: brand, email: `${brand}@globerce.test`, storeName: 'Tienda de prueba' };
 }
 
 test('registrarse, elegir plantilla y entrar al panel', async ({ page }) => {
-	const tienda = nuevaTienda();
+	const store = newStore();
 
-	await page.goto('/registro?plan=pro');
+	await page.goto('/signup?plan=pro');
 
 	// El plan viene marcado desde la página de precios.
 	await expect(page.locator('input[name="planCode"][value="pro"]')).toBeChecked();
 
-	await page.fill('input[name="storeName"]', tienda.nombre);
+	await page.fill('input[name="storeName"]', store.storeName);
 	await page.fill('input[name="whatsappPhone"]', '573001234567');
-	await page.fill('input[name="storeSlug"]', tienda.slug);
+	await page.fill('input[name="storeSlug"]', store.slug);
 	await page.fill('input[name="fullName"]', 'Prueba Playwright');
-	await page.fill('input[name="email"]', tienda.email);
-	await page.fill('input[name="password"]', CONTRASENA);
-	await page.fill('input[name="confirm"]', CONTRASENA);
+	await page.fill('input[name="email"]', store.email);
+	await page.fill('input[name="password"]', PASSWORD);
+	await page.fill('input[name="confirm"]', PASSWORD);
 
 	await page.getByRole('button', { name: /crear mi tienda/i }).click();
 
 	// Primer paso: elegir con qué se viste la tienda.
-	await expect(page).toHaveURL(/\/admin\/bienvenida/);
+	await expect(page).toHaveURL(/\/admin\/welcome/);
 	await expect(page.getByRole('heading', { name: /cómo quieres que se vea/i })).toBeVisible();
 
 	await page
@@ -51,7 +53,7 @@ test('registrarse, elegir plantilla y entrar al panel', async ({ page }) => {
 		.first()
 		.click();
 
-	await expect(page).toHaveURL(/\/admin\?bienvenida=/);
+	await expect(page).toHaveURL(/\/admin\?welcome=/);
 	await expect(page.getByText(/tu tienda está lista/i)).toBeVisible();
 
 	// Y el plan quedó en el que eligió al registrarse.
@@ -62,33 +64,33 @@ test('registrarse, elegir plantilla y entrar al panel', async ({ page }) => {
 test('el formulario de registro se queja campo por campo, sin llamar al servidor', async ({
 	page
 }) => {
-	await page.goto('/registro');
+	await page.goto('/signup');
 
-	await esperarRegistroHidratado(page);
+	await waitForHydratedRecord(page);
 
-	let peticiones = 0;
+	let requests = 0;
 	page.on('request', (request) => {
-		if (request.method() === 'POST') peticiones += 1;
+		if (request.method() === 'POST') requests += 1;
 	});
 
 	await page.getByRole('button', { name: /crear mi tienda/i }).click();
 
 	await expect(page.locator('#storeName-error')).toHaveText(/ponle nombre/i);
 	await expect(page.locator('#email-error')).toHaveText(/escribe tu correo/i);
-	expect(peticiones).toBe(0);
+	expect(requests).toBe(0);
 });
 
 test('la contraseña se puede mirar', async ({ page }) => {
-	await page.goto('/registro');
+	await page.goto('/signup');
 
-	await esperarRegistroHidratado(page);
+	await waitForHydratedRecord(page);
 
-	const campo = page.locator('input[name="password"]');
+	const field = page.locator('input[name="password"]');
 	// Hay dos ojos, uno por contraseña: el primero es el de esta.
-	const ojo = page.getByRole('button', { name: /mostrar la contraseña/i }).first();
+	const eye = page.getByRole('button', { name: /mostrar la contraseña/i }).first();
 
-	await expect(campo).toHaveAttribute('type', 'password');
-	await ojo.click();
-	await expect(campo).toHaveAttribute('type', 'text');
+	await expect(field).toHaveAttribute('type', 'password');
+	await eye.click();
+	await expect(field).toHaveAttribute('type', 'text');
 	await expect(page.locator('input[name="confirm"]')).toHaveAttribute('type', 'password');
 });

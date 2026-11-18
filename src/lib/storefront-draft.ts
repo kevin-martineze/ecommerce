@@ -1,5 +1,7 @@
+// Tipos
 import type { StorefrontDraft } from '$lib/domain/preview';
 
+// Dominio
 import { DRAFT_READY, DRAFT_UPDATE } from '$lib/domain/preview';
 import { readStorefrontDraftMessage } from '$lib/schemas/storefront-draft';
 
@@ -12,7 +14,7 @@ export { DRAFT_READY, DRAFT_UPDATE };
  * El editor tiene la tienda de verdad en un `iframe` y le manda el borrador
  * con `postMessage` en cada cambio, así la vista previa responde al instante
  * en vez de recargarse. La tienda solo escucha si se abrió como vista previa
- * de borrador (`?ajustes=1&solo=1`, ver `$lib/template-preview`) y solo a la
+ * de borrador (`?theme=1&once=1`, ver `$lib/template-preview`) y solo a la
  * ventana que la contiene.
  *
  * 1. La tienda carga y avisa `READY` a quien la contiene.

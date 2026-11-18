@@ -1,6 +1,11 @@
 <script lang="ts">
+	// Componentes
 	import { Progress } from '$lib/components/atoms/progress';
+
+	// Dominio
 	import { usagePercent } from '$lib/domain/account';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	interface Props {

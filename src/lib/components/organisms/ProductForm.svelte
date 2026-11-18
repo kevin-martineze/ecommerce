@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-
+	// Tipos
 	import type { Category } from '$lib/domain/catalog';
 	import type { ProductFormValues } from '$lib/domain/product-form';
 
+	// Svelte
+	import { untrack } from 'svelte';
+
+	// App
 	import { enhance } from '$app/forms';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
@@ -13,6 +17,11 @@
 	import { Textarea } from '$lib/components/atoms/textarea';
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
+
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
+	// Utilidades
 	import { slugify } from '$lib/utils/slug';
 
 	interface Props {
@@ -41,7 +50,7 @@
 		}))
 	);
 	let slugTouched = $state(untrack(() => values.slug !== ''));
-	let submitting = $state(false);
+	const submission = new FormState();
 
 	const categoryOptions = $derived([
 		{ value: '', label: 'Sin categoría' },
@@ -63,19 +72,7 @@
 	});
 </script>
 
-<form
-	method="POST"
-	{action}
-	class="space-y-6"
-	use:enhance={() => {
-		submitting = true;
-
-		return async ({ update }) => {
-			await update({ reset: false });
-			submitting = false;
-		};
-	}}
->
+<form method="POST" {action} class="space-y-6" use:enhance={submission.submit({ reset: false })}>
 	<div class="grid gap-4 sm:grid-cols-2">
 		<div class="space-y-2 sm:col-span-2">
 			<Label for="name">Nombre</Label>
@@ -91,7 +88,7 @@
 				oninput={() => (slugTouched = true)}
 				pattern="[a-z0-9-]+"
 			/>
-			<p class="text-muted-foreground text-xs">/tienda/{form.slug || 'nombre-de-la-producto'}</p>
+			<p class="text-muted-foreground text-xs">/shop/{form.slug || 'nombre-de-la-producto'}</p>
 		</div>
 
 		<div class="space-y-2">
@@ -144,7 +141,7 @@
 		<p class="text-destructive text-sm">{error}</p>
 	{/if}
 
-	<Button type="submit" disabled={submitting}>
-		{submitting ? 'Guardando…' : submitLabel}
+	<Button type="submit" disabled={submission.pending}>
+		{submission.pending ? 'Guardando…' : submitLabel}
 	</Button>
 </form>

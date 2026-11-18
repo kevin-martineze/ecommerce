@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { hexToHsv, hsvToHex } from '$lib/domain/color';
 
 describe('hexToHsv y hsvToHex', () => {

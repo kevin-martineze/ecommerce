@@ -1,11 +1,16 @@
+// Tipos
 import type { LayoutServerLoad } from './$types';
-import { subscriptionNotice } from '$lib/domain/account';
+
+// Servidor
 import { listOrders } from '$lib/server/api/panel-commerce';
 import { getSettings } from '$lib/server/api/panel-content';
 import { listSupportTickets } from '$lib/server/api/panel-support';
 import { getSubscription } from '$lib/server/api/panel-team';
 import { requireAdmin } from '$lib/server/auth';
 import { orFail, panelContext, storeUrl } from '$lib/server/context';
+
+// Dominio
+import { subscriptionNotice } from '$lib/domain/account';
 
 export const load: LayoutServerLoad = async (event) => {
 	const { account, store } = await requireAdmin(event);

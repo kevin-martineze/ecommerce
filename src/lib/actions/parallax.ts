@@ -1,3 +1,4 @@
+// Tipos
 import type { Action } from 'svelte/action';
 
 interface ParallaxOptions {

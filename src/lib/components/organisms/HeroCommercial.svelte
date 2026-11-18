@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Svelte
 	import { onMount } from 'svelte';
 
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Pause from '@lucide/svelte/icons/pause';
@@ -8,10 +10,15 @@
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import ShoppingBag from '@lucide/svelte/icons/shopping-bag';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
-	import { FOTO_PRODUCTO, FOTO_RUBRO } from '$lib/config/fotos';
-	import { HOST_MAQUETA, TIENDA_MAQUETA } from '$lib/config/maqueta';
+
+	// Dominio
+	import { MOCKUP_HOST, MOCKUP_STORE } from '$lib/config/mockup';
+	import { PHOTO_PRODUCT, PHOTO_INDUSTRY } from '$lib/config/photos';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 	import { formatMoney } from '$lib/utils/money';
 
@@ -45,171 +52,171 @@
 
 	interface Props {
 		/** El ancla de lo que sigue: la flecha de abajo lleva allí. */
-		siguiente: string;
+		next: string;
 	}
 
-	let { siguiente }: Props = $props();
+	let { next }: Props = $props();
 
-	const DOMINIO = HOST_MAQUETA.slice(TIENDA_MAQUETA.slug.length + 1);
+	const DOMAIN = MOCKUP_HOST.slice(MOCKUP_STORE.slug.length + 1);
 
 	/** Tamaños del escenario, iguales a los del CSS de abajo. */
-	const ESCENARIO = {
-		horizontal: { ancho: 1280, alto: 720 },
-		vertical: { ancho: 540, alto: 880 }
+	const SCENARIO = {
+		horizontal: { widthPx: 1280, heightPx: 720 },
+		vertical: { widthPx: 540, heightPx: 880 }
 	};
 	/** Lo que tapa la cabecera fija: el escenario se centra debajo. */
-	const CABECERA = 64;
+	const HEADER = 64;
 	/** Más grande que esto, las fotos se empiezan a ver blandas. */
-	const ESCALA_MAXIMA = 1.25;
+	const MAX_SCALE = 1.25;
 	const VERTICAL = '(max-width: 639px)';
 
-	const catalogo = [
+	const catalog = [
 		{
-			nombre: 'Blusa Vera',
-			precio: 89900,
-			foto: FOTO_PRODUCTO.ropa.src,
+			name: 'Blusa Vera',
+			price: 89900,
+			photo: PHOTO_PRODUCT.clothing.src,
 			zoom: '180%',
-			foco: 'center'
+			focusZone: 'center'
 		},
 		{
-			nombre: 'Vestido Lino',
-			precio: 159900,
-			foto: FOTO_RUBRO.ropa.src,
+			name: 'Vestido Lino',
+			price: 159900,
+			photo: PHOTO_INDUSTRY.clothing.src,
 			zoom: '300%',
-			foco: '42% 30%'
+			focusZone: '42% 30%'
 		},
 		{
-			nombre: 'Camisa Salvia',
-			precio: 94900,
-			foto: FOTO_RUBRO.ropa.src,
+			name: 'Camisa Salvia',
+			price: 94900,
+			photo: PHOTO_INDUSTRY.clothing.src,
 			zoom: '320%',
-			foco: '62% 34%'
+			focusZone: '62% 34%'
 		},
 		{
-			nombre: 'Sandalias Cuero',
-			precio: 139900,
-			foto: FOTO_RUBRO.ropa.src,
+			name: 'Sandalias Cuero',
+			price: 139900,
+			photo: PHOTO_INDUSTRY.clothing.src,
 			zoom: '360%',
-			foco: '58% 88%'
+			focusZone: '58% 88%'
 		}
 	];
 
-	const tallas = ['S', 'M', 'L', 'XL'];
+	const sizes = ['S', 'M', 'L', 'XL'];
 
 	/** Colores de la prenda, no de la marca: no cambian con el tema. */
 	const colores = [
-		{ nombre: 'Verde', valor: '#8c9a78' },
-		{ nombre: 'Crema', valor: '#e8dfcc' },
-		{ nombre: 'Terracota', valor: '#b4643c' }
+		{ name: 'Verde', value: '#8c9a78' },
+		{ name: 'Crema', value: '#e8dfcc' },
+		{ name: 'Terracota', value: '#b4643c' }
 	];
 
-	const tiendas = [
-		{ iniciales: 'CO', nombre: TIENDA_MAQUETA.nombre, host: HOST_MAQUETA, foto: FOTO_RUBRO.ropa },
+	const stores = [
+		{ initials: 'CO', name: MOCKUP_STORE.name, host: MOCKUP_HOST, photo: PHOTO_INDUSTRY.clothing },
 		{
-			iniciales: 'TL',
-			nombre: 'Tostadero Ladera',
-			host: `ladera.${DOMINIO}`,
-			foto: FOTO_RUBRO.cafe
+			initials: 'TL',
+			name: 'Tostadero Ladera',
+			host: `ladera.${DOMAIN}`,
+			photo: PHOTO_INDUSTRY.coffee
 		},
 		{
-			iniciales: 'LP',
-			nombre: 'Librería Páramo',
-			host: `paramo.${DOMINIO}`,
-			foto: FOTO_RUBRO.unico
+			initials: 'LP',
+			name: 'Librería Páramo',
+			host: `paramo.${DOMAIN}`,
+			photo: PHOTO_INDUSTRY.single
 		}
 	];
 
-	const productos = [
-		{ nombre: 'Blusa Vera', precio: 89900, foto: FOTO_PRODUCTO.ropa },
-		{ nombre: 'Café de origen 500 g', precio: 42000, foto: FOTO_PRODUCTO.cafe },
-		{ nombre: 'Cuaderno de viaje', precio: 58000, foto: FOTO_PRODUCTO.unico }
+	const products = [
+		{ name: 'Blusa Vera', price: 89900, photo: PHOTO_PRODUCT.clothing },
+		{ name: 'Café de origen 500 g', price: 42000, photo: PHOTO_PRODUCT.coffee },
+		{ name: 'Cuaderno de viaje', price: 58000, photo: PHOTO_PRODUCT.single }
 	];
 
 	/** Los números cuadran con `OrderCard`: $89.900 más $12.000 de envío. */
-	const ENVIO = 12000;
-	const TOTAL = 89900 + ENVIO;
+	const SHIPPING = 12000;
+	const TOTAL = 89900 + SHIPPING;
 
-	const promesa = [
-		{ palabra: 'Que', resaltada: false, salto: false },
-		{ palabra: 'te', resaltada: false, salto: false },
-		{ palabra: 'compren', resaltada: false, salto: true },
-		{ palabra: 'sin', resaltada: true, salto: false },
-		{ palabra: 'esperar', resaltada: true, salto: false },
-		{ palabra: 'tu', resaltada: false, salto: false },
-		{ palabra: 'respuesta', resaltada: false, salto: false }
+	const promise = [
+		{ word: 'Que', highlighted: false, jump: false },
+		{ word: 'te', highlighted: false, jump: false },
+		{ word: 'compren', highlighted: false, jump: true },
+		{ word: 'sin', highlighted: true, jump: false },
+		{ word: 'esperar', highlighted: true, jump: false },
+		{ word: 'tu', highlighted: false, jump: false },
+		{ word: 'respuesta', highlighted: false, jump: false }
 	];
 
 	let marco = $state<HTMLDivElement>();
-	let escenario = $state<HTMLDivElement>();
-	let escala = $state<number | null>(null);
-	let pausaManual = $state(false);
-	let terminado = $state(false);
+	let scenario = $state<HTMLDivElement>();
+	let scaleFactor = $state<number | null>(null);
+	let manualPause = $state(false);
+	let finished = $state(false);
 	let total = $state(formatMoney(TOTAL));
 
 	/** Vueltas que da solo al entrar; las demás, a pedido. */
-	const VUELTAS = 2;
+	const LAPS = 2;
 	/** El segundo del guion en que el cierre ya está armado: el banner. */
 	const BANNER = 27;
 
-	let vueltas = 0;
-	let limite = VUELTAS;
+	let laps = 0;
+	let limit = LAPS;
 	let visible = true;
 
 	/** Lo que el escenario sabe hacer, una vez armado. */
-	let aplicar = () => {};
-	let reiniciar = () => {};
+	let apply = () => {};
+	let restartLoop = () => {};
 
-	function alBoton() {
-		if (terminado) {
+	function onButtonClick() {
+		if (finished) {
 			// Ya en el banner: una vuelta más, desde el principio.
-			limite = vueltas + 1;
-			terminado = false;
-			pausaManual = false;
-			reiniciar();
+			limit = laps + 1;
+			finished = false;
+			manualPause = false;
+			restartLoop();
 			return;
 		}
 
-		pausaManual = !pausaManual;
-		aplicar();
+		manualPause = !manualPause;
+		apply();
 	}
 
 	onMount(() => {
-		if (!marco || !escenario) return;
+		if (!marco || !scenario) return;
 
-		const raizMarco = marco;
-		const raiz = escenario;
+		const rootFrame = marco;
+		const root = scenario;
 
-		const medir = () => {
+		const measure = () => {
 			const vertical = window.matchMedia(VERTICAL).matches;
-			const { ancho, alto } = vertical ? ESCENARIO.vertical : ESCENARIO.horizontal;
-			escala = Math.min(
-				raizMarco.clientWidth / ancho,
-				(raizMarco.clientHeight - CABECERA) / alto,
-				ESCALA_MAXIMA
+			const { widthPx, heightPx } = vertical ? SCENARIO.vertical : SCENARIO.horizontal;
+			scaleFactor = Math.min(
+				rootFrame.clientWidth / widthPx,
+				(rootFrame.clientHeight - HEADER) / heightPx,
+				MAX_SCALE
 			);
 		};
-		const observador = new ResizeObserver(medir);
-		observador.observe(raizMarco);
-		medir();
+		const observer = new ResizeObserver(measure);
+		observer.observe(rootFrame);
+		measure();
 
-		let cancelado = false;
-		let limpiar = () => {};
+		let isCancelled = false;
+		let clear = () => {};
 
 		void (async () => {
 			const { gsap } = await import('gsap');
 
-			if (cancelado) return;
+			if (isCancelled) return;
 
-			const medios = gsap.matchMedia(raizMarco);
+			const medios = gsap.matchMedia(rootFrame);
 
 			// Se arma de nuevo si se cruza el corte entre horizontal y vertical:
 			// las escenas cambian de composición y las distancias, de escala.
-			medios.add({ vertical: VERTICAL, horizontal: '(min-width: 640px)' }, (contexto) => {
-				const vertical = contexto.conditions?.vertical === true;
+			medios.add({ vertical: VERTICAL, horizontal: '(min-width: 640px)' }, (contextText) => {
+				const vertical = contextText.conditions?.vertical === true;
 				/** Desplazamientos de la luz: en vertical hay menos ancho. */
 				const k = vertical ? 0.45 : 1;
-				const TEAL = getComputedStyle(raiz).getPropertyValue('--primary').trim();
-				const SOBRE_TEAL = getComputedStyle(raiz).getPropertyValue('--primary-foreground').trim();
+				const TEAL = getComputedStyle(root).getPropertyValue('--primary').trim();
+				const ON_TEAL = getComputedStyle(root).getPropertyValue('--primary-foreground').trim();
 
 				// El CSS centra con `translate(-50%, -50%)` para el cuadro sin JavaScript;
 				// GSAP lo lleva en porcentajes propios y deja `x`/`y` libres.
@@ -218,7 +225,7 @@
 				gsap.set('.pagado', { autoAlpha: 0, y: 20 });
 
 				// La luz respira aparte del guion: sigue viva sobre el banner.
-				const respiro = gsap.to('.luz-aire', {
+				const breather = gsap.to('.luz-aire', {
 					scale: 1.08,
 					duration: 3.2,
 					yoyo: true,
@@ -326,7 +333,7 @@
 						{ autoAlpha: 1, z: 0, y: 0, stagger: 0.13, duration: 0.8 },
 						7
 					)
-					.to('.chip-blusas', { backgroundColor: TEAL, color: SOBRE_TEAL, duration: 0.3 }, 8)
+					.to('.chip-blusas', { backgroundColor: TEAL, color: ON_TEAL, duration: 0.3 }, 8)
 					.to(
 						'.catalogo',
 						{ rotationX: 12, rotationY: 9, rotationZ: -2, duration: 3, ease: 'sine.inOut' },
@@ -367,7 +374,7 @@
 					.to('.ficha', { rotationY: 7, rotationX: 2, duration: 3.6, ease: 'sine.inOut' }, 11.3)
 					.to(
 						'.talla-elegida',
-						{ backgroundColor: TEAL, color: SOBRE_TEAL, borderColor: TEAL, duration: 0.25 },
+						{ backgroundColor: TEAL, color: ON_TEAL, borderColor: TEAL, duration: 0.25 },
 						12.05
 					);
 				toque('.toque-talla', 12);
@@ -385,7 +392,7 @@
 					.to('.ficha', { autoAlpha: 0, z: -180, duration: 0.5, ease: 'power2.in' }, 14.5);
 
 				// 5. A la dueña le llega el pedido pagado
-				const cuenta = { v: 0 };
+				const account = { v: 0 };
 				tl.fromTo(
 					'.destello',
 					{ opacity: 0 },
@@ -413,14 +420,14 @@
 						15.2
 					)
 					.fromTo(
-						cuenta,
+						account,
 						{ v: 0 },
 						{
 							v: TOTAL,
 							duration: 1,
 							ease: 'power2.out',
 							onUpdate: () => {
-								total = formatMoney(Math.round(cuenta.v / 100) * 100);
+								total = formatMoney(Math.round(account.v / 100) * 100);
 							}
 						},
 						15.7
@@ -439,13 +446,13 @@
 					);
 
 				// 6. Sirve para lo que vendas: la cámara baja por la rejilla
-				const rejilla = raiz.querySelector<HTMLElement>('.tiendas');
-				const sobra = Math.max(0, ((rejilla?.offsetHeight ?? 0) - raiz.offsetHeight) / 2);
-				const viaje = sobra + (vertical ? 120 : 170);
+				const grid = root.querySelector<HTMLElement>('.tiendas');
+				const leftover = Math.max(0, ((grid?.offsetHeight ?? 0) - root.offsetHeight) / 2);
+				const trip = leftover + (vertical ? 120 : 170);
 				tl.fromTo(
 					'.tiendas',
-					{ autoAlpha: 0, rotationX: 30, y: viaje + 130, z: -200 },
-					{ autoAlpha: 1, rotationX: 20, y: viaje, z: 0, duration: 1 },
+					{ autoAlpha: 0, rotationX: 30, y: trip + 130, z: -200 },
+					{ autoAlpha: 1, rotationX: 20, y: trip, z: 0, duration: 1 },
 					17.9
 				)
 					.fromTo(
@@ -454,7 +461,7 @@
 						{ autoAlpha: 1, z: 0, stagger: 0.1, duration: 0.7 },
 						18.1
 					)
-					.to('.tiendas', { y: -viaje, rotationX: 14, duration: 3.2, ease: 'sine.inOut' }, 18.6)
+					.to('.tiendas', { y: -trip, rotationX: 14, duration: 3.2, ease: 'sine.inOut' }, 18.6)
 					.to('.luz', { x: 140 * k, y: 40, scale: 1, duration: 3.2, ease: 'sine.inOut' }, 18.3)
 					.to('.tiendas', { autoAlpha: 0, z: -220, duration: 0.5, ease: 'power2.in' }, 21.4);
 
@@ -488,57 +495,57 @@
 				// se queda. El fundido de después solo lo ve quien repite.
 				tl.call(
 					() => {
-						vueltas += 1;
-						if (vueltas < limite) return;
+						laps += 1;
+						if (laps < limit) return;
 						tl.pause();
-						terminado = true;
+						finished = true;
 					},
 					[],
 					BANNER
 				);
 
-				aplicar = () => {
-					tl.paused(pausaManual || terminado || !visible);
-					respiro.paused(!visible);
+				apply = () => {
+					tl.paused(manualPause || finished || !visible);
+					breather.paused(!visible);
 				};
 
-				reiniciar = () => {
+				restartLoop = () => {
 					tl.restart();
-					aplicar();
+					apply();
 				};
 
 				// Si se rearma tras cruzar el corte, sigue donde iba: en el
 				// banner si ya terminó.
-				if (terminado) tl.pause(BANNER);
-				aplicar();
+				if (finished) tl.pause(BANNER);
+				apply();
 			});
 
 			// Fuera de la pantalla no se mueve: ni batería ni procesador.
-			const vigia = new IntersectionObserver(([entrada]) => {
-				visible = entrada?.isIntersecting ?? true;
-				aplicar();
+			const vigia = new IntersectionObserver(([entry]) => {
+				visible = entry?.isIntersecting ?? true;
+				apply();
 			});
-			vigia.observe(raizMarco);
+			vigia.observe(rootFrame);
 
-			limpiar = () => {
+			clear = () => {
 				vigia.disconnect();
 				medios.revert();
 			};
 		})();
 
 		return () => {
-			cancelado = true;
-			observador.disconnect();
-			limpiar();
+			isCancelled = true;
+			observer.disconnect();
+			clear();
 		};
 	});
 </script>
 
 <div bind:this={marco} class="marco relative">
 	<div
-		bind:this={escenario}
+		bind:this={scenario}
 		class="escenario"
-		style:--escala={escala ?? undefined}
+		style:--escala={scaleFactor ?? undefined}
 		aria-hidden="true"
 	>
 		<div class="luz-aire"><div class="luz"></div></div>
@@ -558,13 +565,13 @@
 					<div><b>Valentina</b><small>en línea</small></div>
 				</div>
 				<div class="chat">
-					<div class="msg">¿Ya viste la colección nueva de {TIENDA_MAQUETA.nombre}?</div>
+					<div class="msg">¿Ya viste la colección nueva de {MOCKUP_STORE.name}?</div>
 					<div class="msg enlace">
-						<img src={FOTO_RUBRO.ropa.src} alt="" width="512" height="512" />
+						<img src={PHOTO_INDUSTRY.clothing.src} alt="" width="512" height="512" />
 						<div class="enlace-texto">
-							<b>{TIENDA_MAQUETA.nombre}</b>
+							<b>{MOCKUP_STORE.name}</b>
 							<small>Ropa en lino, hecha en Medellín</small>
-							<span>{HOST_MAQUETA}</span>
+							<span>{MOCKUP_HOST}</span>
 						</div>
 						<i class="toque toque-enlace"></i>
 					</div>
@@ -577,7 +584,7 @@
 		<!-- 3. La tienda sale del celular -->
 		<div class="capa catalogo">
 			<div class="barra">
-				<b>{TIENDA_MAQUETA.nombre}</b>
+				<b>{MOCKUP_STORE.name}</b>
 				<ShoppingBag class="size-7" />
 			</div>
 			<div class="chips">
@@ -587,17 +594,17 @@
 				<span class="chip">Accesorios</span>
 			</div>
 			<div class="filas">
-				{#each catalogo as item, indice (item.nombre)}
-					<div class={cn('fila', indice === 0 && 'fila-elegida')}>
+				{#each catalog as item, index (item.name)}
+					<div class={cn('fila', index === 0 && 'fila-elegida')}>
 						<div
 							class="miniatura"
-							style:background-image="url({item.foto})"
+							style:background-image="url({item.photo})"
 							style:background-size={item.zoom}
-							style:background-position={item.foco}
+							style:background-position={item.focusZone}
 						></div>
 						<div>
-							<b>{item.nombre}</b>
-							<small>{formatMoney(item.precio)}</small>
+							<b>{item.name}</b>
+							<small>{formatMoney(item.price)}</small>
 						</div>
 					</div>
 				{/each}
@@ -607,12 +614,12 @@
 		<!-- 4. Elige talla y color, y paga -->
 		<div class="capa ficha">
 			<img
-				src={FOTO_PRODUCTO.ropa.src}
-				srcset={FOTO_PRODUCTO.ropa.srcset}
+				src={PHOTO_PRODUCT.clothing.src}
+				srcset={PHOTO_PRODUCT.clothing.srcset}
 				sizes="440px"
 				alt=""
-				width={FOTO_PRODUCTO.ropa.width}
-				height={FOTO_PRODUCTO.ropa.height}
+				width={PHOTO_PRODUCT.clothing.width}
+				height={PHOTO_PRODUCT.clothing.height}
 			/>
 			<div class="ficha-info">
 				<div class="miga">Tienda / Blusas</div>
@@ -621,10 +628,10 @@
 				<div>
 					<div class="rotulo">Talla</div>
 					<div class="tallas">
-						{#each tallas as talla (talla)}
-							<span class={cn('talla', talla === 'M' && 'talla-elegida')}>
-								{talla}
-								{#if talla === 'M'}<i class="toque toque-talla"></i>{/if}
+						{#each sizes as sizeLabel (sizeLabel)}
+							<span class={cn('talla', sizeLabel === 'M' && 'talla-elegida')}>
+								{sizeLabel}
+								{#if sizeLabel === 'M'}<i class="toque toque-talla"></i>{/if}
 							</span>
 						{/each}
 					</div>
@@ -632,9 +639,9 @@
 				<div>
 					<div class="rotulo">Color</div>
 					<div class="colores">
-						{#each colores as color, indice (color.nombre)}
-							<span class="color" style:background-color={color.valor}>
-								{#if indice === 0}
+						{#each colores as color, index (color.name)}
+							<span class="color" style:background-color={color.value}>
+								{#if index === 0}
 									<i class="color-elegido"></i>
 									<i class="toque toque-color"></i>
 								{/if}
@@ -657,7 +664,7 @@
 				<span class="punto"></span><b>Pedido nuevo</b><span>23:41</span>
 			</div>
 			<p class="linea mt-3.5">Blusa Vera · talla M · verde ×1</p>
-			<p class="linea apagado">Envío Medellín · {formatMoney(ENVIO)}</p>
+			<p class="linea apagado">Envío Medellín · {formatMoney(SHIPPING)}</p>
 			<p class="linea cobrado">Pagado en línea · Tarjeta</p>
 			<div class="linea pedido-total"><span>Total</span><strong>{total}</strong></div>
 		</div>
@@ -673,30 +680,30 @@
 				<span class="chip">Libros</span>
 			</div>
 			<div class="rejilla">
-				{#each tiendas as tienda (tienda.host)}
+				{#each stores as store (store.host)}
 					<div class="tarjeta">
 						<div class="tarjeta-meta">
-							<i>{tienda.iniciales}</i>
-							<div><b>{tienda.nombre}</b><small>{tienda.host}</small></div>
+							<i>{store.initials}</i>
+							<div><b>{store.name}</b><small>{store.host}</small></div>
 						</div>
 						<img
-							src={tienda.foto.src}
+							src={store.photo.src}
 							alt=""
-							width={tienda.foto.width}
-							height={tienda.foto.height}
+							width={store.photo.width}
+							height={store.photo.height}
 						/>
 					</div>
 				{/each}
-				{#each productos as producto (producto.nombre)}
+				{#each products as product (product.name)}
 					<div class="tarjeta">
 						<img
-							src={producto.foto.src}
+							src={product.photo.src}
 							alt=""
-							width={producto.foto.width}
-							height={producto.foto.height}
+							width={product.photo.width}
+							height={product.photo.height}
 						/>
 						<div class="tarjeta-precio">
-							<span>{producto.nombre}</span><span>{formatMoney(producto.precio)}</span>
+							<span>{product.name}</span><span>{formatMoney(product.price)}</span>
 						</div>
 					</div>
 				{/each}
@@ -705,9 +712,9 @@
 
 		<!-- 7. La promesa -->
 		<div class="capa promesa">
-			{#each promesa as item (item.palabra)}
-				<span class={cn('palabra', item.resaltada && 'resaltada')}>{item.palabra}</span>
-				{#if item.salto}<br />{/if}
+			{#each promise as item (item.word)}
+				<span class={cn('palabra', item.highlighted && 'resaltada')}>{item.word}</span>
+				{#if item.jump}<br />{/if}
 			{/each}
 		</div>
 
@@ -724,7 +731,7 @@
 	<div class="destello"></div>
 	<div class="sombra"></div>
 
-	<a href="#{siguiente}" class="seguir float" aria-label="Ver cómo funciona">
+	<a href="#{next}" class="seguir float" aria-label="Ver cómo funciona">
 		<ChevronDown class="size-6" />
 	</a>
 
@@ -733,14 +740,14 @@
 		variant="secondary"
 		size="icon"
 		class="absolute right-4 bottom-4 z-10 opacity-80 hover:opacity-100 md:right-6 md:bottom-6"
-		aria-label={terminado
+		aria-label={finished
 			? 'Ver la animación de nuevo'
-			: pausaManual
+			: manualPause
 				? 'Reproducir la animación'
 				: 'Pausar la animación'}
-		onclick={alBoton}
+		onclick={onButtonClick}
 	>
-		{#if terminado}<RotateCcw />{:else if pausaManual}<Play />{:else}<Pause />{/if}
+		{#if finished}<RotateCcw />{:else if manualPause}<Play />{:else}<Pause />{/if}
 	</Button>
 </div>
 

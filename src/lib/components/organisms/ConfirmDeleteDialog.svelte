@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Componentes
 	import ConfirmDialog from '$lib/components/molecules/ConfirmDialog.svelte';
 
 	/**

@@ -1,6 +1,10 @@
+// Tipos
+import type { PageServerLoad } from './$types';
+
+// Svelte
 import { error } from '@sveltejs/kit';
 
-import type { PageServerLoad } from './$types';
+// Servidor
 import { getHome } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
 

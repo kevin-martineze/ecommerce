@@ -1,0 +1,217 @@
+<script lang="ts">
+	// Tipos
+	import type { PageData } from './$types';
+
+	// Svelte
+	import { tick } from 'svelte';
+
+	// Iconos
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+
+	// App
+	import { enhance } from '$app/forms';
+
+	// Componentes
+	import { Badge } from '$lib/components/atoms/badge';
+	import { Button } from '$lib/components/atoms/button';
+	import { Input } from '$lib/components/atoms/input';
+	import { Label } from '$lib/components/atoms/label';
+	import * as Table from '$lib/components/atoms/table';
+	import SelectField from '$lib/components/molecules/SelectField.svelte';
+	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
+
+	// Estado
+	import { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
+	import { FormState } from '$lib/utils/form-state.svelte';
+
+	// Dominio
+	import { MEMBER_ROLE_LABEL } from '$lib/domain/account';
+
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
+
+	const submission = new FormState();
+
+	const roleOptions = [
+		{ value: 'staff', label: 'Personal: catálogo y pedidos' },
+		{ value: 'owner', label: 'Creador: todo, incluido el equipo' }
+	];
+
+	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' });
+
+	/** El select no es un input nativo: se espera a que actualice su campo oculto y se envía. */
+	async function submitRoleFor(userId: string): Promise<void> {
+		await tick();
+		document.getElementById(`role-submit-${userId}`)?.click();
+	}
+	const deletion = new DeleteConfirm();
+	const onDelete = deletion.enhance();
+</script>
+
+<svelte:head>
+	<title>Equipo — Globerce</title>
+</svelte:head>
+
+<PageTemplate
+	title="Equipo"
+	description="Quiénes administran la tienda. El personal maneja catálogo y pedidos; solo las dueñas gestionan el equipo."
+>
+	{#if data.canManage}
+		<section class="border-border bg-card rounded-lg mb-8 border p-6">
+			<h2 class="mb-4 text-lg">Invitar a alguien</h2>
+
+			<form
+				method="POST"
+				action="?/invite"
+				class="grid gap-4 sm:grid-cols-[1fr_16rem_auto] sm:items-end"
+				use:enhance={submission.submit()}
+			>
+				<div class="space-y-2">
+					<Label for="email">Correo</Label>
+					<Input id="email" name="email" type="email" required placeholder="ayudante@correo.com" />
+				</div>
+
+				<div class="space-y-2">
+					<Label for="role">Rol</Label>
+					<SelectField id="role" name="role" value="staff" options={roleOptions} />
+				</div>
+
+				<Button type="submit" disabled={submission.pending}>
+					{submission.pending ? 'Enviando…' : 'Enviar invitación'}
+				</Button>
+			</form>
+
+			<p class="text-muted-foreground mt-3 text-xs">
+				Le llega un enlace por correo que vence en 7 días. Si ya tiene cuenta, entra con su
+				contraseña de siempre.
+			</p>
+		</section>
+	{/if}
+
+	<section class="border-border bg-card mb-8 overflow-hidden rounded-lg border">
+		<Table.Root class="table-stack">
+			<Table.Header>
+				<Table.Row>
+					<Table.Head>Persona</Table.Head>
+					<Table.Head>Rol</Table.Head>
+					<Table.Head>Desde</Table.Head>
+					{#if data.canManage}
+						<Table.Head></Table.Head>
+					{/if}
+				</Table.Row>
+			</Table.Header>
+
+			<Table.Body>
+				{#each data.members as member (member.user_id)}
+					{@const isSelf = member.email === data.selfEmail}
+					<Table.Row>
+						<Table.Cell data-label="Persona">
+							<p>{member.full_name ?? member.email}</p>
+							<p class="text-muted-foreground text-xs">
+								{member.email}{isSelf ? ' · tú' : ''}
+							</p>
+						</Table.Cell>
+
+						<Table.Cell data-label="Rol">
+							{#if data.canManage}
+								<form method="POST" action="?/changeRole" use:enhance class="w-44">
+									<input type="hidden" name="userId" value={member.user_id} />
+									<SelectField
+										name="role"
+										value={member.role}
+										aria-label={`Rol de ${member.email}`}
+										options={[
+											{ value: 'staff', label: MEMBER_ROLE_LABEL.staff },
+											{ value: 'owner', label: MEMBER_ROLE_LABEL.owner }
+										]}
+										onValueChange={() => submitRoleFor(member.user_id)}
+									/>
+									<button type="submit" class="sr-only" id={`role-submit-${member.user_id}`}>
+										Guardar rol
+									</button>
+								</form>
+							{:else}
+								<Badge variant="secondary">{MEMBER_ROLE_LABEL[member.role]}</Badge>
+							{/if}
+						</Table.Cell>
+
+						<Table.Cell data-label="Desde">
+							{dateFormatter.format(new Date(member.joined_at))}
+						</Table.Cell>
+
+						{#if data.canManage}
+							<Table.Cell class="text-right">
+								<form
+									id="quitar-{member.user_id}"
+									method="POST"
+									action="?/remove"
+									use:enhance={onDelete}
+								>
+									<input type="hidden" name="userId" value={member.user_id} />
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										aria-label={`Quitar a ${member.email}`}
+										onclick={() =>
+											deletion.ask(
+												`quitar-${member.user_id}`,
+												`¿Quitar a ${member.email} del equipo?`,
+												{
+													description: 'Esa persona deja de tener acceso al panel.',
+													confirmLabel: 'Quitar',
+													pendingLabel: 'Quitando…'
+												}
+											)}
+									>
+										<Trash2 class="size-4" />
+									</Button>
+								</form>
+							</Table.Cell>
+						{/if}
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</section>
+
+	{#if data.canManage && data.invitations.length > 0}
+		<section class="border-border bg-card overflow-hidden rounded-lg border">
+			<h2 class="border-border border-b px-4 py-3 text-lg">Invitaciones pendientes</h2>
+
+			<Table.Root class="table-stack">
+				<Table.Body>
+					{#each data.invitations as invitation (invitation.id)}
+						<Table.Row>
+							<Table.Cell data-label="Correo">{invitation.email}</Table.Cell>
+							<Table.Cell data-label="Rol">{MEMBER_ROLE_LABEL[invitation.role]}</Table.Cell>
+							<Table.Cell data-label="Vence">
+								Vence el {dateFormatter.format(new Date(invitation.expires_at))}
+							</Table.Cell>
+							<Table.Cell class="text-right">
+								<form method="POST" action="?/revoke" use:enhance>
+									<input type="hidden" name="invitationId" value={invitation.id} />
+									<Button type="submit" variant="outline" size="sm">Anular</Button>
+								</form>
+							</Table.Cell>
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		</section>
+	{/if}
+
+	<ConfirmDeleteDialog
+		bind:open={deletion.open}
+		title={deletion.target?.title ?? ''}
+		description={deletion.target?.description}
+		form={deletion.target?.formId ?? ''}
+		confirmLabel={deletion.target?.confirmLabel}
+		pendingLabel={deletion.target?.pendingLabel}
+		pending={deletion.pending}
+	/>
+</PageTemplate>

@@ -1,5 +1,7 @@
+// Librerías
 import { z } from 'zod';
 
+// Dominio
 import { SUPPORT_CATEGORIES, SUPPORT_STATUSES, type SupportStatus } from '$lib/domain/support';
 
 /** Lo que la dueña escribe para abrir un caso. El servidor vuelve a validarlo: esto es la primera vez, no la última. */
@@ -31,7 +33,7 @@ export const supportStatusSchema = z.enum(SUPPORT_STATUSES, {
 	errorMap: () => ({ message: 'Ese estado no existe.' })
 });
 
-/** Filtros de la bandeja del equipo. Viven en la URL: `?estado=OPEN&q=…&pagina=2`. */
+/** Filtros de la bandeja del equipo. Viven en la URL: `?status=OPEN&q=…&page=2`. */
 export interface PlatformSupportFilters {
 	status: SupportStatus | null;
 	q: string | null;
@@ -39,9 +41,9 @@ export interface PlatformSupportFilters {
 }
 
 const filtersSchema = z.object({
-	estado: z.enum(SUPPORT_STATUSES).optional().catch(undefined),
+	status: z.enum(SUPPORT_STATUSES).optional().catch(undefined),
 	q: z.string().trim().max(100).optional().catch(undefined),
-	pagina: z.coerce.number().int().min(1).catch(1)
+	page: z.coerce.number().int().min(1).catch(1)
 });
 
 /** Lee los filtros de la URL. Lo que no entiende, lo ignora en vez de romper la bandeja. */
@@ -51,8 +53,8 @@ export function parsePlatformSupportFilters(params: URLSearchParams): PlatformSu
 	if (!parsed.success) return { status: null, q: null, page: 1 };
 
 	return {
-		status: parsed.data.estado ?? null,
+		status: parsed.data.status ?? null,
 		q: parsed.data.q || null,
-		page: parsed.data.pagina
+		page: parsed.data.page
 	};
 }

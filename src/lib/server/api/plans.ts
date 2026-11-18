@@ -1,8 +1,11 @@
-import type { Plan } from '$lib/domain/account';
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
+import type { Plan } from '$lib/domain/account';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { apiRequest } from '$lib/server/api/client';
 import { planSchema } from '$lib/server/api/panel-team';
 

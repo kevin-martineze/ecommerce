@@ -1,8 +1,14 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
+
+	// App
 	import { onNavigate } from '$app/navigation';
 
+	// Componentes
 	import { Toaster } from '$lib/components/atoms/sonner';
+
+	// Recursos
 	import '../app.css';
 
 	interface Props {

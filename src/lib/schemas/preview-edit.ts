@@ -1,5 +1,7 @@
+// Librerías
 import { z } from 'zod';
 
+// Dominio
 import { EDITABLE_ZONE_NAMES, type EditableZoneName } from '$lib/domain/editable-zones';
 import { PREVIEW_EDIT_MESSAGE } from '$lib/domain/preview';
 

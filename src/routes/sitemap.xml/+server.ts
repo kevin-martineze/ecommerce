@@ -1,4 +1,7 @@
+// Tipos
 import type { RequestHandler } from './$types';
+
+// Servidor
 import { getSitemap, getStorefront } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
 
@@ -21,12 +24,12 @@ export const GET: RequestHandler = async (event) => {
 
 	const urls = [
 		{ loc: `${site}/`, lastmod: null },
-		{ loc: `${site}/tienda`, lastmod: null },
-		{ loc: `${site}/colecciones`, lastmod: null },
-		...categories.map((slug) => ({ loc: `${site}/tienda?categoria=${slug}`, lastmod: null })),
-		...collections.map((slug) => ({ loc: `${site}/colecciones/${slug}`, lastmod: null })),
+		{ loc: `${site}/shop`, lastmod: null },
+		{ loc: `${site}/collections`, lastmod: null },
+		...categories.map((slug) => ({ loc: `${site}/shop?category=${slug}`, lastmod: null })),
+		...collections.map((slug) => ({ loc: `${site}/collections/${slug}`, lastmod: null })),
 		...products.map((product) => ({
-			loc: `${site}/tienda/${product.slug}`,
+			loc: `${site}/shop/${product.slug}`,
 			lastmod: product.updatedAt
 		}))
 	];

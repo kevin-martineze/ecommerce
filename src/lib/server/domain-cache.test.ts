@@ -1,5 +1,7 @@
+// Librerías
 import { beforeEach, describe, expect, it } from 'vitest';
 
+// Servidor
 import {
 	clearDomainCache,
 	getCachedDomain,
@@ -9,7 +11,7 @@ import {
 	TTL_MISSING_MS
 } from '$lib/server/domain-cache';
 
-const tienda = { slug: 'boutique', status: 'active' as const };
+const store = { slug: 'boutique', status: 'active' as const };
 
 describe('domain-cache', () => {
 	beforeEach(() => {
@@ -17,9 +19,9 @@ describe('domain-cache', () => {
 	});
 
 	it('una tienda encontrada se recuerda 60 s', () => {
-		setCachedDomain('sutienda.com', tienda, 1_000);
+		setCachedDomain('sutienda.com', store, 1_000);
 
-		expect(getCachedDomain('sutienda.com', 1_000 + TTL_FOUND_MS - 1)).toEqual(tienda);
+		expect(getCachedDomain('sutienda.com', 1_000 + TTL_FOUND_MS - 1)).toEqual(store);
 		expect(getCachedDomain('sutienda.com', 1_000 + TTL_FOUND_MS)).toBeUndefined();
 	});
 
@@ -36,24 +38,24 @@ describe('domain-cache', () => {
 
 	it('al llegar al tope, sale la entrada más antigua', () => {
 		for (let i = 0; i < MAX_ENTRIES; i++) {
-			setCachedDomain(`d${i}.com`, tienda, 0);
+			setCachedDomain(`d${i}.com`, store, 0);
 		}
 
-		setCachedDomain('nuevo.com', tienda, 0);
+		setCachedDomain('nuevo.com', store, 0);
 
 		expect(getCachedDomain('d0.com', 0)).toBeUndefined();
-		expect(getCachedDomain('d1.com', 0)).toEqual(tienda);
-		expect(getCachedDomain('nuevo.com', 0)).toEqual(tienda);
+		expect(getCachedDomain('d1.com', 0)).toEqual(store);
+		expect(getCachedDomain('nuevo.com', 0)).toEqual(store);
 	});
 
 	it('volver a guardar un host no lo duplica ni lo echa del tope', () => {
 		for (let i = 0; i < MAX_ENTRIES; i++) {
-			setCachedDomain(`d${i}.com`, tienda, 0);
+			setCachedDomain(`d${i}.com`, store, 0);
 		}
 
 		setCachedDomain('d5.com', null, 0);
 
 		expect(getCachedDomain('d5.com', 0)).toBeNull();
-		expect(getCachedDomain('d0.com', 0)).toEqual(tienda);
+		expect(getCachedDomain('d0.com', 0)).toEqual(store);
 	});
 });

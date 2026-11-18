@@ -1,7 +1,9 @@
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PanelContext } from '$lib/server/context';
 import type { SupportCategory, SupportList, SupportThread } from '$lib/domain/support';
 
+// Servidor
 import { panelRequest, segment } from '$lib/server/api/request';
 import { storeListSchema, storeThreadSchema } from '$lib/server/api/support-common';
 

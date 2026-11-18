@@ -1,11 +1,17 @@
+// Tipos
+import type { LayoutServerLoad } from './$types';
+
+// Svelte
 import { error, redirect } from '@sveltejs/kit';
 
-import type { LayoutServerLoad } from './$types';
-import { esVistaPrevia, redirectToCustomDomain } from '$lib/custom-domain';
+// Servidor
 import { getStorefront } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
 import { resolveTemplatePreview } from '$lib/server/template-preview';
+
+// Utilidades
+import { isPreview, redirectToCustomDomain } from '$lib/custom-domain';
 import { parsePlatformHosts } from '$lib/tenant';
 
 export const load: LayoutServerLoad = async (event) => {
@@ -32,7 +38,7 @@ export const load: LayoutServerLoad = async (event) => {
 		search: event.url.search,
 		rootDomain: env.PUBLIC_STORE_ROOT_DOMAIN,
 		platformHosts: parsePlatformHosts(env.PUBLIC_PLATFORM_HOSTS),
-		skip: esVistaPrevia({
+		skip: isPreview({
 			secFetchDest: event.request.headers.get('sec-fetch-dest'),
 			pathname: event.url.pathname,
 			preview: preview.template !== null || preview.theme !== null

@@ -1,3 +1,4 @@
+// Tipos
 import type { StorefrontTemplate } from '$lib/domain/templates';
 import type { StoreTheme } from '$lib/domain/theme';
 
@@ -47,7 +48,7 @@ export const PREVIEW_ZONES = [
 	'lookbook',
 	'collection-header',
 	'product-card',
-	'prodhipping',
+	'shipping-info',
 	'cart-coupon',
 	'store-header',
 	'categories-menu',
@@ -64,7 +65,7 @@ export const PREVIEW_ZONE_LABEL: Record<PreviewZone, string> = {
 	lookbook: 'Aquí aparecen tus colecciones',
 	'collection-header': 'Aquí aparece tu colección',
 	'product-card': 'Aquí se ve tu producto',
-	prodhipping: 'Aquí se explica el envío',
+	'shipping-info': 'Aquí se explica el envío',
 	announcement: 'Aquí aparece tu anuncio',
 	'cart-coupon': 'Aquí se aplica tu cupón',
 	'store-header': 'Aquí se ve el nombre de tu tienda',
@@ -192,3 +193,6 @@ export interface StorefrontDraft {
 	content: DraftContent | null;
 	focus: PreviewZone | null;
 }
+
+/** La pantalla en la que se ve la vista previa. */
+export type PreviewDevice = 'desktop' | 'mobile';

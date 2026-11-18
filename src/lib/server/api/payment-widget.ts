@@ -1,6 +1,8 @@
-import { z } from 'zod';
-
+// Tipos
 import type { WompiWidget } from '$lib/domain/wompi';
+
+// Librerías
+import { z } from 'zod';
 
 /**
  * El widget embebido de Wompi, tal como lo manda la API.

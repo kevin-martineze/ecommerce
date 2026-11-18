@@ -1,13 +1,25 @@
 <script lang="ts">
+	// Tipos
+	import type { StorefrontTemplate } from '$lib/domain/templates';
+
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
+	// App
 	import { enhance } from '$app/forms';
 
-	import type { StorefrontTemplate } from '$lib/domain/templates';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import StorefrontFrame from '$lib/components/molecules/StorefrontFrame.svelte';
+
+	// Estado
+	import { FormState } from '$lib/utils/form-state.svelte';
+
+	// Dominio
 	import { TEMPLATES } from '$lib/domain/templates';
+
+	// Utilidades
 	import { previewUrl } from '$lib/template-preview';
 	import { cn } from '$lib/utils';
 
@@ -26,7 +38,7 @@
 		current: StorefrontTemplate;
 		/** La dirección pública de la tienda, para las miniaturas y la vista previa. */
 		storeUrl: string;
-		/** Action del form, p. ej. `?/plantilla`. */
+		/** Action del form, p. ej. `?/template`. */
 		action: string;
 		/** Texto del botón de cada opción. */
 		cta?: string;
@@ -34,22 +46,24 @@
 
 	let { current, storeUrl, action, cta = 'Usar esta plantilla' }: Props = $props();
 
-	let submitting = $state('');
+	const submission = new FormState();
+	/** La plantilla que se está aplicando, para poner «Aplicando…» solo en su botón. */
+	let applying = $state('');
 </script>
 
 <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 	{#each TEMPLATES as template (template.code)}
-		{@const elegida = template.code === current}
+		{@const selected = template.code === current}
 
 		<div
 			class={cn(
 				'border-border bg-card flex flex-col rounded-lg border p-5 transition-colors',
-				elegida && 'border-foreground'
+				selected && 'border-foreground'
 			)}
 		>
 			<div class="mb-4 flex items-center justify-between gap-3">
 				<h3 class="text-xl">{template.name}</h3>
-				{#if elegida}
+				{#if selected}
 					<span class="text-muted-foreground flex items-center gap-1.5 text-xs">
 						<Check class="size-4" />
 						La que usas
@@ -87,25 +101,18 @@
 				method="POST"
 				{action}
 				class="mt-auto pt-5"
-				use:enhance={() => {
-					submitting = template.code;
-
-					return async ({ update }) => {
-						await update();
-						submitting = '';
-					};
-				}}
+				use:enhance={submission.submit({ prepare: () => (applying = template.code) })}
 			>
 				<input type="hidden" name="template" value={template.code} />
 				<Button
 					type="submit"
 					class="w-full"
-					variant={elegida ? 'outline' : 'default'}
-					disabled={elegida || submitting !== ''}
+					variant={selected ? 'outline' : 'default'}
+					disabled={selected || submission.pending}
 				>
-					{#if submitting === template.code}
+					{#if submission.pending && applying === template.code}
 						Aplicando…
-					{:else if elegida}
+					{:else if selected}
 						En uso
 					{:else}
 						{cta}

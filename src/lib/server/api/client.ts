@@ -1,5 +1,7 @@
+// Tipos
 import type { z } from 'zod';
 
+// Servidor
 import { serverEnv } from '$lib/server/env';
 
 /**

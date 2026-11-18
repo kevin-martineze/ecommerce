@@ -1,12 +1,18 @@
 <script lang="ts">
+	// Tipos
+	import type { Hsv } from '$lib/domain/color';
+	import type { StorefrontTemplate } from '$lib/domain/templates';
+
+	// Iconos
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import Undo2 from '@lucide/svelte/icons/undo-2';
 
-	import type { Hsv } from '$lib/domain/color';
-	import type { StorefrontTemplate } from '$lib/domain/templates';
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
+
+	// Dominio
 	import { hexToHsv, hsvToHex } from '$lib/domain/color';
 	import { templateOf } from '$lib/domain/templates';
 	import {
@@ -19,6 +25,8 @@
 		readableEdge,
 		readableOn
 	} from '$lib/domain/theme';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**

@@ -1,7 +1,10 @@
+// Tipos
+import type { Actions, PageServerLoad } from './$types';
+
+// Svelte
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Actions, PageServerLoad } from './$types';
-import { planCodeSchema, paymentTokensSchema } from '$lib/schemas/account';
+// Servidor
 import { getBillingSetup } from '$lib/server/api/billing';
 import {
 	checkoutSubscription,
@@ -11,6 +14,9 @@ import {
 } from '$lib/server/api/panel-team';
 import { listPublicPlans } from '$lib/server/api/plans';
 import { clientAddress, failWith, orFail, panelContext } from '$lib/server/context';
+
+// Dominio
+import { planCodeSchema, paymentTokensSchema } from '$lib/schemas/account';
 
 export const load: PageServerLoad = async (event) => {
 	const ip = clientAddress(event);
@@ -36,7 +42,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	pagar: async (event) => {
+	pay: async (event) => {
 		const formData = await event.request.formData();
 		const planCode = planCodeSchema.safeParse(formData.get('planCode'));
 
@@ -59,7 +65,7 @@ export const actions: Actions = {
 	 * Lo que llega es un token hecho en el navegador, nunca un número: si acá
 	 * apareciera uno sería un error de programación, y el esquema lo corta.
 	 */
-	tarjeta: async (event) => {
+	card: async (event) => {
 		const formData = await event.request.formData();
 		const parsed = paymentTokensSchema.safeParse({
 			cardToken: formData.get('cardToken'),
@@ -77,7 +83,7 @@ export const actions: Actions = {
 		return { message: 'Tu plan se cobrará solo con esta tarjeta.' };
 	},
 
-	quitarTarjeta: async (event) => {
+	removeCard: async (event) => {
 		const result = await removePaymentMethod(panelContext(event));
 
 		if (!result.ok) return failWith(result);

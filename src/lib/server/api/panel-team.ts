@@ -1,3 +1,6 @@
+// Tipos
+import type { ApiResult } from '$lib/server/api/client';
+import type { PanelContext } from '$lib/server/context';
 import type {
 	MemberRole,
 	PaymentMethod,
@@ -8,13 +11,12 @@ import type {
 	TeamMember
 } from '$lib/domain/account';
 import type { WompiWidget } from '$lib/domain/wompi';
-import type { ApiResult } from '$lib/server/api/client';
-import type { PanelContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { widgetSchema } from '$lib/server/api/payment-widget';
-
 import { panelRequest, segment } from '$lib/server/api/request';
 import {
 	memberRoleSchema,

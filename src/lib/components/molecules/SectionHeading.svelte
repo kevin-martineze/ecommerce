@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Iconos
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 
+	// Utilidades
 	import { reveal } from '$lib/actions/reveal';
 
 	interface Props {

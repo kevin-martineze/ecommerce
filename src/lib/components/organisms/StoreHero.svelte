@@ -1,7 +1,12 @@
 <script lang="ts">
+	// Tipos
 	import type { HeroLayout } from '$lib/domain/templates';
-	import { parallax } from '$lib/actions/parallax';
+
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
+
+	// Utilidades
+	import { parallax } from '$lib/actions/parallax';
 	import { cn } from '$lib/utils';
 
 	/**
@@ -38,7 +43,7 @@
 	 * Sin foto no hay nada que oscurecer: el fondo es el `muted` de la
 	 * plantilla y el texto toma su color normal, si no salía blanco sobre gris.
 	 */
-	const sobreFoto = $derived(image !== null);
+	const onPhoto = $derived(image !== null);
 </script>
 
 {#if layout === 'split'}
@@ -55,10 +60,10 @@
 				{/if}
 
 				<div class="flex flex-wrap gap-3 pt-1">
-					<Button href="/tienda" size="lg">Ver la tienda</Button>
+					<Button href="/shop" size="lg">Ver la tienda</Button>
 
 					{#if collectionSlug}
-						<Button href="/colecciones/{collectionSlug}" variant="outline" size="lg">
+						<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
 							Ver la colección
 						</Button>
 					{/if}
@@ -104,10 +109,10 @@
 				{/if}
 
 				<div class="flex flex-wrap gap-3">
-					<Button href="/tienda" size="lg">Ver la tienda</Button>
+					<Button href="/shop" size="lg">Ver la tienda</Button>
 
 					{#if collectionSlug}
-						<Button href="/colecciones/{collectionSlug}" variant="outline" size="lg">
+						<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
 							Ver la colección
 						</Button>
 					{/if}
@@ -143,10 +148,10 @@
 			</div>
 
 			<div class="mt-10 flex flex-wrap justify-center gap-3">
-				<Button href="/tienda" size="lg">Ver la tienda</Button>
+				<Button href="/shop" size="lg">Ver la tienda</Button>
 
 				{#if collectionSlug}
-					<Button href="/colecciones/{collectionSlug}" variant="outline" size="lg">
+					<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
 						Ver la colección
 					</Button>
 				{/if}
@@ -168,7 +173,7 @@
 
 				<div class="flex flex-wrap gap-3 pt-1">
 					<Button
-						href="/tienda"
+						href="/shop"
 						size="lg"
 						class="bg-secondary text-secondary-foreground hover:bg-secondary/90"
 					>
@@ -177,7 +182,7 @@
 
 					{#if collectionSlug}
 						<Button
-							href="/colecciones/{collectionSlug}"
+							href="/collections/{collectionSlug}"
 							variant="outline"
 							size="lg"
 							class="border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground bg-transparent"
@@ -224,9 +229,9 @@
 			<div
 				class="relative mx-auto flex min-h-[70vh] max-w-7xl flex-col justify-end px-4 pb-14 sm:px-6 md:min-h-[82vh] md:pb-20"
 			>
-				<div class={cn('max-w-2xl space-y-5', sobreFoto ? 'text-white' : 'text-foreground')}>
+				<div class={cn('max-w-2xl space-y-5', onPhoto ? 'text-white' : 'text-foreground')}>
 					<div class="rise-clip">
-						<p class={cn('eyebrow rise rise-1', sobreFoto && 'text-white/80')}>{eyebrow}</p>
+						<p class={cn('eyebrow rise rise-1', onPhoto && 'text-white/80')}>{eyebrow}</p>
 					</div>
 
 					<div class="rise-clip">
@@ -238,7 +243,7 @@
 							<p
 								class={cn(
 									'rise rise-3 max-w-md text-sm md:text-base',
-									sobreFoto ? 'text-white/85' : 'text-muted-foreground'
+									onPhoto ? 'text-white/85' : 'text-muted-foreground'
 								)}
 							>
 								{subtitle}
@@ -248,19 +253,19 @@
 
 					<div class="rise rise-3 flex flex-wrap gap-3 pt-2">
 						<Button
-							href="/tienda"
+							href="/shop"
 							size="lg"
-							class={sobreFoto ? 'bg-white text-black hover:bg-white/90' : undefined}
+							class={onPhoto ? 'bg-white text-black hover:bg-white/90' : undefined}
 						>
 							Ver la tienda
 						</Button>
 
 						{#if collectionSlug}
 							<Button
-								href="/colecciones/{collectionSlug}"
+								href="/collections/{collectionSlug}"
 								variant="outline"
 								size="lg"
-								class={sobreFoto
+								class={onPhoto
 									? 'border-white/60 bg-transparent text-white hover:bg-white/10 hover:text-white'
 									: undefined}
 							>

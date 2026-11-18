@@ -1,11 +1,17 @@
 <script lang="ts">
-	import AlertTriangle from '@lucide/svelte/icons/triangle-alert';
+	// Iconos
 	import Check from '@lucide/svelte/icons/check';
+	import AlertTriangle from '@lucide/svelte/icons/triangle-alert';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Label } from '$lib/components/atoms/label';
 	import { Textarea } from '$lib/components/atoms/textarea';
+
+	// Dominio
 	import { completeWompiKeys, mixedModes, parseWompiKeys, wompiMode } from '$lib/domain/wompi';
+
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**
@@ -28,13 +34,13 @@
 
 	let { error = null, submitting = false, submitLabel = 'Conectar' }: Props = $props();
 
-	let texto = $state('');
-	const keys = $derived(parseWompiKeys(texto));
-	const completas = $derived(completeWompiKeys(keys) !== null);
-	const mezcladas = $derived(mixedModes(keys));
-	const modo = $derived(keys.publicKey ? wompiMode(keys.publicKey) : null);
+	let text = $state('');
+	const keys = $derived(parseWompiKeys(text));
+	const complete = $derived(completeWompiKeys(keys) !== null);
+	const mixedList = $derived(mixedModes(keys));
+	const mode = $derived(keys.publicKey ? wompiMode(keys.publicKey) : null);
 
-	const campos = [
+	const fields = [
 		{ field: 'publicKey' as const, label: 'Llave pública' },
 		{ field: 'privateKey' as const, label: 'Llave privada' },
 		{ field: 'integritySecret' as const, label: 'Secreto de integridad' },
@@ -42,8 +48,8 @@
 	];
 
 	/** El prefijo y unos caracteres, nunca la llave entera. */
-	function pista(llave: string): string {
-		return `${llave.slice(0, llave.indexOf('_', llave.indexOf('_') + 1) + 5)}…`;
+	function hint(keyName: string): string {
+		return `${keyName.slice(0, keyName.indexOf('_', keyName.indexOf('_') + 1) + 5)}…`;
 	}
 </script>
 
@@ -51,10 +57,10 @@
 	<div class="space-y-2">
 		<div class="flex items-center justify-between gap-3">
 			<Label for="wompi-paste">Pega aquí las cuatro llaves</Label>
-			{#if modo}
+			{#if mode}
 				<span class="text-muted-foreground text-xs">
 					Modo: <span class="text-foreground font-medium"
-						>{modo === 'test' ? 'Pruebas' : 'Producción'}</span
+						>{mode === 'test' ? 'Pruebas' : 'Producción'}</span
 					>
 				</span>
 			{/if}
@@ -62,7 +68,7 @@
 
 		<Textarea
 			id="wompi-paste"
-			bind:value={texto}
+			bind:value={text}
 			rows={4}
 			placeholder="Pega aquí lo que copiaste de Wompi: las cuatro llaves, en el orden que sea."
 			aria-describedby="wompi-paste-hint"
@@ -75,28 +81,28 @@
 	{/if}
 
 	<ul id="wompi-paste-hint" class="grid gap-2 sm:grid-cols-2">
-		{#each campos as campo (campo.field)}
-			{@const encontrada = keys[campo.field]}
+		{#each fields as pastedField (pastedField.field)}
+			{@const found = keys[pastedField.field]}
 			<li
 				class={cn(
 					'flex items-center gap-2 border px-3 py-2 text-sm',
-					encontrada
+					found
 						? 'border-primary text-foreground border-solid'
 						: 'border-border text-muted-foreground border-dashed'
 				)}
 			>
-				{#if encontrada}
+				{#if found}
 					<Check class="text-primary size-4 flex-none" />
 				{/if}
-				<span class="flex-1">{campo.label}</span>
-				{#if encontrada}
-					<span class="text-muted-foreground font-mono text-xs">{pista(encontrada)}</span>
+				<span class="flex-1">{pastedField.label}</span>
+				{#if found}
+					<span class="text-muted-foreground font-mono text-xs">{hint(found)}</span>
 				{/if}
 			</li>
 		{/each}
 	</ul>
 
-	{#if mezcladas}
+	{#if mixedList}
 		<p class="text-caution flex items-start gap-2 text-sm">
 			<AlertTriangle class="mt-0.5 size-4 flex-none" />
 			Estás mezclando llaves de pruebas con llaves de producción. Revisa que las cuatro vengan del mismo
@@ -108,9 +114,9 @@
 		Lo único que viaja de aquí es el texto. No se manda cada llave en su
 		propio campo: el servidor reconoce las cuatro de `pasteText`.
 	-->
-	<input type="hidden" name="pasteText" value={texto} />
+	<input type="hidden" name="pasteText" value={text} />
 
-	<Button type="submit" disabled={!completas || submitting}>
+	<Button type="submit" disabled={!complete || submitting}>
 		{submitting ? 'Guardando…' : submitLabel}
 	</Button>
 </div>

@@ -46,11 +46,11 @@ function digits(value: string): string {
  * probable.
  */
 export function dialOf(code: string): string {
-	const pais = COUNTRIES.find((candidato) => candidato.code === code);
+	const pais = COUNTRIES.find((candidate) => candidate.code === code);
 
 	if (pais) return pais.dial;
 
-	return COUNTRIES.find((candidato) => candidato.code === DEFAULT_COUNTRY)?.dial ?? '';
+	return COUNTRIES.find((candidate) => candidate.code === DEFAULT_COUNTRY)?.dial ?? '';
 }
 
 /** Une indicativo y número en lo que viaja a la API. */
@@ -70,14 +70,14 @@ export function joinPhone(code: string, number: string): string {
  * igual —el número completo es el mismo—.
  */
 export function splitPhone(full: string): { code: string; number: string } {
-	const todos = digits(full);
+	const allItems = digits(full);
 
-	if (!todos) return { code: DEFAULT_COUNTRY, number: '' };
+	if (!allItems) return { code: DEFAULT_COUNTRY, number: '' };
 
-	const candidatos = [...COUNTRIES].sort((uno, otro) => otro.dial.length - uno.dial.length);
-	const pais = candidatos.find((candidato) => todos.startsWith(candidato.dial));
+	const candidates = [...COUNTRIES].sort((one, other) => other.dial.length - one.dial.length);
+	const pais = candidates.find((candidate) => allItems.startsWith(candidate.dial));
 
-	if (!pais) return { code: DEFAULT_COUNTRY, number: todos };
+	if (!pais) return { code: DEFAULT_COUNTRY, number: allItems };
 
-	return { code: pais.code, number: todos.slice(pais.dial.length) };
+	return { code: pais.code, number: allItems.slice(pais.dial.length) };
 }

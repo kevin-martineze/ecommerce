@@ -1,6 +1,8 @@
 <script lang="ts">
+	// Tipos
 	import type { Snippet } from 'svelte';
 
+	// Svelte
 	import { onMount } from 'svelte';
 
 	/**
@@ -37,24 +39,24 @@
 	let content = $state<HTMLDivElement>();
 
 	/** Las piezas a revelar, según las marcas del contenido. */
-	function piezas(raiz: HTMLElement): HTMLElement[] {
-		const salida: HTMLElement[] = [];
+	function pieces(root: HTMLElement): HTMLElement[] {
+		const output: HTMLElement[] = [];
 
-		for (const bloque of raiz.querySelectorAll<HTMLElement>('[data-reveal]')) {
-			for (const hijo of bloque.children) {
-				if (!(hijo instanceof HTMLElement)) continue;
+		for (const block of root.querySelectorAll<HTMLElement>('[data-reveal]')) {
+			for (const child of block.children) {
+				if (!(child instanceof HTMLElement)) continue;
 
-				if (hijo.hasAttribute('data-reveal-group')) {
-					for (const nieto of hijo.children) {
-						if (nieto instanceof HTMLElement) salida.push(nieto);
+				if (child.hasAttribute('data-reveal-group')) {
+					for (const grandchild of child.children) {
+						if (grandchild instanceof HTMLElement) output.push(grandchild);
 					}
 				} else {
-					salida.push(hijo);
+					output.push(child);
 				}
 			}
 		}
 
-		return salida;
+		return output;
 	}
 
 	onMount(() => {
@@ -63,11 +65,11 @@
 
 		// La carga es asíncrona: si la página se abandona antes de que llegue,
 		// no hay que montar nada sobre un DOM que ya no está.
-		let cancelado = false;
-		let limpiar = () => {};
+		let isCancelled = false;
+		let clear = () => {};
 
-		const raizWrapper = wrapper;
-		const raizContent = content;
+		const rootWrapper = wrapper;
+		const rootContent = content;
 
 		void (async () => {
 			const [{ gsap }, { ScrollTrigger }, { ScrollSmoother }] = await Promise.all([
@@ -76,13 +78,13 @@
 				import('gsap/ScrollSmoother')
 			]);
 
-			if (cancelado) return;
+			if (isCancelled) return;
 
 			gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 			const smoother = ScrollSmoother.create({
-				wrapper: raizWrapper,
-				content: raizContent,
+				wrapper: rootWrapper,
+				content: rootContent,
 				// Cuánto tarda en alcanzar la posición real, en segundos. Más
 				// de 1.2 empieza a sentirse como que la página no obedece.
 				smooth: 1.1,
@@ -93,13 +95,13 @@
 				smoothTouch: false
 			});
 
-			const elementos = piezas(raizContent);
+			const elements = pieces(rootContent);
 
 			// Se ocultan aquí y no en el CSS: sin JavaScript, o si GSAP no
 			// carga, el contenido tiene que verse igual.
-			gsap.set(elementos, { autoAlpha: 0, y: 28 });
+			gsap.set(elements, { autoAlpha: 0, y: 28 });
 
-			ScrollTrigger.batch(elementos, {
+			ScrollTrigger.batch(elements, {
 				start: 'top 90%',
 				once: true,
 				onEnter: (lote) =>
@@ -113,46 +115,46 @@
 					})
 			});
 
-			function irAlAncla(evento: MouseEvent) {
-				if (!(evento.target instanceof Element)) return;
+			function goToAnchor(incomingEvent: MouseEvent) {
+				if (!(incomingEvent.target instanceof Element)) return;
 
-				const enlace = evento.target.closest<HTMLAnchorElement>('a[href^="#"]');
+				const enlace = incomingEvent.target.closest<HTMLAnchorElement>('a[href^="#"]');
 
 				if (!enlace || enlace.hash.length < 2) return;
 
-				const destino = document.getElementById(decodeURIComponent(enlace.hash.slice(1)));
+				const scrollTarget = document.getElementById(decodeURIComponent(enlace.hash.slice(1)));
 
-				if (!destino) return;
+				if (!scrollTarget) return;
 
-				evento.preventDefault();
-				smoother.scrollTo(destino, true, `top ${offset}px`);
+				incomingEvent.preventDefault();
+				smoother.scrollTo(scrollTarget, true, `top ${offset}px`);
 				// La dirección conserva el ancla: se puede copiar y compartir.
 				history.replaceState(history.state, '', enlace.hash);
 			}
 
-			document.addEventListener('click', irAlAncla);
+			document.addEventListener('click', goToAnchor);
 
 			// Si se llegó con un ancla en la dirección, se va allí una vez que
 			// el contenido ya está montado sobre el suavizador.
 			if (location.hash.length > 1) {
-				const inicial = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+				const initial = document.getElementById(decodeURIComponent(location.hash.slice(1)));
 
-				if (inicial) smoother.scrollTo(inicial, false, `top ${offset}px`);
+				if (initial) smoother.scrollTo(initial, false, `top ${offset}px`);
 			}
 
-			limpiar = () => {
-				document.removeEventListener('click', irAlAncla);
-				ScrollTrigger.getAll().forEach((disparador) => disparador.kill());
+			clear = () => {
+				document.removeEventListener('click', goToAnchor);
+				ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
 				smoother.kill();
 				// Sin esto, al volver a la página por navegación del cliente los
 				// elementos seguirían con la opacidad en cero.
-				gsap.set(elementos, { clearProps: 'opacity,visibility,transform' });
+				gsap.set(elements, { clearProps: 'opacity,visibility,transform' });
 			};
 		})();
 
 		return () => {
-			cancelado = true;
-			limpiar();
+			isCancelled = true;
+			clear();
 		};
 	});
 </script>

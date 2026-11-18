@@ -9,22 +9,22 @@
  * Función pura para probarla sin SvelteKit.
  */
 
-/** Rutas del sitio comercial. Viven bajo `/inicio` y el dominio raíz las sirve desde `/`. */
-export const MARKETING_HOME = '/inicio';
+/** Rutas del sitio comercial. Viven bajo `/home` y el dominio raíz las sirve desde `/`. */
+export const MARKETING_HOME = '/home';
 
 /**
  * Las demás páginas del sitio comercial. Se sirven tal cual en el dominio
  * raíz y no existen en el host de una tienda: `boutique.globerce.store` vende
  * ropa, no software.
  */
-const MARKETING_PATHS = [MARKETING_HOME, '/terminos', '/privacidad', '/contacto'];
+const MARKETING_PATHS = [MARKETING_HOME, '/terms', '/privacy', '/contact'];
 
 function isMarketingPath(pathname: string): boolean {
 	return MARKETING_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
 /** Lo que el sitio comercial sirve además de la portada, en cualquier host. */
-const SHARED_PATHS = ['/registro', '/admin', '/plataforma'];
+const SHARED_PATHS = ['/signup', '/admin', '/platform'];
 
 export interface RerouteInput {
 	pathname: string;
@@ -36,7 +36,7 @@ export interface RerouteInput {
  * La ruta que se va a enrutar de verdad, o `undefined` para dejarla igual.
  *
  * - Dominio raíz: `/` muestra el sitio comercial.
- * - Host de una tienda, sea subdominio o dominio propio: `/inicio` no existe;
+ * - Host de una tienda, sea subdominio o dominio propio: `/home` no existe;
  *   esa tienda no vende Globerce.
  */
 export function rerouteForHost({ pathname, isStore }: RerouteInput): string | undefined {
@@ -46,7 +46,7 @@ export function rerouteForHost({ pathname, isStore }: RerouteInput): string | un
 
 	// En una tienda, las páginas del sitio comercial no tienen por qué existir.
 	if (isMarketingPath(pathname)) {
-		return '/no-existe';
+		return '/not-found';
 	}
 
 	return undefined;

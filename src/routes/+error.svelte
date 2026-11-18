@@ -1,7 +1,10 @@
 <script lang="ts">
+	// App
 	import { page } from '$app/state';
 
+	// Componentes
 	import { Button } from '$lib/components/atoms/button';
+	import ErrorTemplate from '$lib/components/templates/ErrorTemplate.svelte';
 
 	const isNotFound = $derived(page.status === 404);
 </script>
@@ -10,23 +13,15 @@
 	<title>{isNotFound ? 'Página no encontrada' : 'Algo salió mal'}</title>
 </svelte:head>
 
-<main
-	class="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center gap-6 px-6 text-center"
+<ErrorTemplate
+	status={page.status}
+	title={isNotFound ? 'No encontramos esta página' : 'Algo salió mal'}
+	message={isNotFound
+		? 'Puede que el producto ya no esté disponible o que el enlace haya cambiado.'
+		: (page.error?.message ?? 'Vuelve a intentarlo en un momento.')}
 >
-	<p class="eyebrow">Error {page.status}</p>
-
-	<h1 class="text-4xl md:text-5xl">
-		{isNotFound ? 'No encontramos esta página' : 'Algo salió mal'}
-	</h1>
-
-	<p class="text-muted-foreground max-w-md text-balance">
-		{isNotFound
-			? 'Puede que el producto ya no esté disponible o que el enlace haya cambiado.'
-			: (page.error?.message ?? 'Vuelve a intentarlo en un momento.')}
-	</p>
-
-	<div class="flex flex-wrap justify-center gap-3">
+	{#snippet actions()}
 		<Button href="/">Ir al inicio</Button>
-		<Button href="/tienda" variant="outline">Ver la tienda</Button>
-	</div>
-</main>
+		<Button href="/shop" variant="outline">Ver la tienda</Button>
+	{/snippet}
+</ErrorTemplate>

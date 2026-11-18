@@ -1,5 +1,7 @@
+// Tipos
 import type { HeroLayout, StorefrontTemplate } from '$lib/domain/templates';
 
+// Dominio
 import { hsvToHex } from '$lib/domain/color';
 import { HERO_LAYOUTS, templateOf } from '$lib/domain/templates';
 

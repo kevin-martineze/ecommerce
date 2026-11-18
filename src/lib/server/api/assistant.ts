@@ -1,8 +1,11 @@
+// Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PublicContext } from '$lib/server/context';
 
+// Librerías
 import { z } from 'zod';
 
+// Servidor
 import { publicRequest } from '$lib/server/api/request';
 
 /** El asistente de la tienda. Ver `ecommerce-api/src/modules/assistant`. */

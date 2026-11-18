@@ -1,5 +1,7 @@
+// Librerías
 import { describe, expect, it } from 'vitest';
 
+// Dominio
 import { DEFAULT_COUNTRY, dialOf, joinPhone, splitPhone } from '$lib/domain/phone';
 
 describe('joinPhone', () => {

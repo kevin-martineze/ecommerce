@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Utilidades
 	import { cn } from '$lib/utils';
 
 	/**
@@ -29,13 +30,13 @@
 
 	let { name, class: className }: Props = $props();
 
-	const atencion = $derived(name === 'cupones' || name === 'avisos');
+	const attention = $derived(name === 'cupones' || name === 'avisos');
 </script>
 
 <span
 	class={cn(
 		'inline-grid size-15 shrink-0 place-items-center rounded-2xl',
-		atencion ? 'bg-caution/12 text-caution' : 'bg-primary/10 text-primary',
+		attention ? 'bg-caution/12 text-caution' : 'bg-primary/10 text-primary',
 		className
 	)}
 	aria-hidden="true"

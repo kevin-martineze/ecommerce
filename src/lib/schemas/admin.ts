@@ -1,7 +1,12 @@
+// Librerías
 import { z } from 'zod';
 
+// Dominio
 import { HERO_LAYOUTS, STOREFRONT_TEMPLATES } from '$lib/domain/templates';
 import { HEX_COLOR, THEME_CORNERS, THEME_FONTS } from '$lib/domain/theme';
+import { checkbox, formId, optionalInt } from '$lib/schemas/fields';
+
+// Utilidades
 import { parseAmount } from '$lib/utils/money';
 
 /**
@@ -9,20 +14,20 @@ import { parseAmount } from '$lib/utils/money';
  * un monto (signo, decimal, letra) no pasa: el esquema lo rechaza. Así "-5" no
  * se vuelve 5 y "8.9" no se vuelve 89.
  */
-const MONTO_ESCRITO = /^\s*\$?\s*(\d+|\d{1,3}([.\s]\d{3})+)\s*$/;
+const TYPED_AMOUNT = /^\s*\$?\s*(\d+|\d{1,3}([.\s]\d{3})+)\s*$/;
 
 /** Lo que llega del formulario: un monto escrito se lee; cualquier otra cosa pasa tal cual. */
-function leerMonto(value: unknown): unknown {
+function readAmount(value: unknown): unknown {
 	if (typeof value !== 'string') return value;
 	if (value.trim() === '') return undefined;
-	if (!MONTO_ESCRITO.test(value)) return value;
+	if (!TYPED_AMOUNT.test(value)) return value;
 
 	return parseAmount(value) ?? undefined;
 }
 
 /** Precios en pesos enteros: la administradora los escribe con o sin puntos. */
 const price = z.preprocess(
-	leerMonto,
+	readAmount,
 	z
 		.number({
 			required_error: 'Escribe un precio.',
@@ -130,7 +135,7 @@ export const couponSchema = z
 			.regex(/^[A-Z0-9]{3,40}$/, 'Solo letras y números, entre 3 y 40 caracteres.'),
 		type: z.enum(['percent', 'fixed']),
 		value: z.preprocess(
-			leerMonto,
+			readAmount,
 			z
 				.number({
 					required_error: 'Escribe el valor del cupón.',
@@ -142,8 +147,8 @@ export const couponSchema = z
 		minSubtotal: price.default(0),
 		startsAt: z.string().optional().default(''),
 		endsAt: z.string().optional().default(''),
-		maxUses: z.coerce.number().int().min(1).nullable().optional(),
-		active: z.boolean().default(true)
+		maxUses: optionalInt.refine((uses) => uses === null || uses >= 1, 'Los usos van desde 1.'),
+		active: checkbox
 	})
 	.refine((value) => value.type !== 'percent' || value.value <= 100, {
 		message: 'Un porcentaje no puede pasar de 100.',
@@ -153,19 +158,24 @@ export const couponSchema = z
 export const shippingZoneSchema = z.object({
 	name: z.string().trim().min(2, 'Ponle nombre a la zona.').max(80),
 	cost: price,
-	etaDays: z.coerce.number().int().min(0).max(60).nullable().optional(),
-	active: z.boolean().default(true),
-	sortOrder: z.coerce.number().int().min(0).max(999).default(0)
+	etaDays: optionalInt.refine(
+		(days) => days === null || (days >= 0 && days <= 60),
+		'Los días de entrega van de 0 a 60.'
+	),
+	active: checkbox,
+	sortOrder: optionalInt
+		.transform((order) => order ?? 0)
+		.refine((order) => order >= 0 && order <= 999, 'El orden va de 0 a 999.')
 });
 
 /** La marca que se edita en Diseño: el nombre y la barra de anuncio. */
-export const tiendaSchema = z.object({
+export const storeSchema = z.object({
 	storeName: z.string().trim().min(2, 'Escribe el nombre de la tienda.').max(80),
 	announcement: z.string().trim().max(160, 'Máximo 160 caracteres.').optional().default('')
 });
 
 /** Lo de Ajustes: WhatsApp, Instagram y el envío gratis. No es diseño. */
-export const ajustesSchema = z.object({
+export const adjustmentsSchema = z.object({
 	whatsappPhone: z
 		.string()
 		.trim()
@@ -188,9 +198,18 @@ export const collectionSchema = z.object({
 
 export type ProductInput = z.infer<typeof productSchema>;
 export type CouponInput = z.infer<typeof couponSchema>;
+
+/** Un formulario que solo manda el id de lo que se toca (borrar, quitar). */
+export const idFormSchema = z.object({ id: formId });
+
+/** Activar o desactivar: el estado nuevo llega como texto desde un input oculto. */
+export const toggleFormSchema = z.object({
+	id: formId,
+	active: z.enum(['true', 'false']).transform((value) => value === 'true')
+});
 export type ShippingZoneInput = z.infer<typeof shippingZoneSchema>;
-export type TiendaInput = z.infer<typeof tiendaSchema>;
-export type AjustesInput = z.infer<typeof ajustesSchema>;
+export type StoreInput = z.infer<typeof storeSchema>;
+export type AdjustmentsInput = z.infer<typeof adjustmentsSchema>;
 export type CollectionInput = z.infer<typeof collectionSchema>;
 
 /** Categorías: cómo agrupa la tienda sus productos. */

@@ -1,6 +1,10 @@
+// Tipos
+import type { RequestHandler } from './$types';
+
+// Svelte
 import { redirect } from '@sveltejs/kit';
 
-import type { RequestHandler } from './$types';
+// Servidor
 import { logout } from '$lib/server/api/auth';
 import { clientAddress } from '$lib/server/context';
 import { clearSession } from '$lib/server/session';

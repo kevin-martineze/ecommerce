@@ -1,7 +1,10 @@
+// Tipos
 import type { Reroute } from '@sveltejs/kit';
 
+// App
 import { env } from '$env/dynamic/public';
 
+// Utilidades
 import { rerouteForHost } from '$lib/marketing-host';
 import { hostServesStore, parsePlatformHosts, resolveHost } from '$lib/tenant';
 
