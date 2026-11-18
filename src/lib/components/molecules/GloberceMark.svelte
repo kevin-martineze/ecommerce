@@ -3,15 +3,19 @@
 	import logo from '$lib/assets/logo.png';
 
 	/**
-	 * El isotipo de Globerce: el hexágono con la G en negativo.
+	 * El isotipo de Globerce: la G blanca en relieve abrazando la esfera teal.
 	 *
-	 * Es un dibujo de mapa de bits y no un SVG porque así vino la marca. Eso
-	 * tiene dos consecuencias que conviene conocer:
+	 * Es un render 3D y no un SVG: el volumen y la luz no se pueden dibujar en
+	 * vector. Eso tiene dos consecuencias que conviene conocer:
 	 *
-	 * - Se guarda a 512 px y se muestra siempre más chico, para que en pantallas
-	 *   densas siga viéndose nítido. Pedirlo más grande que eso lo despinta.
-	 * - Aguanta hasta 16 px, que es donde se mide un isotipo: el hexágono y la
-	 *   G siguen leyéndose porque son formas macizas de un solo grosor.
+	 * - Se guarda a 512 px, con fondo transparente, y se muestra siempre más
+	 *   chico, para que en pantallas densas siga viéndose nítido. Pedirlo más
+	 *   grande que eso lo despinta.
+	 * - Aguanta hasta 16 px porque la silueta es un círculo macizo: la G y la
+	 *   esfera siguen leyéndose aunque se pierda el relieve.
+	 *
+	 * El original, a 2048 px y sin fondo, es el que se reduce para cada tamaño.
+	 * Nunca se agranda una versión chica.
 	 *
 	 * El archivo lo importa Vite y no vive en `static/`: así viaja con su huella
 	 * en el nombre y el navegador puede guardarlo para siempre. Lo que sí está
