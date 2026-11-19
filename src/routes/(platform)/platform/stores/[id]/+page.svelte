@@ -1,9 +1,13 @@
 <script lang="ts">
 	// Tipos
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { PageData } from './$types';
 
 	// Svelte
 	import { untrack } from 'svelte';
+
+	// Librerías
+	import { toast } from 'svelte-sonner';
 
 	// Iconos
 	import ExternalLink from '@lucide/svelte/icons/external-link';
@@ -20,6 +24,7 @@
 	import MoneyField from '$lib/components/molecules/MoneyField.svelte';
 	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import StoreStatusBadge from '$lib/components/molecules/StoreStatusBadge.svelte';
+	import TypedConfirmDialog from '$lib/components/molecules/TypedConfirmDialog.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
 	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
@@ -69,6 +74,22 @@
 	let planCode = $state(untrack(() => data.store.plan_code ?? ''));
 	const deletion = new DeleteConfirm();
 	const onDelete = deletion.enhance();
+
+	let removeOpen = $state(false);
+	let removing = $state(false);
+
+	/** Al eliminar, la acción redirige al listado: el aviso va aquí porque no queda `form`. */
+	const onRemove: SubmitFunction = () => {
+		removing = true;
+
+		return async ({ result, update }) => {
+			if (result.type === 'redirect') toast.success(`Eliminamos ${store.name}.`);
+
+			await update();
+			removing = false;
+			if (result.type !== 'redirect') removeOpen = false;
+		};
+	};
 </script>
 
 <svelte:head>
@@ -101,10 +122,19 @@
 	{/snippet}
 
 	{#snippet actions()}
-		<form id="estado" method="POST" action="?/status" use:enhance={onDelete}>
+		<form
+			id="estado"
+			class="flex flex-wrap gap-2"
+			method="POST"
+			action="?/status"
+			use:enhance={onDelete}
+		>
 			{#if store.status === 'suspended'}
 				<input type="hidden" name="status" value="active" />
 				<Button type="submit">Reactivar tienda</Button>
+				<Button type="button" variant="destructive" onclick={() => (removeOpen = true)}>
+					Eliminar tienda
+				</Button>
 			{:else}
 				<input type="hidden" name="status" value="suspended" />
 				<Button
@@ -299,4 +329,20 @@
 		pendingLabel={deletion.target?.pendingLabel}
 		pending={deletion.pending}
 	/>
+
+	{#if store.status === 'suspended'}
+		<form id="store-delete" method="POST" action="?/delete" use:enhance={onRemove}></form>
+
+		<TypedConfirmDialog
+			bind:open={removeOpen}
+			title={`¿Eliminar ${store.name}?`}
+			description="No tiene vuelta atrás. Se borran sus productos, pedidos, fotos, pagos de la suscripción y su dominio propio. Las cuentas del equipo siguen existiendo, sin esta tienda."
+			form="store-delete"
+			name="confirmSlug"
+			expected={store.slug}
+			label="Escribe la dirección de la tienda"
+			confirmLabel="Eliminar tienda"
+			pending={removing}
+		/>
+	{/if}
 </PageTemplate>

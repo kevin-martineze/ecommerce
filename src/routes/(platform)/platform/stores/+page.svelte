@@ -87,11 +87,11 @@
 		</form>
 
 		<SelectField
-			name="estado"
+			name="status"
 			aria-label="Estado"
 			value={data.filters.status ?? 'all'}
 			options={statusOptions}
-			onValueChange={(value) => applyFilter('estado', value === 'all' ? null : value)}
+			onValueChange={(value) => applyFilter('status', value === 'all' ? null : value)}
 		/>
 
 		<div class="flex items-center gap-2">

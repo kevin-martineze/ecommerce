@@ -2,11 +2,12 @@
 import type { Actions, PageServerLoad } from './$types';
 
 // Svelte
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 // Servidor
 import {
 	changePlan,
+	deleteStore,
 	getStore,
 	listPlans,
 	recordPayment,
@@ -15,7 +16,12 @@ import {
 import { accountContext, failWith, orFail } from '$lib/server/context';
 
 // Dominio
-import { paymentSchema, planChangeSchema, storeStatusSchema } from '$lib/schemas/platform';
+import {
+	deleteStoreSchema,
+	paymentSchema,
+	planChangeSchema,
+	storeStatusSchema
+} from '$lib/schemas/platform';
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = accountContext(event);
@@ -93,5 +99,21 @@ export const actions: Actions = {
 					? 'Tienda suspendida: no se ve en internet y su panel quedó en solo lectura.'
 					: 'Tienda reactivada.'
 		};
+	},
+
+	delete: async (event) => {
+		const ctx = accountContext(event);
+		const formData = await event.request.formData();
+		const parsed = deleteStoreSchema.safeParse({ confirmSlug: formData.get('confirmSlug') ?? '' });
+
+		if (!parsed.success) {
+			return fail(400, { error: parsed.error.issues.at(0)?.message ?? 'Revisa la confirmación.' });
+		}
+
+		const result = await deleteStore(ctx, event.params.id, parsed.data.confirmSlug);
+
+		if (!result.ok) return failWith(result);
+
+		redirect(303, '/platform/stores');
 	}
 };

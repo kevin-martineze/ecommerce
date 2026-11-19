@@ -30,3 +30,18 @@ export const storeStatusSchema = z.enum(['active', 'suspended'], {
 });
 
 export const storeFilterStatusSchema = z.enum(['trial', 'active', 'past_due', 'suspended']);
+
+export const userFilterStatusSchema = z.enum(['active', 'disabled']);
+
+export const userDisabledSchema = z.enum(['true', 'false'], {
+	errorMap: () => ({ message: 'Estado inválido.' })
+});
+
+export const deleteUserSchema = z.object({
+	confirmEmail: z.string().trim().min(1, 'Escribe el correo de la cuenta para confirmar.').max(320),
+	deleteStoreIds: z.array(z.string().uuid('Una de las tiendas no es válida.')).max(50)
+});
+
+export const deleteStoreSchema = z.object({
+	confirmSlug: z.string().trim().min(1, 'Escribe la dirección de la tienda para confirmar.').max(63)
+});
