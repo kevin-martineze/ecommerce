@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 
 // Dominio
-import { registerSchema, resetPasswordSchema } from '$lib/schemas/account';
+import { googleRegisterSchema, registerSchema, resetPasswordSchema } from '$lib/schemas/account';
 
 const valid = {
 	storeName: 'Casa Oliva',
@@ -45,5 +45,31 @@ describe('resetPasswordSchema', () => {
 		});
 
 		expect(result.success).toBe(false);
+	});
+});
+
+describe('googleRegisterSchema', () => {
+	const store = {
+		storeName: 'Casa Oliva',
+		storeSlug: 'casa-oliva',
+		whatsappPhone: '+57 300 123 4567'
+	};
+
+	it('si Google no dio nombre, lo exige y lo deja pasar a la API', () => {
+		const schema = googleRegisterSchema(true);
+		const missing = schema.safeParse({ ...store, fullName: '' });
+
+		expect(missing.success).toBe(false);
+		expect(missing.error?.issues.at(0)?.path).toEqual(['fullName']);
+		expect(schema.parse({ ...store, fullName: '  María Restrepo ' }).fullName).toBe(
+			'María Restrepo'
+		);
+	});
+
+	it('si Google dio nombre, descarta el del formulario', () => {
+		const parsed = googleRegisterSchema(false).parse({ ...store, fullName: 'Otra Persona' });
+
+		expect(parsed.fullName).toBeUndefined();
+		expect(parsed.whatsappPhone).toBe('573001234567');
 	});
 });

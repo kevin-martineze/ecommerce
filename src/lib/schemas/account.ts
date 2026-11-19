@@ -123,3 +123,25 @@ export const storeFieldsSchema = registerSchema.innerType().pick({
 	storeSlug: true,
 	whatsappPhone: true
 });
+
+/**
+ * Terminar el registro con Google: la tienda y, solo si Google no lo dio, el
+ * nombre.
+ *
+ * El correo nunca viene del formulario sino de Google, sellado en la cookie
+ * `globerce_google_signup` junto con el `signupToken` que lo respalda, y no
+ * hay contraseña: la cuenta entra con Google. Aceptarlo del formulario
+ * dejaría registrar a nombre de otro correo.
+ *
+ * El nombre sí se puede pedir: hay cuentas de Google sin él, y sin esto la
+ * cuenta quedaba sin nombre. Con `askName` es obligatorio y viaja a la API;
+ * sin él, lo que llegue en el campo (el nombre de Google, de solo lectura) se
+ * descarta y la API usa el de Google.
+ */
+export function googleRegisterSchema(askName: boolean) {
+	return storeFieldsSchema.extend({
+		fullName: askName
+			? registerSchema.innerType().shape.fullName
+			: z.unknown().transform((): undefined => undefined)
+	});
+}

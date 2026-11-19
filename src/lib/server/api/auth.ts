@@ -87,6 +87,75 @@ export function register(
 	});
 }
 
+// ---------------------------------------------------------------------------
+// Google
+// ---------------------------------------------------------------------------
+
+/**
+ * Lo que responde `POST /auth/google`: la cuenta ya existe (o se acaba de
+ * vincular por correo) y viene su sesión, o no existe y hay que terminar el
+ * registro con los datos de la tienda.
+ */
+const googleSignInSchema = z.discriminatedUnion('status', [
+	z.object({ status: z.literal('session'), session: sessionSchema }),
+	z.object({
+		status: z.literal('signup_required'),
+		/** Prueba de 15 minutos, firmada por la API, de que Google confirmó este correo. */
+		signupToken: z.string().min(1),
+		email: z.string(),
+		fullName: z.string().nullable()
+	})
+]);
+
+export type GoogleSignIn = z.infer<typeof googleSignInSchema>;
+
+export interface GoogleExchangeInput {
+	/** El `code` que Google dejó en el callback. */
+	code: string;
+	/** El verificador PKCE guardado en la cookie `globerce_oauth`. */
+	codeVerifier: string;
+	/** La misma URI de callback con que se pidió el código: Google la vuelve a exigir. */
+	redirectUri: string;
+}
+
+/**
+ * Canjea el código de Google. El canje, la verificación del `id_token` y la
+ * elección de la cuenta los hace la API: este servidor nunca ve el
+ * `client_secret` ni decide quién es quién.
+ */
+export function signInWithGoogle(
+	input: GoogleExchangeInput,
+	clientIp: string | null
+): Promise<ApiResult<GoogleSignIn>> {
+	return apiRequest('/auth/google', googleSignInSchema, {
+		method: 'POST',
+		body: input,
+		clientIp
+	});
+}
+
+export interface GoogleRegisterInput {
+	signupToken: string;
+	storeName: string;
+	storeSlug: string;
+	whatsappPhone: string;
+	planCode?: string;
+	/** Reemplaza el nombre que dio Google. Solo se manda cuando Google no dio ninguno. */
+	fullName?: string;
+}
+
+/** Termina el registro con Google: crea la tienda y la cuenta sin contraseña. */
+export function registerWithGoogle(
+	input: GoogleRegisterInput,
+	clientIp: string | null
+): Promise<ApiResult<ApiSession>> {
+	return apiRequest('/auth/google/register', sessionSchema, {
+		method: 'POST',
+		body: input,
+		clientIp
+	});
+}
+
 /** Otra tienda para la cuenta de la sesión. Devuelve una sesión ya atada a ella. */
 export function createStore(
 	ctx: AccountContext,

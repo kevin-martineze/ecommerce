@@ -1,13 +1,13 @@
 // Tipos
-import type { RequestEvent } from '@sveltejs/kit';
-import type { ApiMe, ApiSessionStore } from '$lib/server/api/auth';
+import type { Cookies, RequestEvent } from '@sveltejs/kit';
+import type { ApiMe, ApiSession, ApiSessionStore } from '$lib/server/api/auth';
 import type { AdminSession } from '$lib/server/session-crypto';
 
 // Svelte
 import { error, redirect } from '@sveltejs/kit';
 
 // Servidor
-import { me, switchStore } from '$lib/server/api/auth';
+import { logout, me, switchStore } from '$lib/server/api/auth';
 import { accountContext, clientAddress, storeSlugFor } from '$lib/server/context';
 import { clearSession, toAdminSession, writeSession } from '$lib/server/session';
 
@@ -99,4 +99,58 @@ export async function requirePlatformAdmin(event: GuardEvent): Promise<ApiMe> {
 	if (!account.isPlatformAdmin) error(403, 'Esta cuenta no administra la plataforma.');
 
 	return account;
+}
+
+/** A dónde va una sesión recién emitida, o por qué no se guardó. */
+export type SignInOutcome =
+	{ ok: true; destination: 'panel' | 'platform' } | { ok: false; status: 403; error: string };
+
+/**
+ * Lo que pasa después de que la API emite una sesión, entre por contraseña o
+ * por Google: elige la tienda, guarda la cookie y dice a dónde seguir.
+ *
+ * - En el host de una tienda se entra a ESA tienda, si la cuenta es parte de
+ *   ella, aunque la API haya elegido otra (`hostSlug`).
+ * - Sin tienda solo se entra a la consola de la plataforma, si la cuenta la
+ *   administra. Si no, la sesión se cierra en la API y no se guarda.
+ *
+ * No redirige: el login responde con `fail` y el callback de Google con una
+ * redirección a otro host, así que cada uno decide cómo contarlo.
+ */
+export async function completeSignIn(
+	cookies: Cookies,
+	issued: ApiSession,
+	hostSlug: string | null,
+	clientIp: string | null
+): Promise<SignInOutcome> {
+	let session = toAdminSession(issued);
+
+	const hostStore = issued.stores.find((store) => store.slug === hostSlug);
+
+	if (hostStore && hostStore.id !== session.storeId) {
+		const switched = await switchStore(
+			{ accessToken: session.accessToken, clientIp },
+			hostStore.id,
+			session.refreshToken
+		);
+
+		if (switched.ok) session = toAdminSession(switched.data);
+	}
+
+	if (!session.storeId) {
+		const account = await me(session.accessToken, clientIp);
+
+		if (account.ok && account.data.isPlatformAdmin) {
+			writeSession(cookies, session);
+			return { ok: true, destination: 'platform' };
+		}
+
+		await logout(session.refreshToken, clientIp);
+
+		return { ok: false, status: 403, error: 'Esta cuenta no tiene acceso al panel.' };
+	}
+
+	writeSession(cookies, session);
+
+	return { ok: true, destination: 'panel' };
 }
