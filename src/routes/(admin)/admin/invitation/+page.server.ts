@@ -7,21 +7,42 @@ import { fail, redirect } from '@sveltejs/kit';
 // Servidor
 import { acceptInvitation, previewInvitation } from '$lib/server/api/auth';
 import { clientAddress, displayStatus } from '$lib/server/context';
+import { googleInvitationHref } from '$lib/server/google-signin';
 import { toAdminSession, writeSession } from '$lib/server/session';
 
 // Dominio
+import { googleNotice } from '$lib/domain/google-auth';
 import { acceptExistingSchema, acceptNewSchema } from '$lib/schemas/account';
 
 export const load: PageServerLoad = async (event) => {
 	const token = event.url.searchParams.get('token') ?? '';
+	// Lo que dejó el callback de Google (`?error=…`): solo un código, el texto lo pone el aviso.
+	const notice = googleNotice(event.url.searchParams.get('error'));
 
-	if (!token) return { token, invitation: null, problem: 'El enlace está incompleto.' };
+	if (!token) {
+		return {
+			token,
+			invitation: null,
+			problem: 'El enlace está incompleto.',
+			googleHref: null,
+			notice: null
+		};
+	}
 
 	const result = await previewInvitation(token, clientAddress(event));
 
-	if (!result.ok) return { token, invitation: null, problem: result.message };
+	if (!result.ok) {
+		return { token, invitation: null, problem: result.message, googleHref: null, notice: null };
+	}
 
-	return { token, invitation: result.data, problem: null };
+	return {
+		token,
+		invitation: result.data,
+		problem: null,
+		// Solo con una invitación válida: el botón de Google no sirve para una vencida.
+		googleHref: googleInvitationHref(event.url, token),
+		notice
+	};
 };
 
 export const actions: Actions = {

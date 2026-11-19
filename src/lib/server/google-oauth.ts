@@ -35,10 +35,19 @@ export const oauthIntentSchema = z.enum(['login', 'signup', 'invitation']);
 
 export type OAuthIntent = z.infer<typeof oauthIntentSchema>;
 
-const oauthStateSchema = z.object({
+/**
+ * El enlace de una invitación tal como lo emite la API: `<storeId>.<secreto>`
+ * (ver `INVITATION_TOKEN_PATTERN` en la API). Se valida antes de sellarlo en la
+ * cookie, y el token nunca sale hacia Google.
+ */
+export const invitationTokenSchema = z
+	.string()
+	.max(200)
+	.regex(/^[0-9a-f-]{36}\.[A-Za-z0-9_-]{20,}$/);
+
+const oauthBaseSchema = z.object({
 	state: z.string().min(32),
 	codeVerifier: z.string().min(43).max(128),
-	intent: oauthIntentSchema,
 	/** Ruta de este sitio a la que se vuelve. Ya pasó por `safeRedirectTarget`. */
 	redirectTo: z.string(),
 	/** Host desde el que se pidió entrar (el raíz o el subdominio de una tienda). Ya validado. */
@@ -46,6 +55,16 @@ const oauthStateSchema = z.object({
 	/** Epoch en ms. La cookie vence sola, pero el valor sellado no debe servir después. */
 	expiresAt: z.number().int()
 });
+
+// El token de la invitación existe solo en su rama: `login` y `signup` no lo
+// llevan, e `invitation` no se puede sellar ni abrir sin él.
+const oauthStateSchema = z.union([
+	oauthBaseSchema.extend({ intent: z.enum(['login', 'signup']) }),
+	oauthBaseSchema.extend({
+		intent: z.literal('invitation'),
+		invitationToken: invitationTokenSchema
+	})
+]);
 
 export type OAuthState = z.infer<typeof oauthStateSchema>;
 
@@ -164,11 +183,17 @@ export function originFor(host: string, siteUrl: string): string {
 	return `${new URL(siteUrl).protocol}//${host}`;
 }
 
-export interface StartRequest {
-	intent: OAuthIntent;
+interface StartCommon {
 	redirectTo: string | null;
 	returnHost: string | null;
 }
+
+/** Lo que pide el botón. Una invitación siempre trae su token (ya validado con `invitationTokenSchema`). */
+export type StartRequest = StartCommon &
+	(
+		| { intent: Exclude<OAuthIntent, 'invitation'> }
+		| { intent: 'invitation'; invitationToken: string }
+	);
 
 /** El estado del intento, ya con `redirectTo` y `returnHost` en lo que se puede confiar. */
 export function newOAuthState(
@@ -177,17 +202,20 @@ export function newOAuthState(
 	now: number = Date.now()
 ): { state: OAuthState; codeChallenge: string } {
 	const { codeVerifier, codeChallenge } = createPkce();
+	const common = {
+		state: randomToken(),
+		codeVerifier,
+		redirectTo: safeRedirectTarget(request.redirectTo),
+		returnHost: safeReturnHost(request.returnHost, rules),
+		expiresAt: now + OAUTH_TTL_SECONDS * 1000
+	};
 
 	return {
 		codeChallenge,
-		state: {
-			state: randomToken(),
-			codeVerifier,
-			intent: request.intent,
-			redirectTo: safeRedirectTarget(request.redirectTo),
-			returnHost: safeReturnHost(request.returnHost, rules),
-			expiresAt: now + OAUTH_TTL_SECONDS * 1000
-		}
+		state:
+			request.intent === 'invitation'
+				? { ...common, intent: 'invitation', invitationToken: request.invitationToken }
+				: { ...common, intent: request.intent }
 	};
 }
 
