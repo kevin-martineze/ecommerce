@@ -134,6 +134,50 @@ export interface PlatformStoreDetail extends PlatformStore {
 	custom_domain_status: DomainStatus | null;
 }
 
+/** Filtro del listado de cuentas de la plataforma. */
+export type UserStatus = 'active' | 'disabled';
+
+export const USER_STATUS_LABEL: Record<UserStatus, string> = {
+	active: 'Activa',
+	disabled: 'Deshabilitada'
+};
+
+export interface PlatformUserMembership {
+	store_id: string;
+	store_name: string;
+	store_slug: string;
+	store_status: StoreStatus;
+	role: MemberRole;
+}
+
+export interface PlatformUser {
+	id: string;
+	email: string;
+	full_name: string | null;
+	created_at: string;
+	/** Null: la cuenta está activa. */
+	disabled_at: string | null;
+	/** Última sesión abierta o renovada. Null: nunca entró. */
+	last_sign_in_at: string | null;
+	has_password: boolean;
+	has_google: boolean;
+	/** Administra la plataforma: no se deshabilita ni se elimina desde la consola. */
+	is_platform_admin: boolean;
+	memberships: PlatformUserMembership[];
+}
+
+/** Una tienda que se iría con la cuenta. */
+export interface PlatformUserStore {
+	id: string;
+	name: string;
+	slug: string;
+}
+
+export interface PlatformUserDetail extends PlatformUser {
+	/** Tiendas donde es la única creadora: se eliminan junto con la cuenta. */
+	sole_owner_stores: PlatformUserStore[];
+}
+
 export type NoticeTone = 'danger' | 'warning' | 'info';
 
 export interface SubscriptionNotice {

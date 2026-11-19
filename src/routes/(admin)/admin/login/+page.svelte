@@ -67,6 +67,10 @@
 			<p class="text-destructive text-sm">{form.error}</p>
 		{:else if googleMessage}
 			<p class="text-destructive text-sm">{googleMessage}</p>
+		{:else if data.notice === 'account_disabled'}
+			<p class="text-destructive text-sm">
+				Esta cuenta está deshabilitada. Escríbenos si crees que es un error.
+			</p>
 		{:else if data.notice === 'no-access'}
 			<p class="text-destructive text-sm">Esa cuenta no tiene acceso al panel.</p>
 		{:else if data.notice === 'password-reset'}

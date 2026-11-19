@@ -11,7 +11,7 @@ import { dev } from '$app/environment';
 
 // Servidor
 import { acceptInvitationWithGoogle, signInWithGoogle } from '$lib/server/api/auth';
-import { completeSignIn } from '$lib/server/auth';
+import { ACCOUNT_DISABLED, completeSignIn } from '$lib/server/auth';
 import { clientAddress } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
 import {
@@ -166,9 +166,12 @@ export function startGoogleSignIn(event: GoogleEvent): never {
 
 /** El código de aviso para la página de origen. El texto vive en `GOOGLE_NOTICES`. */
 function noticeFor(apiCode: string): string {
-	return apiCode === GOOGLE_NOTICE_CODES.emailUnverified
-		? GOOGLE_NOTICE_CODES.emailUnverified
-		: GOOGLE_NOTICE_CODES.failed;
+	if (apiCode === GOOGLE_NOTICE_CODES.emailUnverified) return GOOGLE_NOTICE_CODES.emailUnverified;
+
+	// No es un aviso de Google: lo pinta el login como cualquier cuenta deshabilitada.
+	if (apiCode === ACCOUNT_DISABLED) return ACCOUNT_DISABLED;
+
+	return GOOGLE_NOTICE_CODES.failed;
 }
 
 /** Los códigos de la API que tienen aviso propio al aceptar una invitación. */

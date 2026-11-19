@@ -9,7 +9,10 @@ import type {
 	PlatformPaymentRow,
 	PlatformStore,
 	PlatformStoreDetail,
-	StoreStatus
+	PlatformUser,
+	PlatformUserDetail,
+	StoreStatus,
+	UserStatus
 } from '$lib/domain/account';
 
 // Librerías
@@ -121,7 +124,7 @@ function platformRequest<T>(
 	ctx: AccountContext,
 	path: string,
 	schema: z.ZodType<T, z.ZodTypeDef, unknown>,
-	options: { method?: 'GET' | 'POST' | 'PUT' | 'PATCH'; body?: unknown } = {}
+	options: { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown } = {}
 ): Promise<ApiResult<T>> {
 	return apiRequest(`/platform${path}`, schema, {
 		...options,
@@ -320,5 +323,127 @@ export function listPayments(
 export function reconcile(ctx: AccountContext): Promise<ApiResult<{ markedPastDue: number }>> {
 	return platformRequest(ctx, '/reconcile', z.object({ markedPastDue: z.number() }), {
 		method: 'POST'
+	});
+}
+
+// ---------------------------------------------------------------------------
+// Cuentas
+// ---------------------------------------------------------------------------
+
+const userFields = {
+	id: z.string(),
+	email: z.string(),
+	fullName: z.string().nullable(),
+	createdAt: z.string(),
+	disabledAt: z.string().nullable(),
+	lastSignInAt: z.string().nullable(),
+	hasPassword: z.boolean(),
+	hasGoogle: z.boolean(),
+	isPlatformAdmin: z.boolean(),
+	memberships: z.array(
+		z.object({
+			storeId: z.string(),
+			storeName: z.string(),
+			storeSlug: z.string(),
+			storeStatus: storeStatusSchema,
+			role: memberRoleSchema
+		})
+	)
+};
+
+type RawUser = z.output<z.ZodObject<typeof userFields>>;
+
+function toUser(user: RawUser): PlatformUser {
+	return {
+		id: user.id,
+		email: user.email,
+		full_name: user.fullName,
+		created_at: user.createdAt,
+		disabled_at: user.disabledAt,
+		last_sign_in_at: user.lastSignInAt,
+		has_password: user.hasPassword,
+		has_google: user.hasGoogle,
+		is_platform_admin: user.isPlatformAdmin,
+		memberships: user.memberships.map((membership) => ({
+			store_id: membership.storeId,
+			store_name: membership.storeName,
+			store_slug: membership.storeSlug,
+			store_status: membership.storeStatus,
+			role: membership.role
+		}))
+	};
+}
+
+const userSchema = z.object(userFields).transform(toUser);
+
+const userDetailSchema = z
+	.object({
+		...userFields,
+		soleOwnerStores: z.array(z.object({ id: z.string(), name: z.string(), slug: z.string() }))
+	})
+	.transform((user): PlatformUserDetail => ({
+		...toUser(user),
+		sole_owner_stores: user.soleOwnerStores
+	}));
+
+export interface UserFilters {
+	q: string | null;
+	status: UserStatus | null;
+}
+
+export function listUsers(
+	ctx: AccountContext,
+	filters: UserFilters
+): Promise<ApiResult<PlatformUser[]>> {
+	const params = new URLSearchParams();
+
+	if (filters.q) params.set('q', filters.q);
+	if (filters.status) params.set('status', filters.status);
+
+	const query = params.size > 0 ? `?${params}` : '';
+
+	return platformRequest(ctx, `/users${query}`, z.array(userSchema));
+}
+
+export function getUser(ctx: AccountContext, id: string): Promise<ApiResult<PlatformUserDetail>> {
+	return platformRequest(ctx, `/users/${encodeURIComponent(id)}`, userDetailSchema);
+}
+
+/** Deshabilitar cierra todas sus sesiones; reactivar le devuelve la entrada. */
+export function setUserDisabled(
+	ctx: AccountContext,
+	id: string,
+	disabled: boolean
+): Promise<ApiResult<PlatformUserDetail>> {
+	return platformRequest(ctx, `/users/${encodeURIComponent(id)}/status`, userDetailSchema, {
+		method: 'PATCH',
+		body: { disabled }
+	});
+}
+
+/**
+ * Elimina la cuenta y las tiendas donde era la única creadora. `deleteStoreIds`
+ * es la lista que se le mostró a quien confirma: si la API calcula otra, 409.
+ */
+export function deleteUser(
+	ctx: AccountContext,
+	id: string,
+	input: { confirmEmail: string; deleteStoreIds: string[] }
+): Promise<ApiResult<undefined>> {
+	return platformRequest(ctx, `/users/${encodeURIComponent(id)}`, z.undefined(), {
+		method: 'DELETE',
+		body: input
+	});
+}
+
+/** Borrado definitivo de una tienda suspendida, con sus fotos y su dominio. */
+export function deleteStore(
+	ctx: AccountContext,
+	id: string,
+	confirmSlug: string
+): Promise<ApiResult<undefined>> {
+	return platformRequest(ctx, `/stores/${encodeURIComponent(id)}`, z.undefined(), {
+		method: 'DELETE',
+		body: { confirmSlug }
 	});
 }

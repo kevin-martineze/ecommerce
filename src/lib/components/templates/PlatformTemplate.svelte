@@ -37,6 +37,7 @@ sesión) fija arriba. Cada página pone su contenido con `PageTemplate`.
 	const LINKS = [
 		{ href: '/platform', label: 'Resumen' },
 		{ href: '/platform/stores', label: 'Tiendas' },
+		{ href: '/platform/users', label: 'Cuentas' },
 		{ href: '/platform/payments', label: 'Pagos' },
 		{ href: '/platform/support', label: 'Soporte' }
 	];

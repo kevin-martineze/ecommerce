@@ -11,6 +11,9 @@ import { logout, me, switchStore } from '$lib/server/api/auth';
 import { accountContext, clientAddress, storeSlugFor } from '$lib/server/context';
 import { clearSession, toAdminSession, writeSession } from '$lib/server/session';
 
+/** El código con que la API rechaza una cuenta deshabilitada (403). */
+export const ACCOUNT_DISABLED = 'account_disabled';
+
 type GuardEvent = Pick<RequestEvent, 'locals' | 'cookies' | 'url' | 'getClientAddress'>;
 
 export interface PanelAccess {
@@ -32,6 +35,13 @@ async function currentAccount(event: GuardEvent, session: AdminSession): Promise
 	if (result.status === 401) {
 		clearSession(event.cookies);
 		redirect(303, loginUrl(event));
+	}
+
+	// La plataforma deshabilitó la cuenta: la sesión no sirve más y el login
+	// dice por qué, en vez de mostrar un error genérico en cada página.
+	if (result.code === ACCOUNT_DISABLED) {
+		clearSession(event.cookies);
+		redirect(303, `/admin/login?error=${ACCOUNT_DISABLED}`);
 	}
 
 	// La API no respondió o falló: no es motivo para cerrar la sesión.
