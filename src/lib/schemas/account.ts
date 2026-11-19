@@ -46,6 +46,9 @@ export const changePasswordSchema = z
 		path: ['confirm']
 	});
 
+/** Crear la contraseña de una cuenta solo-Google: no hay una actual que pedir. */
+export const setPasswordSchema = withConfirmation({});
+
 export const memberRoleSchema = z.enum(['owner', 'staff'], {
 	errorMap: () => ({ message: 'Elige un rol.' })
 });

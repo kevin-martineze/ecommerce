@@ -1,7 +1,7 @@
 # Plan: entrar y registrarse con Google
 
-Estado: **Fase 1 (API) implementada en `ecommerce-api`, sin commit**; el resto,
-planificado. Noviembre de 2026.
+Estado: **Fases 1, 2 y 3 fusionadas en main**; Fase 4 en curso; Fase 5 pendiente.
+Noviembre de 2026.
 
 Alcance: cuentas de **dueñas y equipo** (`User` de la API): `/admin/login`,
 `/signup` e invitaciones. Las clientas de las tiendas siguen comprando sin
@@ -114,6 +114,55 @@ Throttle 10/min, como `invitations/accept`. Errores:
 La cuenta se elige igual que en `/auth/google`: por identidad, luego por correo
 (con las reglas del §6) y, si no hay ninguna, se crea sin contraseña. El
 vínculo, la membresía y la invitación aceptada van en una sola transacción.
+
+### Fase 4: cuenta
+
+**`GET /auth/me` (cambio aditivo).** Agrega `signIn`:
+
+```jsonc
+{
+	"user": { … },
+	"stores": [ … ],
+	"isPlatformAdmin": false,
+	"signIn": {
+		"hasPassword": true,
+		"google": { "email": "maria@gmail.com", "linkedAt": "2026-11-19T12:00:00.000Z" } // o null
+	}
+}
+```
+
+El front lo lee como **opcional**: `requireAdmin` usa `me` en cada página del
+panel, y un esquema estricto tumbaría el panel entero si el front se despliega
+antes que la API.
+
+**`POST /auth/password/set`**, con throttle de 10/min y sesión obligatoria.
+Sirve para crear la primera contraseña de una cuenta solo-Google.
+
+```jsonc
+{ "newPassword": "…", "refreshToken": "…" }
+// 204. Las demás sesiones de la cuenta se cierran; la de `refreshToken` sigue viva.
+```
+
+- `password_already_set` (409): la cuenta ya tiene contraseña. Para cambiarla
+  se usa `password/change`.
+- La contraseña nueva se valida con las mismas reglas que `password/change`.
+- Se manda un correo de aviso: "Se creó una contraseña para tu cuenta".
+
+**`POST /auth/identities/google/unlink`**, con throttle de 10/min y sesión
+obligatoria.
+
+```jsonc
+{ "refreshToken": "…" }
+// 204. Borra la UserIdentity de Google. Las demás sesiones se cierran.
+```
+
+- `password_required` (409): la cuenta no tiene contraseña. Sin Google se
+  quedaría sin forma de entrar.
+- `google_not_linked` (404): no hay Google vinculado.
+- Se manda un correo de aviso: "Se desconectó Google de tu cuenta".
+
+Fuera de la Fase 4: conectar desde la cuenta una cuenta de Google con **otro**
+correo. Con el mismo correo ya se vincula sola al entrar con Google en el login.
 
 ---
 
@@ -248,13 +297,21 @@ es independiente y se puede dejar para después.
   `intent=invitation` y el token de la invitación en la cookie `globerce_oauth`.
   El callback llama `accept-google` en vez de `/auth/google`.
 
-### Fase 4 — Cuenta (opcional, después)
+### Fase 4 — Cuenta
 
-- Ver y desconectar Google desde la configuración de la cuenta. No se deja
-  desconectar si la cuenta no tiene contraseña.
-- "Crear contraseña" para cuentas solo-Google: `changePassword` sin
-  `currentPassword` cuando `passwordHash` es null. Mientras tanto,
-  "¿Olvidaste tu contraseña?" ya sirve para fijarla.
+Contrato en el §2 ("Fase 4: cuenta").
+
+- API: `signIn` en `GET /auth/me`, `POST /auth/password/set` y
+  `POST /auth/identities/google/unlink`, cada uno con su correo de aviso.
+- Front, en `(panel)/account`:
+  - Sección "Cómo entras": Google conectado con su correo, o no conectado.
+  - El botón "Desconectar Google" pasa por `ConfirmDialog`. No aparece si la
+    cuenta no tiene contraseña; en su lugar se explica que primero hay que
+    crearla.
+  - Con `hasPassword: false`, el formulario de contraseña es "Crear contraseña"
+    (`?/setPassword`, sin contraseña actual). Con `true`, sigue el de cambiarla.
+  - Si `signIn` no llega (API vieja), la sección no se pinta y el formulario
+    de cambiar contraseña queda como hoy.
 
 ### Fase 5 — QA y despliegue
 

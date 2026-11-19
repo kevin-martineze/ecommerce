@@ -42,10 +42,27 @@ const sessionSchema = z.object({
 	activeStoreId: z.string().nullable()
 });
 
+/** Cómo entra la cuenta: con contraseña, con Google, o con las dos. */
+const signInSchema = z.object({
+	hasPassword: z.boolean(),
+	/** Null si Google no está vinculado. */
+	google: z
+		.object({
+			email: z.string(),
+			linkedAt: z.string()
+		})
+		.nullable()
+});
+
 const meSchema = z.object({
 	user: userSchema,
 	stores: z.array(storeSchema),
-	isPlatformAdmin: z.boolean()
+	isPlatformAdmin: z.boolean(),
+	/**
+	 * Opcional a propósito: `requireAdmin` lee `me` en cada página del panel, y
+	 * una API que aún no lo manda no debe tumbar el panel.
+	 */
+	signIn: signInSchema.optional()
 });
 
 export type ApiSession = z.infer<typeof sessionSchema>;
@@ -156,6 +173,23 @@ export function registerWithGoogle(
 	});
 }
 
+/**
+ * Quita el vínculo con Google. La API lo rechaza (`password_required`) si la
+ * cuenta no tiene contraseña: sin ella se quedaría sin forma de entrar. Esta
+ * sesión sigue viva; las demás de la cuenta se cierran.
+ */
+export function unlinkGoogle(
+	ctx: AccountContext,
+	input: { refreshToken: string }
+): Promise<ApiResult<undefined>> {
+	return apiRequest('/auth/identities/google/unlink', z.undefined(), {
+		method: 'POST',
+		body: input,
+		accessToken: ctx.accessToken,
+		clientIp: ctx.clientIp
+	});
+}
+
 /** Otra tienda para la cuenta de la sesión. Devuelve una sesión ya atada a ella. */
 export function createStore(
 	ctx: AccountContext,
@@ -245,6 +279,23 @@ export function changePassword(
 	input: { currentPassword: string; newPassword: string; refreshToken: string }
 ): Promise<ApiResult<undefined>> {
 	return apiRequest('/auth/password/change', z.undefined(), {
+		method: 'POST',
+		body: input,
+		accessToken: ctx.accessToken,
+		clientIp: ctx.clientIp
+	});
+}
+
+/**
+ * Crea la primera contraseña de una cuenta solo-Google. La API responde
+ * `password_already_set` si ya tiene una: para cambiarla está `changePassword`.
+ * Esta sesión sigue viva; las demás de la cuenta se cierran.
+ */
+export function setPassword(
+	ctx: AccountContext,
+	input: { newPassword: string; refreshToken: string }
+): Promise<ApiResult<undefined>> {
+	return apiRequest('/auth/password/set', z.undefined(), {
 		method: 'POST',
 		body: input,
 		accessToken: ctx.accessToken,
