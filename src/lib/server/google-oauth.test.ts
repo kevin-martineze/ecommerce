@@ -10,6 +10,7 @@ import {
 	callbackUrl,
 	codeChallengeFor,
 	createPkce,
+	invitationTokenSchema,
 	newOAuthState,
 	safeReturnHost,
 	sealGoogleSignup,
@@ -18,10 +19,11 @@ import {
 	unsealGoogleSignup,
 	unsealOAuthState
 } from '$lib/server/google-oauth';
-import { sealSession, unsealSession } from '$lib/server/session-crypto';
+import { seal, sealSession, unsealSession } from '$lib/server/session-crypto';
 
 const secret = 'un-secreto-de-prueba-con-largo-suficiente';
 const now = 1_800_000_000_000;
+const TOKEN = '0b8c3d1e-5f6a-4b7c-8d9e-0f1a2b3c4d5e.abcdefghijklmnopqrstuvwx';
 
 const production: HostRules = {
 	siteUrl: 'https://globerce.com',
@@ -131,6 +133,25 @@ describe('newOAuthState', () => {
 		expect(codeChallenge).toBe(codeChallengeFor(built.codeVerifier));
 	});
 
+	it('una invitación guarda su token tal cual', () => {
+		const { state: built } = newOAuthState(
+			{
+				intent: 'invitation',
+				invitationToken: TOKEN,
+				redirectTo: null,
+				returnHost: 'boutique.globerce.com'
+			},
+			production,
+			now
+		);
+
+		expect(built).toMatchObject({
+			intent: 'invitation',
+			invitationToken: TOKEN,
+			returnHost: 'boutique.globerce.com'
+		});
+	});
+
 	it('conserva una ruta nuestra y un subdominio válido', () => {
 		const { state: built } = newOAuthState(
 			{ intent: 'signup', redirectTo: '/admin/orders?page=2', returnHost: 'boutique.globerce.com' },
@@ -161,6 +182,28 @@ describe('cookie globerce_oauth', () => {
 		expect(unsealOAuthState(sealed, 'otro-secreto-igual-de-largo-que-el-real', now)).toBeNull();
 		expect(unsealOAuthState(sealed, secret, state.expiresAt)).toBeNull();
 		expect(unsealOAuthState(undefined, secret, now)).toBeNull();
+	});
+
+	it('recupera una invitación con su token', () => {
+		const invitation: OAuthState = {
+			state: 'i'.repeat(43),
+			codeVerifier: 'v'.repeat(43),
+			intent: 'invitation',
+			invitationToken: TOKEN,
+			redirectTo: '/admin',
+			returnHost: 'globerce.com',
+			expiresAt: now + 60_000
+		};
+
+		expect(unsealOAuthState(sealOAuthState(invitation, secret), secret, now)).toEqual(invitation);
+	});
+
+	it('una invitación sellada sin token no se abre', () => {
+		const withoutToken = seal({ ...state, intent: 'invitation' }, secret, {
+			purpose: 'google-oauth'
+		});
+
+		expect(unsealOAuthState(withoutToken, secret, now)).toBeNull();
 	});
 
 	it('no abre como sesión ni como registro, ni al revés', () => {
@@ -201,6 +244,22 @@ describe('cookie globerce_google_signup', () => {
 		expect(sealed).not.toContain('token-de-registro');
 		expect(unsealGoogleSignup(sealed, secret, now)).toEqual(signup);
 		expect(unsealGoogleSignup(sealed, secret, signup.expiresAt + 1)).toBeNull();
+	});
+});
+
+describe('invitationTokenSchema', () => {
+	it('acepta el enlace de la API, <storeId>.<secreto>, y nada más', () => {
+		expect(invitationTokenSchema.safeParse(TOKEN).success).toBe(true);
+
+		for (const bad of [
+			'',
+			'sin-punto',
+			'no-es-uuid.abcdefghijklmnopqrstuvwx',
+			`${TOKEN}/otra-ruta`,
+			'0b8c3d1e-5f6a-4b7c-8d9e-0f1a2b3c4d5e.corto'
+		]) {
+			expect(invitationTokenSchema.safeParse(bad).success).toBe(false);
+		}
 	});
 });
 

@@ -31,17 +31,19 @@ vi.mock('$env/dynamic/public', () => ({ env: publicEnv }));
 vi.mock('$app/environment', () => ({ dev: false }));
 vi.mock('$lib/server/api/auth', () => ({
 	signInWithGoogle: vi.fn(),
+	acceptInvitationWithGoogle: vi.fn(),
 	switchStore: vi.fn(),
 	me: vi.fn(),
 	logout: vi.fn(),
 	refresh: vi.fn()
 }));
 
-const { logout, me, signInWithGoogle, switchStore } = await import('$lib/server/api/auth');
+const { acceptInvitationWithGoogle, logout, me, signInWithGoogle, switchStore } =
+	await import('$lib/server/api/auth');
 const { resetServerEnv } = await import('$lib/server/env');
 const { codeChallengeFor, sealOAuthState, unsealGoogleSignup, unsealOAuthState } =
 	await import('$lib/server/google-oauth');
-const { finishGoogleSignIn, googleStartHref, startGoogleSignIn } =
+const { finishGoogleSignIn, googleInvitationHref, googleStartHref, startGoogleSignIn } =
 	await import('$lib/server/google-signin');
 const { unsealSession } = await import('$lib/server/session-crypto');
 
@@ -104,7 +106,10 @@ const issued: ApiSession = {
 	activeStoreId: 'store-1'
 };
 
-function pending(overrides: Partial<OAuthState> = {}): OAuthState {
+/** Lo que deja `/auth/google` para `login` y `signup`. */
+type LoginState = Extract<OAuthState, { intent: 'login' | 'signup' }>;
+
+function pending(overrides: Partial<LoginState> = {}): OAuthState {
 	return {
 		state: 'estado-'.padEnd(43, 'x'),
 		codeVerifier: 'verificador-'.padEnd(43, 'v'),
@@ -113,6 +118,21 @@ function pending(overrides: Partial<OAuthState> = {}): OAuthState {
 		returnHost: 'globerce.com',
 		expiresAt: Date.now() + 60_000,
 		...overrides
+	};
+}
+
+/** Un enlace de invitación con la forma que emite la API: `<storeId>.<secreto>`. */
+const TOKEN = '0b8c3d1e-5f6a-4b7c-8d9e-0f1a2b3c4d5e.abcdefghijklmnopqrstuvwx';
+
+function invitationPending(returnHost = 'globerce.com'): OAuthState {
+	return {
+		state: 'estado-invitacion-'.padEnd(43, 'x'),
+		codeVerifier: 'verificador-invitacion-'.padEnd(43, 'v'),
+		intent: 'invitation',
+		invitationToken: TOKEN,
+		redirectTo: '/admin',
+		returnHost,
+		expiresAt: Date.now() + 60_000
 	};
 }
 
@@ -148,6 +168,31 @@ describe('googleStartHref', () => {
 	it('en una tienda apunta al raíz y dice de dónde viene', () => {
 		expect(googleStartHref(new URL('https://boutique.globerce.com/admin/login'), 'login')).toBe(
 			'https://globerce.com/auth/google?intent=login&returnHost=boutique.globerce.com'
+		);
+	});
+});
+
+describe('googleInvitationHref', () => {
+	it('sin GOOGLE_CLIENT_ID no hay botón', () => {
+		privateEnv.GOOGLE_CLIENT_ID = '';
+		resetServerEnv();
+
+		expect(
+			googleInvitationHref(new URL('https://globerce.com/admin/invitation'), TOKEN)
+		).toBeNull();
+	});
+
+	it('en el raíz es una ruta relativa con el token', () => {
+		expect(googleInvitationHref(new URL('https://globerce.com/admin/invitation'), TOKEN)).toBe(
+			`/auth/google?intent=invitation&token=${TOKEN}`
+		);
+	});
+
+	it('en una tienda apunta al raíz con el token y de dónde viene', () => {
+		expect(
+			googleInvitationHref(new URL('https://boutique.globerce.com/admin/invitation'), TOKEN)
+		).toBe(
+			`https://globerce.com/auth/google?intent=invitation&token=${TOKEN}&returnHost=boutique.globerce.com`
 		);
 	});
 });
@@ -200,6 +245,128 @@ describe('GET /auth/google', () => {
 		expect(location.searchParams.get('redirect_uri')).toBe(
 			'https://globerce.com/auth/google/callback'
 		);
+	});
+});
+
+describe('invitación: GET /auth/google', () => {
+	it('sin un token válido se rechaza antes de hablar con Google y no deja cookie', () => {
+		for (const href of [
+			'https://globerce.com/auth/google?intent=invitation',
+			'https://globerce.com/auth/google?intent=invitation&token=no-es-un-enlace'
+		]) {
+			const event = eventAt(href);
+
+			try {
+				startGoogleSignIn(event);
+				expect.unreachable();
+			} catch (thrown) {
+				expect(isHttpError(thrown) && thrown.status).toBe(400);
+			}
+
+			expect(event.cookies.jar.size).toBe(0);
+		}
+	});
+
+	it('el token queda en la cookie sellada y nunca en la URL de Google', async () => {
+		const event = eventAt(`https://globerce.com/auth/google?intent=invitation&token=${TOKEN}`);
+		const location = new URL(await locationOf(() => startGoogleSignIn(event)));
+		const stored = unsealOAuthState(event.cookies.get('globerce_oauth'), secret);
+
+		expect(stored).toMatchObject({ intent: 'invitation', invitationToken: TOKEN });
+		expect(location.origin).toBe('https://accounts.google.com');
+		expect(location.toString()).not.toContain(TOKEN);
+		expect(location.searchParams.get('state')).toBe(stored?.state);
+		expect(location.searchParams.get('state')).not.toBe(TOKEN);
+	});
+});
+
+describe('invitación: GET /auth/google/callback', () => {
+	it('acepta con la cuenta de Google, con el token de la cookie, y entra a /admin', async () => {
+		const state = invitationPending();
+		const event = callback(state, `code=el-codigo&state=${state.state}`);
+
+		vi.mocked(acceptInvitationWithGoogle).mockResolvedValue({ ok: true, data: issued });
+
+		expect(await locationOf(() => finishGoogleSignIn(event))).toBe('https://globerce.com/admin');
+		expect(acceptInvitationWithGoogle).toHaveBeenCalledWith(
+			{
+				token: TOKEN,
+				code: 'el-codigo',
+				codeVerifier: state.codeVerifier,
+				redirectUri: 'https://globerce.com/auth/google/callback'
+			},
+			'203.0.113.7'
+		);
+		expect(signInWithGoogle).not.toHaveBeenCalled();
+		expect(unsealSession(event.cookies.get('globerce_session') ?? '', secret)?.storeId).toBe(
+			'store-1'
+		);
+		expect(event.cookies.deleted).toContain('globerce_oauth');
+	});
+
+	it('desde el subdominio de la tienda vuelve a su /admin', async () => {
+		const state = invitationPending('boutique.globerce.com');
+
+		vi.mocked(acceptInvitationWithGoogle).mockResolvedValue({ ok: true, data: issued });
+
+		expect(
+			await locationOf(() => finishGoogleSignIn(callback(state, `code=c&state=${state.state}`)))
+		).toBe('https://boutique.globerce.com/admin');
+	});
+
+	it.each([
+		{ status: 403, code: 'invitation_email_mismatch', notice: 'invitation_email_mismatch' },
+		{
+			status: 409,
+			code: 'google_account_linked_elsewhere',
+			notice: 'google_account_linked_elsewhere'
+		},
+		{ status: 403, code: 'google_email_unverified', notice: 'google_email_unverified' },
+		{ status: 404, code: 'not_found', notice: 'invitation_invalid' },
+		{ status: 400, code: 'bad_request', notice: 'invitation_invalid' },
+		{ status: 400, code: 'google_exchange_failed', notice: 'google' },
+		{ status: 0, code: 'unreachable', notice: 'google' }
+	])(
+		'$code (HTTP $status) vuelve a la invitación con el aviso $notice, sin sesión',
+		async ({ status, code, notice }) => {
+			const state = invitationPending();
+			const event = callback(state, `code=c&state=${state.state}`);
+
+			vi.mocked(acceptInvitationWithGoogle).mockResolvedValue({
+				ok: false,
+				status,
+				code,
+				message: 'Mensaje de la API.',
+				details: undefined
+			});
+
+			expect(await locationOf(() => finishGoogleSignIn(event))).toBe(
+				`https://globerce.com/admin/invitation?token=${TOKEN}&error=${notice}`
+			);
+			expect(event.cookies.get('globerce_session')).toBeUndefined();
+			expect(signInWithGoogle).not.toHaveBeenCalled();
+		}
+	);
+
+	it('un state distinto no acepta nada y vuelve a la invitación, no al login', async () => {
+		const state = invitationPending();
+		const event = callback(state, 'code=c&state=otro-estado');
+
+		expect(await locationOf(() => finishGoogleSignIn(event))).toBe(
+			`https://globerce.com/admin/invitation?token=${TOKEN}&error=google`
+		);
+		expect(acceptInvitationWithGoogle).not.toHaveBeenCalled();
+		expect(event.cookies.deleted).toContain('globerce_oauth');
+	});
+
+	it('cancelar en Google vuelve a la invitación con su token', async () => {
+		const state = invitationPending();
+		const event = callback(state, `error=access_denied&state=${state.state}`);
+
+		expect(await locationOf(() => finishGoogleSignIn(event))).toBe(
+			`https://globerce.com/admin/invitation?token=${TOKEN}&error=google`
+		);
+		expect(acceptInvitationWithGoogle).not.toHaveBeenCalled();
 	});
 });
 

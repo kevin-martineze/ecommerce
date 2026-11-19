@@ -9,6 +9,8 @@
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
+	import AuthDivider from '$lib/components/molecules/AuthDivider.svelte';
+	import GoogleSignInButton from '$lib/components/molecules/GoogleSignInButton.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
 	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
@@ -41,6 +43,17 @@
 		</p>
 	{:else}
 		{@const invitation = data.invitation}
+		{#if data.notice}
+			<p class="text-destructive mb-6 text-sm">{data.notice}</p>
+		{/if}
+
+		{#if data.googleHref}
+			<div class="mb-6 space-y-6">
+				<GoogleSignInButton href={data.googleHref} label="Aceptar con Google" />
+				<AuthDivider />
+			</div>
+		{/if}
+
 		<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
 			<p class="text-muted-foreground text-sm">
 				Te invitaron como <strong>{MEMBER_ROLE_LABEL[invitation.role].toLowerCase()}</strong> con el

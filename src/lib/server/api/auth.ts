@@ -302,3 +302,25 @@ export function acceptInvitation(
 		clientIp
 	});
 }
+
+export interface AcceptInvitationGoogleInput extends GoogleExchangeInput {
+	/** El enlace completo de la invitación: `<storeId>.<secreto>`. */
+	token: string;
+}
+
+/**
+ * Acepta la invitación con la cuenta de Google que la recibió. La API compara el
+ * correo de Google con el invitado (`invitation_email_mismatch`) y responde la
+ * sesión ya atada a la tienda invitada. El canje del `code` lo hace la API, igual
+ * que en `signInWithGoogle`.
+ */
+export function acceptInvitationWithGoogle(
+	input: AcceptInvitationGoogleInput,
+	clientIp: string | null
+): Promise<ApiResult<ApiSession>> {
+	return apiRequest('/auth/invitations/accept-google', sessionSchema, {
+		method: 'POST',
+		body: input,
+		clientIp
+	});
+}
