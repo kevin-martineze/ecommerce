@@ -25,6 +25,8 @@
 		hint?: string;
 		error?: string | null;
 		required?: boolean;
+		/** Se ve y viaja en el envío, pero no se edita (un dato que ya trae Google). */
+		readonly?: boolean;
 		autocomplete?: HTMLInputAttributes['autocomplete'];
 		/** Qué teclado abre el celular. `numeric` para lo que solo son dígitos. */
 		inputmode?: HTMLInputAttributes['inputmode'];
@@ -46,6 +48,7 @@
 		hint,
 		error = null,
 		required = false,
+		readonly = false,
 		autocomplete,
 		inputmode,
 		placeholder,
@@ -69,6 +72,7 @@
 			{name}
 			{type}
 			{required}
+			{readonly}
 			{autocomplete}
 			{inputmode}
 			{placeholder}

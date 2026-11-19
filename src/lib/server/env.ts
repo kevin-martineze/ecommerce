@@ -106,6 +106,20 @@ const schema = z.object({
 				/^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/,
 				'PUBLIC_DEMO_STORE_SLUG tiene el formato de un subdominio.'
 			)
+	),
+	/**
+	 * `client_id` de la credencial OAuth de Google (el mismo de la API). No es
+	 * secreto, pero solo lo usa el servidor para armar la URL de autorización:
+	 * el canje del código y el `client_secret` viven en la API. Sin él no se
+	 * ofrece entrar con Google.
+	 */
+	GOOGLE_CLIENT_ID: optional(
+		z
+			.string()
+			.regex(
+				/^[\x21-\x7e]+$/,
+				'GOOGLE_CLIENT_ID tiene espacios o saltos de línea. Pega solo el client_id.'
+			)
 	)
 });
 
@@ -129,7 +143,8 @@ export function serverEnv(): ServerEnv {
 		PUBLIC_STORE_ROOT_DOMAIN: publicEnv.PUBLIC_STORE_ROOT_DOMAIN,
 		PUBLIC_STORE_SLUG: publicEnv.PUBLIC_STORE_SLUG,
 		PUBLIC_PLATFORM_HOSTS: publicEnv.PUBLIC_PLATFORM_HOSTS,
-		PUBLIC_DEMO_STORE_SLUG: publicEnv.PUBLIC_DEMO_STORE_SLUG
+		PUBLIC_DEMO_STORE_SLUG: publicEnv.PUBLIC_DEMO_STORE_SLUG,
+		GOOGLE_CLIENT_ID: privateEnv.GOOGLE_CLIENT_ID
 	});
 
 	if (!parsed.success) {

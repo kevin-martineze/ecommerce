@@ -9,11 +9,16 @@
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
+	import AuthDivider from '$lib/components/molecules/AuthDivider.svelte';
+	import GoogleSignInButton from '$lib/components/molecules/GoogleSignInButton.svelte';
 	import PasswordField from '$lib/components/molecules/PasswordField.svelte';
 	import AuthTemplate from '$lib/components/templates/AuthTemplate.svelte';
 
 	// Estado
 	import { FormState } from '$lib/utils/form-state.svelte';
+
+	// Dominio
+	import { googleNotice } from '$lib/domain/google-auth';
 
 	interface Props {
 		data: PageData;
@@ -23,6 +28,9 @@
 	let { data, form }: Props = $props();
 
 	const submission = new FormState();
+
+	/** Lo que devolvió Google por el callback (`?error=google…`). */
+	const googleMessage = $derived(googleNotice(data.notice));
 </script>
 
 <svelte:head>
@@ -31,6 +39,13 @@
 </svelte:head>
 
 <AuthTemplate title="Iniciar sesión">
+	{#if data.googleHref}
+		<div class="mb-6 space-y-6">
+			<GoogleSignInButton href={data.googleHref} />
+			<AuthDivider />
+		</div>
+	{/if}
+
 	<form method="POST" class="space-y-4" use:enhance={submission.submit()}>
 		<div class="space-y-2">
 			<Label for="email">Correo</Label>
@@ -50,6 +65,8 @@
 
 		{#if form?.error}
 			<p class="text-destructive text-sm">{form.error}</p>
+		{:else if googleMessage}
+			<p class="text-destructive text-sm">{googleMessage}</p>
 		{:else if data.notice === 'no-access'}
 			<p class="text-destructive text-sm">Esa cuenta no tiene acceso al panel.</p>
 		{:else if data.notice === 'password-reset'}

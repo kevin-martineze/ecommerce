@@ -7,15 +7,22 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 
 // Servidor
-import { createStore, register } from '$lib/server/api/auth';
+import { createStore, register, registerWithGoogle } from '$lib/server/api/auth';
 import { listPublicPlans } from '$lib/server/api/plans';
 import { accountContext, clientAddress, displayStatus } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
+import { clearGoogleSignup, googleStartHref, readGoogleSignup } from '$lib/server/google-signin';
 import { toAdminSession, writeSession } from '$lib/server/session';
 
 // Dominio
+import { GOOGLE_NOTICE_CODES, GOOGLE_NOTICES } from '$lib/domain/google-auth';
 import { joinPhone } from '$lib/domain/phone';
-import { planCodeSchema, registerSchema, storeFieldsSchema } from '$lib/schemas/account';
+import {
+	googleRegisterSchema,
+	planCodeSchema,
+	registerSchema,
+	storeFieldsSchema
+} from '$lib/schemas/account';
 
 // Utilidades
 import { fieldErrors } from '$lib/utils/form';
@@ -28,10 +35,20 @@ export const load: PageServerLoad = async (event) => {
 	// precios no puede ser motivo para no dejar abrir la tienda.
 	const availableItems = plans.ok ? plans.data : [];
 	const order = event.url.searchParams.get('plan');
+	const signedIn = event.locals.session !== null;
+	const withGoogle = !signedIn && event.url.searchParams.get('with') === 'google';
+	const signup = withGoogle ? readGoogleSignup(event.cookies) : null;
 
 	return {
 		// Con sesión se crea una tienda más para esa cuenta: no se piden sus datos.
-		signedIn: event.locals.session !== null,
+		signedIn,
+		// Solo el nombre y el correo: el `signupToken` no sale de la cookie.
+		google: signup ? { email: signup.email, fullName: signup.fullName } : null,
+		googleHref: signedIn || signup ? null : googleStartHref(event.url, 'signup'),
+		notice:
+			withGoogle && !signup
+				? GOOGLE_NOTICE_CODES.signupExpired
+				: event.url.searchParams.get('error'),
 		addressSuffix: rootDomain ? `.${rootDomain}` : null,
 		plans: availableItems,
 		// El que venía de la página de precios; si no, el primero de la lista.
@@ -53,7 +70,7 @@ function apiError(result: ApiFailure): { error?: string; errors?: FieldErrors } 
 
 export const actions: Actions = {
 	default: async (event) => {
-		const { request, cookies, locals } = event;
+		const { request, cookies, locals, url } = event;
 		const formData = await request.formData();
 		const ip = clientAddress(event);
 		const text = (field: string) => String(formData.get(field) ?? '');
@@ -106,6 +123,42 @@ export const actions: Actions = {
 			writeSession(cookies, session);
 
 			// La tienda ya existe; lo primero que se elige es con qué se viste.
+			redirect(303, '/admin/welcome');
+		}
+
+		if (url.searchParams.get('with') === 'google') {
+			const signup = readGoogleSignup(cookies);
+
+			if (!signup) {
+				return fail(400, { error: GOOGLE_NOTICES[GOOGLE_NOTICE_CODES.signupExpired], values });
+			}
+
+			// Sin nombre de Google, la dueña lo escribe; con él, no se toca.
+			const parsed = googleRegisterSchema(!signup.fullName).safeParse(fields);
+
+			if (!parsed.success) {
+				return fail(400, { errors: fieldErrors(parsed.error), values });
+			}
+
+			const result = await registerWithGoogle(
+				{ signupToken: signup.signupToken, ...parsed.data, planCode },
+				ip
+			);
+
+			if (!result.ok) {
+				// El token venció o ya no vale: no sirve de nada volver a intentarlo.
+				if (result.code === 'signup_token_invalid') clearGoogleSignup(cookies);
+
+				// El correo lo dio Google y no se puede cambiar aquí: su choque va
+				// arriba del formulario y no bajo un campo de solo lectura.
+				const failure =
+					result.code === 'email_taken' ? { error: result.message } : apiError(result);
+
+				return fail(displayStatus(result), { ...failure, values });
+			}
+
+			clearGoogleSignup(cookies);
+			writeSession(cookies, toAdminSession(result.data));
 			redirect(303, '/admin/welcome');
 		}
 

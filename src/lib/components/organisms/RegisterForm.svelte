@@ -24,7 +24,12 @@
 	import { MOCKUP_STORE } from '$lib/config/mockup';
 	import { TRIAL_DAYS } from '$lib/domain/account';
 	import { joinPhone, splitPhone } from '$lib/domain/phone';
-	import { PASSWORD_MIN, registerSchema, storeFieldsSchema } from '$lib/schemas/account';
+	import {
+		googleRegisterSchema,
+		PASSWORD_MIN,
+		registerSchema,
+		storeFieldsSchema
+	} from '$lib/schemas/account';
 
 	// Utilidades
 	import { fieldErrors } from '$lib/utils/form';
@@ -50,6 +55,11 @@
 	interface Props {
 		/** Con sesión se crea otra tienda para esa cuenta: no se piden sus datos. */
 		signedIn: boolean;
+		/**
+		 * Terminar un registro empezado con Google: la cuenta ya la dio Google
+		 * (nombre y correo de solo lectura) y no lleva contraseña.
+		 */
+		google?: { email: string; fullName: string | null } | null;
 		/** Lo que va detrás de la dirección, p. ej. `.globerce.store`. */
 		addressSuffix: string | null;
 		plans: Plan[];
@@ -63,7 +73,7 @@
 		} | null;
 	}
 
-	let { signedIn, addressSuffix, plans, selectedPlan, result }: Props = $props();
+	let { signedIn, google = null, addressSuffix, plans, selectedPlan, result }: Props = $props();
 
 	/** Lo tecleado vuelve del servidor para no perderlo cuando algo falla. */
 	const sent = untrack(() => result?.values ?? {});
@@ -134,7 +144,9 @@
 		return { ...merged, ...clientErrors };
 	});
 
-	const schema = $derived(signedIn ? storeFieldsSchema : registerSchema);
+	const schema = $derived(
+		signedIn ? storeFieldsSchema : google ? googleRegisterSchema(!google.fullName) : registerSchema
+	);
 	const shape = registerSchema.innerType().shape;
 
 	/**
@@ -154,7 +166,13 @@
 				: {
 						id: 'cuenta',
 						title: 'Tu cuenta',
-						fields: ['fullName', 'email', 'password', 'confirm'] as Campo[]
+						// Con Google solo se escribe el nombre, y solo si Google no lo
+						// dio: el paso muestra con qué cuenta se va a entrar.
+						fields: google
+							? google.fullName
+								? []
+								: (['fullName'] as Campo[])
+							: (['fullName', 'email', 'password', 'confirm'] as Campo[])
 					}
 			// No hay paso de pago: los primeros días son gratis, y la tarjeta se
 			// pone después desde el panel, en Plan.
@@ -378,7 +396,46 @@
 		/>
 	</fieldset>
 
-	{#if !signedIn}
+	{#if !signedIn && google}
+		<fieldset class="space-y-4" hidden={hidden('cuenta')}>
+			<legend class="mb-3 text-sm font-medium">Tu cuenta</legend>
+
+			<div class="grid gap-4 sm:grid-cols-2">
+				{#if google.fullName}
+					<TextField
+						name="fullName"
+						label="Tu nombre y apellido"
+						value={google.fullName}
+						readonly
+						autocomplete="name"
+					/>
+				{:else}
+					<!-- Google no dio nombre: se pide, igual que en el registro con correo. -->
+					<TextField
+						name="fullName"
+						label="Tu nombre y apellido"
+						bind:value={fullName}
+						error={errors.fullName}
+						required
+						autocomplete="name"
+						placeholder="María Restrepo"
+						oninput={() => clear('fullName')}
+						onblur={() => check('fullName')}
+					/>
+				{/if}
+
+				<TextField
+					name="email"
+					label="Correo"
+					type="email"
+					value={google.email}
+					hint="Entras al panel con tu cuenta de Google."
+					readonly
+					autocomplete="username"
+				/>
+			</div>
+		</fieldset>
+	{:else if !signedIn}
 		<fieldset class="space-y-4" hidden={hidden('cuenta')}>
 			<legend class="mb-3 text-sm font-medium">Tu cuenta</legend>
 
