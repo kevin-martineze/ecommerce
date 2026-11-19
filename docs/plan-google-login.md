@@ -99,8 +99,21 @@ genérico "Correo o contraseña incorrectos.".
 
 ```jsonc
 { "token": "…", "code": "…", "codeVerifier": "…", "redirectUri": "…" }
-// 200: ApiSession. 403 `invitation_email_mismatch` si el correo de Google no es el invitado.
+// 200: ApiSession, atada a la tienda de la invitación.
 ```
+
+Throttle 10/min, como `invitations/accept`. Errores:
+
+- `invitation_email_mismatch` (403): el correo de Google no es el invitado.
+- `google_account_linked_elsewhere` (409): esa cuenta de Google ya está
+  vinculada a una cuenta de Globerce con otro correo.
+- Invitación vencida, revocada o ya aceptada: el mismo 400 de
+  `invitations/accept`.
+- Los errores de Google de `POST /auth/google`.
+
+La cuenta se elige igual que en `/auth/google`: por identidad, luego por correo
+(con las reglas del §6) y, si no hay ninguna, se crea sin contraseña. El
+vínculo, la membresía y la invitación aceptada van en una sola transacción.
 
 ---
 
