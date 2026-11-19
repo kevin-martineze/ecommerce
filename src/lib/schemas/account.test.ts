@@ -2,7 +2,12 @@
 import { describe, expect, it } from 'vitest';
 
 // Dominio
-import { googleRegisterSchema, registerSchema, resetPasswordSchema } from '$lib/schemas/account';
+import {
+	googleRegisterSchema,
+	registerSchema,
+	resetPasswordSchema,
+	setPasswordSchema
+} from '$lib/schemas/account';
 
 const valid = {
 	storeName: 'Casa Oliva',
@@ -45,6 +50,43 @@ describe('resetPasswordSchema', () => {
 		});
 
 		expect(result.success).toBe(false);
+	});
+});
+
+describe('setPasswordSchema (crear contraseña para una cuenta solo-Google)', () => {
+	it('acepta una contraseña de doce caracteres escrita dos veces', () => {
+		const parsed = setPasswordSchema.parse({
+			password: 'doce caracteres',
+			confirm: 'doce caracteres'
+		});
+
+		expect(parsed.password).toBe('doce caracteres');
+	});
+
+	it('no pide contraseña actual', () => {
+		expect(
+			setPasswordSchema.safeParse({ password: 'doce caracteres', confirm: 'doce caracteres' })
+				.success
+		).toBe(true);
+	});
+
+	it('exige doce caracteres, igual que cambiarla', () => {
+		const result = setPasswordSchema.safeParse({ password: 'corta', confirm: 'corta' });
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues.at(0)?.message).toBe(
+			'La contraseña necesita al menos 12 caracteres.'
+		);
+	});
+
+	it('exige que la confirmación coincida', () => {
+		const result = setPasswordSchema.safeParse({
+			password: 'doce caracteres',
+			confirm: 'doce caracteres distintos'
+		});
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues.at(0)?.path).toEqual(['confirm']);
 	});
 });
 

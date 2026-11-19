@@ -1,11 +1,12 @@
 // Tipos
+import type { RequestEvent } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 // Svelte
 import { error, fail, redirect } from '@sveltejs/kit';
 
 // Servidor
-import { changePassword, me, switchStore } from '$lib/server/api/auth';
+import { changePassword, me, setPassword, switchStore, unlinkGoogle } from '$lib/server/api/auth';
 import {
 	accountContext,
 	clientAddress,
@@ -19,7 +20,13 @@ import { parseForm } from '$lib/server/form';
 import { toAdminSession, writeSession } from '$lib/server/session';
 
 // Dominio
-import { changePasswordSchema } from '$lib/schemas/account';
+import { changePasswordSchema, setPasswordSchema } from '$lib/schemas/account';
+
+/**
+ * Lo que las actions de cuenta leen del evento. Pedirlo así (y no el
+ * `RequestEvent` entero) deja probarlas con un evento armado a mano.
+ */
+type AccountEvent = Pick<RequestEvent, 'request' | 'locals' | 'url' | 'getClientAddress'>;
 
 export const load: PageServerLoad = async (event) => {
 	const ctx = panelContext(event);
@@ -28,11 +35,13 @@ export const load: PageServerLoad = async (event) => {
 	return {
 		user: { email: account.user.email, full_name: account.user.fullName },
 		activeStoreId: ctx.storeId,
-		stores: account.stores.map((store) => ({ ...store, url: storeUrl(store.slug) }))
+		stores: account.stores.map((store) => ({ ...store, url: storeUrl(store.slug) })),
+		// Null si la API todavía no manda `signIn`: la página no pinta la sección.
+		signIn: account.signIn ?? null
 	};
 };
 
-export const actions: Actions = {
+export const actions = {
 	password: async (event) => {
 		const ctx = accountContext(event);
 		const session = event.locals.session;
@@ -72,5 +81,40 @@ export const actions: Actions = {
 
 		writeSession(event.cookies, toAdminSession(result.data));
 		redirect(303, '/admin');
+	},
+
+	/** Crea la contraseña de una cuenta solo-Google. Sin contraseña actual: no la tiene. */
+	setPassword: async (event: AccountEvent) => {
+		const ctx = accountContext(event);
+		const session = event.locals.session;
+
+		if (!session) redirect(303, '/admin/login');
+
+		const form = await parseForm(event, setPasswordSchema);
+
+		if (!form.ok) return form.failure;
+
+		const result = await setPassword(ctx, {
+			newPassword: form.data.password,
+			refreshToken: session.refreshToken
+		});
+
+		if (!result.ok) return fail(displayStatus(result), { error: result.message });
+
+		return { message: 'Listo, ya puedes entrar también con tu correo y contraseña.' };
+	},
+
+	/** Desconecta Google. La API rechaza quitarlo si la cuenta no tiene contraseña. */
+	unlinkGoogle: async (event: AccountEvent) => {
+		const ctx = accountContext(event);
+		const session = event.locals.session;
+
+		if (!session) redirect(303, '/admin/login');
+
+		const result = await unlinkGoogle(ctx, { refreshToken: session.refreshToken });
+
+		if (!result.ok) return fail(displayStatus(result), { error: result.message });
+
+		return { message: 'Google desconectado.' };
 	}
-};
+} satisfies Actions;
