@@ -251,7 +251,7 @@ export interface MonthPayments {
 }
 
 /** Días de prueba con que arranca toda tienda. Igual que `TRIAL_DAYS` en la API. */
-export const TRIAL_DAYS = 14;
+export const TRIAL_DAYS = 30;
 
 /**
  * Lo que un plan ofrece, en frases para el sitio comercial.
