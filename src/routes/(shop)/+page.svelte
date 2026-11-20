@@ -163,7 +163,10 @@
 {/if}
 
 {#if highlights.length > 0}
-	<section class="bg-secondary/60" data-preview-zone={data.draftPreview ? 'highlights' : undefined}>
+	<section
+		class="home-highlights bg-secondary/60"
+		data-preview-zone={data.draftPreview ? 'highlights' : undefined}
+	>
 		<div class="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 md:grid-cols-3">
 			{#each highlights as highlight, index (highlight.id)}
 				<div class="border-border space-y-2 border-t pt-6" use:reveal={{ delay: index * 80 }}>

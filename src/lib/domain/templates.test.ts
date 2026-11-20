@@ -44,8 +44,10 @@ describe('plantilla moda', () => {
 		expect(fashion.shelves).toBe('carousel');
 	});
 
-	it('todas las plantillas existentes siguen con la portada en grilla', () => {
-		for (const template of TEMPLATES.filter((item) => item.code !== 'moda')) {
+	it('las demás plantillas siguen con la portada en grilla', () => {
+		const carousels = ['moda', 'maison'];
+
+		for (const template of TEMPLATES.filter((item) => !carousels.includes(item.code))) {
 			expect(template.shelves).toBe('grid');
 		}
 	});

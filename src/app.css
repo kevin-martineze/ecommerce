@@ -1379,3 +1379,141 @@
 [data-storefront-template='moda'] .product-card .price-tag > .text-sale {
 	display: none;
 }
+
+/*
+ * Maison: casa de lujo en negro y blanco. Titulares finos en serif de gran
+ * tamaño, el banner a sangre con el texto a la izquierda, el anuncio que se
+ * desliza y una franja negra para los mensajes. Pensada para perfumería,
+ * joyería y cosmética, donde el producto es el protagonista.
+ */
+[data-storefront-template='maison'] {
+	--background: oklch(1 0 0);
+	--foreground: oklch(0.13 0 0);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.13 0 0);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.13 0 0);
+	--primary: oklch(0.13 0 0);
+	--primary-foreground: oklch(1 0 0);
+	--secondary: oklch(0.965 0 0);
+	--secondary-foreground: oklch(0.13 0 0);
+	--muted: oklch(0.965 0 0);
+	--muted-foreground: oklch(0.48 0 0);
+	--accent: oklch(0.965 0 0);
+	--accent-foreground: oklch(0.13 0 0);
+	--border: oklch(0.9 0 0);
+	--input: oklch(0.9 0 0);
+	--ring: oklch(0.13 0 0);
+	--sale: oklch(0.5 0.19 25);
+	--sale-foreground: oklch(1 0 0);
+	--font-body: 'Inter Tight Variable', ui-sans-serif, system-ui, sans-serif;
+	--font-title: 'Fraunces Variable', ui-serif, Georgia, serif;
+	--radius: 0;
+}
+
+[data-storefront-template='maison'] :is(h1, h2, h3) {
+	font-weight: 300;
+	letter-spacing: -0.025em;
+	font-variation-settings: 'opsz' 144;
+}
+
+[data-storefront-template='maison'] .eyebrow {
+	font-size: 0.6875rem;
+	letter-spacing: 0.32em;
+	text-transform: uppercase;
+}
+
+/* El banner: la foto se oscurece desde la izquierda, donde va el texto, y el
+   producto queda limpio a la derecha. En celular se corre hacia el producto. */
+[data-storefront-template='maison'] .hero-veil {
+	background:
+		linear-gradient(to right, rgb(0 0 0 / 60%), rgb(0 0 0 / 12%) 55%, transparent),
+		linear-gradient(to top, rgb(0 0 0 / 70%), rgb(0 0 0 / 35%) 45%, transparent 75%);
+}
+
+/* En escritorio el texto va a la izquierda y el producto a la derecha: basta un velo más suave. */
+@media (min-width: 48rem) {
+	[data-storefront-template='maison'] .hero-veil {
+		background:
+			linear-gradient(to right, rgb(0 0 0 / 60%), rgb(0 0 0 / 12%) 55%, transparent),
+			linear-gradient(to top, rgb(0 0 0 / 45%), transparent 45%);
+	}
+}
+
+[data-storefront-template='maison'] .hero-image {
+	object-position: 70% center;
+}
+
+/* El titular en dos líneas, para que no se monte sobre el producto. */
+[data-storefront-template='maison'] .hero-cover h1 {
+	max-width: 10ch;
+}
+
+@media (min-width: 768px) {
+	[data-storefront-template='maison'] .hero-image {
+		object-position: center;
+	}
+}
+
+/* Tarjeta: el nombre como una etiqueta de vitrina y el precio en serif. */
+[data-storefront-template='maison'] .product-card h3 {
+	font-size: 0.6875rem;
+	font-weight: 500;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+[data-storefront-template='maison'] .product-card .price-tag {
+	font-family: var(--font-title);
+	font-size: 1rem;
+	letter-spacing: 0.01em;
+}
+
+/* Los mensajes de la portada, en una franja negra que corta la página. */
+[data-storefront-template='maison'] .home-highlights {
+	background-color: var(--foreground);
+	color: var(--background);
+}
+
+[data-storefront-template='maison'] .home-highlights .border-border {
+	border-color: rgb(255 255 255 / 20%);
+}
+
+[data-storefront-template='maison'] .home-highlights .text-muted-foreground {
+	color: rgb(255 255 255 / 65%);
+}
+
+/* El anuncio se desliza en bucle: dos mitades iguales que se mueven media
+   pista. Quien pidió menos movimiento lo ve quieto. */
+[data-storefront-template='maison'] .announcement {
+	padding-inline: 0;
+	letter-spacing: 0.24em;
+	text-transform: uppercase;
+	font-size: 0.625rem;
+}
+
+[data-storefront-template='maison'] .announcement-track {
+	display: inline-flex;
+	white-space: nowrap;
+	animation: maison-marquee 40s linear infinite;
+}
+
+[data-storefront-template='maison'] .announcement-item {
+	padding-inline-end: 4rem;
+}
+
+[data-storefront-template='maison'] .announcement-copy {
+	display: inline;
+}
+
+@keyframes maison-marquee {
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-storefront-template='maison'] .announcement-track {
+		animation: none;
+	}
+}
