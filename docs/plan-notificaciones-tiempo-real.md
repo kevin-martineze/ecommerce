@@ -214,22 +214,39 @@ Todos después de la transacción, y vía `NotificationsService`:
 
 ## Fase 5 — Web Push (avisos con el panel cerrado)
 
-- [ ] API: `model PushSubscription` (`userId`, `endpoint` único, `p256dh`,
+- [x] API: `model PushSubscription` (`userId`, `endpoint` único, `p256dh`,
       `auth`, `userAgent`, `createdAt`). Llaves `VAPID_PUBLIC_KEY`,
       `VAPID_PRIVATE_KEY` y `VAPID_SUBJECT` en `env.ts` (opcionales: sin ellas no se
       envía push). Dependencia `web-push`.
-- [ ] `NotificationsService` también envía push a cada suscripción de la
+- [x] `NotificationsService` también envía push a cada suscripción de la
       destinataria. Con 404/410 borra la suscripción. Nunca lanza. El push lleva
       solo `title`, `body` y `url` (regla 2).
-- [ ] `POST/DELETE /me/push-subscriptions`.
-- [ ] Front: `src/service-worker.ts` (eventos `push` y `notificationclick`, que
+- [x] `POST/DELETE /me/push-subscriptions`.
+- [x] Front: `src/service-worker.ts` (eventos `push` y `notificationclick`, que
       abre o enfoca `url`) y `static/manifest.webmanifest` (en iPhone solo hay push
       con la web instalada en la pantalla de inicio).
-- [ ] Activar se hace a mano: en la bandeja, «Avisarme en este dispositivo»
+- [x] Activar se hace a mano: en la bandeja, «Avisarme en este dispositivo»
       pide el permiso solo al pulsarlo, nunca al cargar. La suscripción llega al
       servidor por form action.
-- [ ] Explica en la interfaz el caso de iPhone: «Para recibir avisos en iPhone,
+- [x] Explica en la interfaz el caso de iPhone: «Para recibir avisos en iPhone,
       agrega Globerce a tu pantalla de inicio».
+- Hecho distinto a lo planeado:
+  - Una suscripción es de un navegador **y una bandeja** (`push_subscriptions`,
+    con `store_id` o nulo para la consola), de la cuenta y sin RLS. Así el
+    enlace del aviso siempre es del sitio donde se activó.
+  - El push lleva el mismo aviso de la bandeja (sin datos de clientas) y el
+    texto lo arma el service worker con `notificationText`: una sola fuente
+    del texto. Va cifrado de punta a punta.
+  - Rutas `GET push-key` y `PUT`/`DELETE push-subscriptions` bajo la bandeja de
+    la tienda y la de la consola, no `/me`.
+  - Solo endpoints de servicios push conocidos: la API les hace un POST.
+  - El service worker se registra a mano al activar
+    (`kit.serviceWorker.register: false`): la tienda pública no lo carga.
+  - El interruptor está en `/admin/notifications` y `/platform/notifications`
+    (`PushToggle` y el ViewModel `PushDevice`).
+- Sin probar con un push real: el navegador del panel de desarrollo bloquea
+  las notificaciones. Probado: el service worker registra, las form actions
+  llegan a la API y una dirección interna se rechaza.
 
 ## Fuera de alcance (no lo hagas)
 

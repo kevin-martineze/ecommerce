@@ -79,6 +79,15 @@ export interface StreamTicket {
 	ticket: string;
 }
 
+/**
+ * Lo que da `PushSubscription.toJSON()` en el navegador: a dónde manda el
+ * servicio push y con qué llaves se cifra. Llega al servidor por form action.
+ */
+export interface PushDeviceSubscription {
+	endpoint: string;
+	keys: { p256dh: string; auth: string };
+}
+
 const meta = {
 	id: z.string(),
 	createdAt: z.string(),

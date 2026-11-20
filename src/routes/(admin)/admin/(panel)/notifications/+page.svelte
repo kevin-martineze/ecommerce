@@ -11,6 +11,7 @@
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import NotificationFeed from '$lib/components/organisms/NotificationFeed.svelte';
+	import PushToggle from '$lib/components/organisms/PushToggle.svelte';
 	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
 	interface Props {
@@ -52,6 +53,8 @@
 			</form>
 		{/if}
 	{/snippet}
+
+	<PushToggle publicKey={data.pushKey} scope={data.pushScope} />
 
 	<NotificationFeed
 		inbox={data.inbox}

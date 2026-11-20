@@ -50,3 +50,8 @@ export function inboxQuery(page: { before?: string | null; limit?: number } = {}
 
 	return query ? `?${query}` : '';
 }
+
+/** La llave VAPID para suscribirse. Null: la API no manda push. */
+export const pushKeySchema = z
+	.object({ publicKey: z.string().min(1).nullable() })
+	.transform((result) => result.publicKey);

@@ -60,6 +60,9 @@ shadcn-svelte**, sobre la API propia `ecommerce-api`.
     ticket solo sirve para el stream. Lo que llega se lee con
     `parseNotification` de `$lib/domain/notifications.ts` (el mismo esquema que
     usa el servidor), y lo maneja `NotificationCenter`. Nada más se abre así.
+    El service worker (`src/service-worker.ts`) solo existe para el push de
+    esas notificaciones: se registra a mano al activarlo (`PushDevice`), nunca
+    al cargar, y no guarda nada en caché.
 17. **Toda form action del panel empieza con `panelContext(event)`.** Las actions
     no ejecutan el `load` del layout, así que no heredan `requireAdmin`.
 18. **Las reglas de precio viven solo en la API.** El carrito cotiza con

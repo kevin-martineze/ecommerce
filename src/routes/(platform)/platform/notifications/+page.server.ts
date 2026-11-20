@@ -7,13 +7,16 @@ import { redirect } from '@sveltejs/kit';
 // Servidor
 import {
 	listPlatformNotifications,
-	markPlatformNotificationsRead
+	markPlatformNotificationsRead,
+	platformPushKey,
+	subscribePlatformPush,
+	unsubscribePlatformPush
 } from '$lib/server/api/platform-notifications';
 import { accountContext, failWith, orFail } from '$lib/server/context';
 import { parseForm } from '$lib/server/form';
 
 // Dominio
-import { openNotificationSchema } from '$lib/schemas/notifications';
+import { openNotificationSchema, pushOffSchema, pushOnSchema } from '$lib/schemas/notifications';
 
 // Utilidades
 import { safeRedirectTarget } from '$lib/utils/redirect';
@@ -23,9 +26,18 @@ const BASE_PATH = '/platform/notifications';
 export const load: PageServerLoad = async (event) => {
 	const before = event.url.searchParams.get('before');
 
+	const ctx = accountContext(event);
+	const [inbox, key] = await Promise.all([
+		listPlatformNotifications(ctx, { before }),
+		platformPushKey(ctx)
+	]);
+
 	return {
-		inbox: orFail(await listPlatformNotifications(accountContext(event), { before })),
-		before
+		inbox: orFail(inbox),
+		before,
+		// Sin push en la API, la página no ofrece activarlo.
+		pushKey: key.ok ? key.data : null,
+		pushScope: 'platform'
 	};
 };
 
@@ -51,5 +63,32 @@ export const actions: Actions = {
 		if (!result.ok) return failWith(result);
 
 		return { message: 'Marcamos todo como leído.' };
+	},
+
+	/** Este dispositivo recibe las notificaciones por push. */
+	pushOn: async (event) => {
+		const ctx = accountContext(event);
+		const form = await parseForm(event, pushOnSchema);
+
+		if (!form.ok) return form.failure;
+
+		const result = await subscribePlatformPush(ctx, form.data);
+
+		if (!result.ok) return failWith(result);
+
+		return { message: 'Listo: te avisaremos en este dispositivo.' };
+	},
+
+	pushOff: async (event) => {
+		const ctx = accountContext(event);
+		const form = await parseForm(event, pushOffSchema);
+
+		if (!form.ok) return form.failure;
+
+		const result = await unsubscribePlatformPush(ctx, form.data.endpoint);
+
+		if (!result.ok) return failWith(result);
+
+		return { message: 'Ya no te avisaremos en este dispositivo.' };
 	}
 };

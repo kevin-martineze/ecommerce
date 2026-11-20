@@ -1,12 +1,20 @@
 // Tipos
 import type { ApiResult } from '$lib/server/api/client';
 import type { PanelContext } from '$lib/server/context';
-import type { NotificationInbox, StreamTicket } from '$lib/domain/notifications';
+import type {
+	NotificationInbox,
+	PushDeviceSubscription,
+	StreamTicket
+} from '$lib/domain/notifications';
+
+// Librerías
+import { z } from 'zod';
 
 // Servidor
 import {
 	inboxQuery,
 	inboxSchema,
+	pushKeySchema,
 	ticketSchema,
 	unreadSchema
 } from '$lib/server/api/notifications-common';
@@ -40,5 +48,31 @@ export function streamTicket(ctx: PanelContext): Promise<ApiResult<StreamTicket>
 	return panelRequest(ctx, '/notifications/stream-ticket', ticketSchema, {
 		method: 'POST',
 		body: {}
+	});
+}
+
+/** La llave para que el navegador se suscriba a push. Null: no hay push. */
+export function pushKey(ctx: PanelContext): Promise<ApiResult<string | null>> {
+	return panelRequest(ctx, '/notifications/push-key', pushKeySchema);
+}
+
+/** Este navegador recibe por push los avisos de esta tienda. */
+export function subscribePush(
+	ctx: PanelContext,
+	subscription: PushDeviceSubscription
+): Promise<ApiResult<undefined>> {
+	return panelRequest(ctx, '/notifications/push-subscriptions', z.undefined(), {
+		method: 'PUT',
+		body: subscription
+	});
+}
+
+export function unsubscribePush(
+	ctx: PanelContext,
+	endpoint: string
+): Promise<ApiResult<undefined>> {
+	return panelRequest(ctx, '/notifications/push-subscriptions', z.undefined(), {
+		method: 'DELETE',
+		body: { endpoint }
 	});
 }

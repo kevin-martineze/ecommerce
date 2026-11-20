@@ -26,6 +26,8 @@
 
 <svelte:head>
 	<meta name="robots" content="noindex" />
+	<!-- Instalable desde el celular: en iPhone es lo que habilita el push. -->
+	<link rel="manifest" href="/manifest.webmanifest" />
 </svelte:head>
 
 <AdminTemplate {shell} notice={data.notice} notifications={data.notifications}>
