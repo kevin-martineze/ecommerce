@@ -85,39 +85,68 @@
 		</div>
 	</section>
 {:else if layout === 'typographic'}
+	<!-- Con foto, el titular comparte la portada con un bodegón: la foto va sobre
+	     el gris de la plantilla y se funde en él (`mix-blend-multiply`), así un
+	     producto fotografiado sobre blanco queda como en un estudio. -->
 	<section class="border-border border-b">
-		<div class="mx-auto max-w-7xl px-4 pt-16 pb-12 sm:px-6 md:pt-28 md:pb-16">
-			<div class="rise-clip">
-				<p class="eyebrow rise rise-1">{eyebrow}</p>
-			</div>
+		<div
+			class={cn(
+				'mx-auto max-w-7xl px-4 pt-16 pb-12 sm:px-6 md:pt-28 md:pb-16',
+				image && 'grid items-end gap-10 md:grid-cols-12 md:gap-12 md:pt-20'
+			)}
+		>
+			<div class={cn(image && 'md:col-span-7 md:pb-4')}>
+				<div class="rise-clip">
+					<p class="eyebrow rise rise-1">{eyebrow}</p>
+				</div>
 
-			<div class="rise-clip">
-				<h1 class="rise rise-2 mt-5 max-w-5xl text-5xl leading-[0.98] text-balance md:text-8xl">
-					{title}
-				</h1>
-			</div>
+				<div class="rise-clip">
+					<h1
+						class={cn(
+							'rise rise-2 mt-5 max-w-5xl text-5xl leading-[0.98] text-balance',
+							image ? 'md:text-7xl lg:text-8xl' : 'md:text-8xl'
+						)}
+					>
+						{title}
+					</h1>
+				</div>
 
-			<div
-				class="rise rise-3 mt-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
-			>
-				{#if subtitle}
-					<p class="text-muted-foreground max-w-md text-sm leading-relaxed md:text-base">
-						{subtitle}
-					</p>
-				{:else}
-					<span></span>
-				{/if}
-
-				<div class="flex flex-wrap gap-3">
-					<Button href="/shop" size="lg">Ver la tienda</Button>
-
-					{#if collectionSlug}
-						<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
-							Ver la colección
-						</Button>
+				<div
+					class={cn(
+						'rise rise-3 mt-10 flex flex-col gap-6',
+						image ? 'md:gap-8' : 'md:flex-row md:items-end md:justify-between'
+					)}
+				>
+					{#if subtitle}
+						<p class="text-muted-foreground max-w-md text-sm leading-relaxed md:text-base">
+							{subtitle}
+						</p>
+					{:else}
+						<span></span>
 					{/if}
+
+					<div class="flex flex-wrap gap-3">
+						<Button href="/shop" size="lg">Ver la tienda</Button>
+
+						{#if collectionSlug}
+							<Button href="/collections/{collectionSlug}" variant="outline" size="lg">
+								Ver la colección
+							</Button>
+						{/if}
+					</div>
 				</div>
 			</div>
+
+			{#if image}
+				<div class="rise rise-3 bg-secondary relative aspect-square overflow-hidden md:col-span-5">
+					<img
+						src={image}
+						alt=""
+						class="absolute inset-0 h-full w-full object-contain p-8 mix-blend-multiply md:p-12"
+						fetchpriority="high"
+					/>
+				</div>
+			{/if}
 		</div>
 	</section>
 {:else if layout === 'centered'}
