@@ -520,47 +520,17 @@
 	letter-spacing: 0.24em;
 }
 
-/* Tarjeta de galería: el objeto entero en un cuadro gris, como en un estudio.
-   La foto no se recorta (`contain`) y se funde con el gris (`multiply`): un
-   producto fotografiado sobre blanco queda sin el recuadro blanco alrededor. */
-[data-storefront-template='galeria'] .product-card > a > div:first-child {
-	aspect-ratio: 1 / 1;
-	background-color: var(--secondary);
-}
-
-/* El marco de `ProductImage` (y el de la segunda foto, que aparece en hover). */
-[data-storefront-template='galeria'] .product-card > a > div:first-child .bg-muted {
-	aspect-ratio: 1 / 1;
-	background-color: transparent;
-}
-
-[data-storefront-template='galeria'] .product-card > a > div:first-child img:not([aria-hidden]) {
-	object-fit: contain;
-	padding: 12%;
-	mix-blend-mode: multiply;
-}
-
-[data-storefront-template='galeria'] .product-card > a > div:first-child img[aria-hidden] {
-	display: none;
-}
-
-[data-storefront-template='galeria'] .product-card .price-tag {
-	letter-spacing: 0.04em;
-}
-
-/* La ficha, con el mismo estudio: cuadrada, entera y fundida con el gris. */
+/* Galería enmarca en cuadrado, en la tarjeta y en la ficha: los objetos se
+   fotografían en cuadrado, y así la foto llena el marco a tamaño completo
+   sin que el 3:4 le corte los lados. */
+[data-storefront-template='galeria'] .product-card > a > div:first-child,
+[data-storefront-template='galeria'] .product-card > a > div:first-child .bg-muted,
 [data-storefront-template='galeria'] .product-gallery .bg-muted {
 	aspect-ratio: 1 / 1;
 }
 
-[data-storefront-template='galeria'] .product-gallery img:not([aria-hidden]) {
-	object-fit: contain;
-	padding: 8%;
-	mix-blend-mode: multiply;
-}
-
-[data-storefront-template='galeria'] .product-gallery img[aria-hidden] {
-	display: none;
+[data-storefront-template='galeria'] .product-card .price-tag {
+	letter-spacing: 0.04em;
 }
 
 /*
