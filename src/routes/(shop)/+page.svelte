@@ -4,6 +4,7 @@
 
 	// Componentes
 	import SectionHeading from '$lib/components/molecules/SectionHeading.svelte';
+	import ShareMeta from '$lib/components/molecules/ShareMeta.svelte';
 	import CollectionBand from '$lib/components/organisms/CollectionBand.svelte';
 	import CollectionMosaic from '$lib/components/organisms/CollectionMosaic.svelte';
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
@@ -14,6 +15,7 @@
 	import { storefrontDraft } from '$lib/stores/storefront-draft.svelte';
 
 	// Dominio
+	import { storeSharePreview } from '$lib/domain/share-preview';
 	import { templateOf } from '$lib/domain/templates';
 	import { heroOf } from '$lib/domain/theme';
 
@@ -111,15 +113,28 @@
 
 		return (name: string) => String(order.indexOf(name) + 1).padStart(2, '0');
 	});
+
+	/**
+	 * La tarjeta al compartir la portada: con lo guardado, nunca con el
+	 * borrador del editor, que no es lo que ve quien abre el enlace.
+	 */
+	const share = $derived(
+		storeSharePreview({
+			storeName: data.settings.store_name,
+			publicUrl: data.public_url,
+			hero: data.heroCollection,
+			heroSubtitle: data.settings.hero_subtitle,
+			logoUrl: data.settings.logo_url,
+			productImage: data.newest.at(0)?.images.at(0)?.url_card ?? null
+		})
+	);
 </script>
+
+<ShareMeta preview={share} />
 
 <svelte:head>
 	<title>{data.settings.store_name} — {heroTitle}</title>
-	<meta
-		name="description"
-		content="Productos seleccionados de {data.settings
-			.store_name}. Pide por WhatsApp: te confirmamos disponibilidad y envío."
-	/>
+	<meta name="description" content={share.description} />
 </svelte:head>
 
 <div data-preview-zone={data.draftPreview ? 'hero' : undefined}>

@@ -21,6 +21,7 @@
 	import { Input } from '$lib/components/atoms/input';
 	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
 	import PriceTag from '$lib/components/molecules/PriceTag.svelte';
+	import ShareMeta from '$lib/components/molecules/ShareMeta.svelte';
 	import ProductGallery from '$lib/components/organisms/ProductGallery.svelte';
 	import ProductGrid from '$lib/components/organisms/ProductGrid.svelte';
 	import VariantPicker from '$lib/components/organisms/VariantPicker.svelte';
@@ -29,6 +30,9 @@
 	import { cart } from '$lib/stores/cart.svelte';
 	import { favorites } from '$lib/stores/favorites.svelte';
 	import { FormState } from '$lib/utils/form-state.svelte';
+
+	// Dominio
+	import { absoluteUrl, productSharePreview } from '$lib/domain/share-preview';
 
 	// Utilidades
 	import { cn } from '$lib/utils';
@@ -149,16 +153,26 @@
 			}
 		}).replace(/</g, '\u003c')
 	);
+
+	// La tarjeta al compartir la ficha: con la dirección pública de la tienda,
+	// no la del host que atendió la visita.
+	const share = $derived(
+		productSharePreview({
+			storeName: data.settings.store_name,
+			url: absoluteUrl(`/shop/${product.slug}`, data.public_url) ?? productUrl,
+			name: product.name,
+			description: product.description,
+			image: product.images.at(0)?.url_full ?? null,
+			logoUrl: data.settings.logo_url
+		})
+	);
 </script>
+
+<ShareMeta preview={share} />
 
 <svelte:head>
 	<title>{product.name} — {data.settings.store_name}</title>
 	<meta name="description" content={product.description ?? product.name} />
-	<meta property="og:title" content={product.name} />
-	<meta property="og:type" content="product" />
-	{#if product.images.at(0)}
-		<meta property="og:image" content={product.images[0].url_full} />
-	{/if}
 	<!-- eslint-disable-next-line svelte/no-at-html-tags, no-useless-escape -- JSON-LD propio, con `<` ya escapado -->
 	{@html `<script type="application/ld+json">${jsonLd}<\/script>`}
 </svelte:head>
