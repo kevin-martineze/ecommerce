@@ -15,6 +15,7 @@
 
 	const shell = $derived({
 		storeName: data.settings.store_name,
+		storeLogo: data.settings.logo_url,
 		storeUrl: data.storeUrl,
 		role: data.role,
 		email: data.adminEmail,

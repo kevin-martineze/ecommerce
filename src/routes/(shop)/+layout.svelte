@@ -24,6 +24,7 @@
 
 	// Dominio
 	import { CARD_LOOK, cardLookOf } from '$lib/domain/card-look';
+	import { storeIcon } from '$lib/domain/share-preview';
 	import { templateOf } from '$lib/domain/templates';
 
 	interface Props {
@@ -51,6 +52,16 @@
 	// La dirección canónica es la pública de la tienda (dominio propio si lo tiene), nunca `PUBLIC_SITE_URL`.
 	const canonical = $derived(`${data.public_url.replace(/\/+$/, '')}${page.url.pathname}`);
 
+	// El icono de la pestaña y de la pantalla de inicio: el de la tienda.
+	const icon = $derived(
+		storeIcon({
+			storeName: data.settings.store_name,
+			logoUrl: data.settings.logo_url,
+			accent: data.settings.theme.accent,
+			publicUrl: data.public_url
+		})
+	);
+
 	// Lo que la plantilla decide dentro de cada tarjeta (ver card-look.ts).
 	setContext(CARD_LOOK, {
 		get swatchLimit() {
@@ -61,6 +72,10 @@
 
 <svelte:head>
 	<link rel="canonical" href={canonical} />
+	<link rel="icon" href={icon.href} type={icon.type ?? undefined} />
+	{#if icon.appleTouch}
+		<link rel="apple-touch-icon" href={icon.appleTouch} />
+	{/if}
 	{#if data.previewTemplate}
 		<!-- Una tienda con un vestido de prueba no es la tienda: que no la indexen. -->
 		<meta name="robots" content="noindex" />

@@ -102,6 +102,8 @@ export function isActiveLink(pathname: string, href: string, root = '/admin'): b
 /** Lo que el cascarón del panel muestra de la sesión y la tienda. */
 export interface AdminShell {
 	storeName: string;
+	/** Logo de la tienda que se administra. Null: la barra muestra el nombre. */
+	storeLogo: string | null;
 	/** La dirección pública de la tienda: el nombre en la barra lleva ahí. */
 	storeUrl: string;
 	role: MemberRole;

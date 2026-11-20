@@ -20,7 +20,7 @@ tienda, la navegación y la sesión.
 	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
-	import GloberceMark from '$lib/components/molecules/GloberceMark.svelte';
+	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
 
 	// Dominio
 	import { isActiveLink } from '$lib/config/admin-nav';
@@ -40,8 +40,9 @@ tienda, la navegación y la sesión.
 </script>
 
 <div class="flex min-h-full flex-col gap-2 p-3">
-	<!-- La marca y la tienda: el nombre lleva a la vitrina, que es lo que
-	     la dueña quiere abrir cada dos por tres. -->
+	<!-- La marca de la tienda que se administra (su logo o, si no tiene, su
+	     nombre), no la de Globerce. Lleva a la vitrina, que es lo que la
+	     dueña quiere abrir cada dos por tres. -->
 	<div class="flex items-center gap-1">
 		<a
 			href={shell.storeUrl}
@@ -49,8 +50,9 @@ tienda, la navegación y la sesión.
 			rel="noopener noreferrer"
 			class="hover:bg-sidebar-accent flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 transition-colors"
 		>
-			<GloberceMark size={24} label="" />
-			<span class="truncate text-sm font-semibold">{shell.storeName}</span>
+			<span class="flex min-w-0 items-center truncate text-sm font-semibold">
+				<StoreBrand name={shell.storeName} logoUrl={shell.storeLogo} class="h-7 max-w-40 md:h-7" />
+			</span>
 			<ExternalLink class="text-muted-foreground ml-auto size-3.5 flex-none" />
 		</a>
 		{@render actions?.()}
