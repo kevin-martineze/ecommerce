@@ -114,10 +114,10 @@
 </script>
 
 <svelte:head>
-	<title>{data.settings.store_name} — Ropa</title>
+	<title>{data.settings.store_name} — {heroTitle}</title>
 	<meta
 		name="description"
-		content="Productos seleccionadas de {data.settings
+		content="Productos seleccionados de {data.settings
 			.store_name}. Pide por WhatsApp: te confirmamos disponibilidad y envío."
 	/>
 </svelte:head>
@@ -125,7 +125,7 @@
 <div data-preview-zone={data.draftPreview ? 'hero' : undefined}>
 	<StoreHero
 		layout={heroOf(look.template, look.theme)}
-		eyebrow={hero ? 'Colección en curso' : 'Nueva temporada'}
+		eyebrow={hero ? 'Colección en curso' : data.settings.store_name}
 		title={heroTitle}
 		subtitle={heroSubtitle}
 		image={heroImage}

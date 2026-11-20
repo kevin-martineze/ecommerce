@@ -42,7 +42,9 @@
 	const current = $derived(visible.at(selected) ?? visible.at(0) ?? null);
 </script>
 
-<div class="grid gap-4 md:grid-cols-[auto_1fr]">
+<!-- `product-gallery` es el gancho con que una plantilla viste las fotos desde
+     `app.css`, igual que `product-card` en la tarjeta. -->
+<div class="product-gallery grid gap-4 md:grid-cols-[auto_1fr]">
 	{#if visible.length > 1}
 		<div class="order-2 flex gap-2 overflow-x-auto md:order-1 md:flex-col md:overflow-visible">
 			{#each visible as image, index (image.id)}
