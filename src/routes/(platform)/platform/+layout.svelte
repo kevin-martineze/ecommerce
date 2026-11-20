@@ -16,8 +16,14 @@
 
 <svelte:head>
 	<meta name="robots" content="noindex" />
+	<!-- Instalable desde el celular: en iPhone es lo que habilita el push. -->
+	<link rel="manifest" href="/manifest.webmanifest" />
 </svelte:head>
 
-<PlatformTemplate email={data.adminEmail} hasStores={data.hasStores}>
+<PlatformTemplate
+	email={data.adminEmail}
+	hasStores={data.hasStores}
+	notifications={data.notifications}
+>
 	{@render children()}
 </PlatformTemplate>

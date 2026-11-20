@@ -16,6 +16,12 @@ const config = {
 		adapter,
 		alias: {
 			$lib: 'src/lib'
+		},
+		// El service worker solo sirve para los avisos push del panel y la
+		// consola: se registra a mano cuando alguien los activa, nunca en la
+		// tienda pública (ver `$lib/stores/push-device.svelte.ts`).
+		serviceWorker: {
+			register: false
 		}
 	},
 	compilerOptions: {

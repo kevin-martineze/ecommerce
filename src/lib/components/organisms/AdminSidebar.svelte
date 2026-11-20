@@ -5,6 +5,7 @@ tienda, la navegación y la sesión.
 -->
 <script lang="ts">
 	// Tipos
+	import type { Snippet } from 'svelte';
 	import type { AdminShell, NavGroup } from '$lib/config/admin-nav';
 
 	// Iconos
@@ -31,24 +32,29 @@ tienda, la navegación y la sesión.
 	interface Props {
 		shell: AdminShell;
 		groups: NavGroup[];
+		/** Lo que va junto al nombre de la tienda: la campana de avisos. */
+		actions?: Snippet;
 	}
 
-	let { shell, groups }: Props = $props();
+	let { shell, groups, actions }: Props = $props();
 </script>
 
 <div class="flex min-h-full flex-col gap-2 p-3">
 	<!-- La marca y la tienda: el nombre lleva a la vitrina, que es lo que
 	     la dueña quiere abrir cada dos por tres. -->
-	<a
-		href={shell.storeUrl}
-		target="_blank"
-		rel="noopener noreferrer"
-		class="hover:bg-sidebar-accent flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors"
-	>
-		<GloberceMark size={24} label="" />
-		<span class="truncate text-sm font-semibold">{shell.storeName}</span>
-		<ExternalLink class="text-muted-foreground ml-auto size-3.5 flex-none" />
-	</a>
+	<div class="flex items-center gap-1">
+		<a
+			href={shell.storeUrl}
+			target="_blank"
+			rel="noopener noreferrer"
+			class="hover:bg-sidebar-accent flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 transition-colors"
+		>
+			<GloberceMark size={24} label="" />
+			<span class="truncate text-sm font-semibold">{shell.storeName}</span>
+			<ExternalLink class="text-muted-foreground ml-auto size-3.5 flex-none" />
+		</a>
+		{@render actions?.()}
+	</div>
 
 	<!-- La acción rápida: lo que más se crea es un producto. -->
 	<Button href="/admin/products/new" size="sm" class="mt-1 h-9 w-full justify-start">
