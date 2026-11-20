@@ -22,7 +22,8 @@ export const STOREFRONT_TEMPLATES = [
 	'noche',
 	'vibrante',
 	'atelier',
-	'moda'
+	'moda',
+	'maison'
 ] as const;
 
 export type StorefrontTemplate = (typeof STOREFRONT_TEMPLATES)[number];
@@ -186,6 +187,22 @@ export const TEMPLATES: TemplateInfo[] = [
 		hero: 'cover',
 		header: 'mega',
 		card: 'retail',
+		shelves: 'carousel',
+		background: '#FFFFFF'
+	},
+	{
+		code: 'maison',
+		name: 'Maison',
+		tagline:
+			'Negro y blanco, un banner a pantalla completa y letra de casa de lujo. Para perfumería, joyería y cosmética.',
+		features: [
+			'Banner a pantalla completa con la foto de la colección',
+			'Titulares finos en serif y anuncio que se desliza',
+			'Colecciones y productos en filas que se deslizan'
+		],
+		hero: 'cover',
+		header: 'centered',
+		card: 'plain',
 		shelves: 'carousel',
 		background: '#FFFFFF'
 	}

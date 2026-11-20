@@ -239,13 +239,13 @@
 		</div>
 	</section>
 {:else}
-	<section class="relative">
+	<section class="hero-cover relative">
 		<div class="relative min-h-[70vh] overflow-hidden md:min-h-[82vh]">
 			{#if image}
 				<img
 					src={image}
 					alt=""
-					class="absolute inset-0 h-[120%] w-full object-cover"
+					class="hero-image absolute inset-0 h-[120%] w-full object-cover"
 					fetchpriority="high"
 					use:parallax={{ amount: 0.18 }}
 				/>
