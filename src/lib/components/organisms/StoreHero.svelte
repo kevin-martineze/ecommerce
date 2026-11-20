@@ -85,9 +85,8 @@
 		</div>
 	</section>
 {:else if layout === 'typographic'}
-	<!-- Con foto, el titular comparte la portada con un bodegón: la foto va sobre
-	     el gris de la plantilla y se funde en él (`mix-blend-multiply`), así un
-	     producto fotografiado sobre blanco queda como en un estudio. -->
+	<!-- Con foto, el titular comparte la portada con ella: enmarcada en cuadrado
+	     y a tamaño completo. -->
 	<section class="border-border border-b">
 		<div
 			class={cn(
@@ -138,11 +137,11 @@
 			</div>
 
 			{#if image}
-				<div class="rise rise-3 bg-secondary relative aspect-square overflow-hidden md:col-span-5">
+				<div class="rise rise-3 bg-muted relative aspect-square overflow-hidden md:col-span-5">
 					<img
 						src={image}
 						alt=""
-						class="absolute inset-0 h-full w-full object-contain p-8 mix-blend-multiply md:p-12"
+						class="absolute inset-0 h-full w-full object-cover"
 						fetchpriority="high"
 					/>
 				</div>
