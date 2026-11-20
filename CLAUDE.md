@@ -35,7 +35,8 @@ shadcn-svelte**, sobre la API propia `ecommerce-api`.
 ### Datos
 
 11. **La carga inicial se hace en `+page.server.ts` / `+layout.server.ts`.** El
-    cliente no hace `fetch` a la API.
+    cliente no hace `fetch` a la API. Única excepción: el stream de avisos
+    (`EventSource` directo a la API, ver regla 16).
 12. **Las mutaciones van por form actions** con `use:enhance`.
 13. **El carrito y los favoritos viven en `localStorage`** y llegan al servidor
     por form action, nunca por `fetch` manual.
@@ -53,6 +54,12 @@ shadcn-svelte**, sobre la API propia `ecommerce-api`.
     La tienda pública es la del host (`storeSlugFor`): subdominio de
     `STORE_ROOT_DOMAIN`, o `STORE_SLUG`. El panel opera sobre la tienda de la
     sesión, y `requireAdmin` la cambia a la del host si la cuenta es miembro.
+    **Excepción: el stream de avisos.** El navegador abre `EventSource` contra
+    la API con un ticket de 60 s que le pide por POST a este sitio
+    (`/admin/notifications/ticket`, `/platform/notifications/ticket`); el
+    ticket solo sirve para el stream. Lo que llega se lee con
+    `parseNotification` de `$lib/domain/notifications.ts` (el mismo esquema que
+    usa el servidor), y lo maneja `NotificationCenter`. Nada más se abre así.
 17. **Toda form action del panel empieza con `panelContext(event)`.** Las actions
     no ejecutan el `load` del layout, así que no heredan `requireAdmin`.
 18. **Las reglas de precio viven solo en la API.** El carrito cotiza con

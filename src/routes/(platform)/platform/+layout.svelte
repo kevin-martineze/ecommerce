@@ -18,6 +18,10 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<PlatformTemplate email={data.adminEmail} hasStores={data.hasStores}>
+<PlatformTemplate
+	email={data.adminEmail}
+	hasStores={data.hasStores}
+	notifications={data.notifications}
+>
 	{@render children()}
 </PlatformTemplate>

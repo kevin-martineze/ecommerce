@@ -6,6 +6,7 @@ sesión) fija arriba. Cada página pone su contenido con `PageTemplate`.
 <script lang="ts">
 	// Tipos
 	import type { Snippet } from 'svelte';
+	import type { NotificationInbox } from '$lib/domain/notifications';
 
 	// Iconos
 	import LogOut from '@lucide/svelte/icons/log-out';
@@ -18,6 +19,10 @@ sesión) fija arriba. Cada página pone su contenido con `PageTemplate`.
 	import { Button } from '$lib/components/atoms/button';
 	import StackedLayout from '$lib/components/layouts/StackedLayout.svelte';
 	import ActionToasts from '$lib/components/molecules/ActionToasts.svelte';
+	import NotificationBell from '$lib/components/organisms/NotificationBell.svelte';
+
+	// Estado
+	import { liveNotifications } from '$lib/stores/live-notifications.svelte';
 
 	// Dominio
 	import { isActiveLink } from '$lib/config/admin-nav';
@@ -29,10 +34,16 @@ sesión) fija arriba. Cada página pone su contenido con `PageTemplate`.
 		email: string;
 		/** Si la cuenta también administra tiendas: lleva a su panel. */
 		hasStores: boolean;
+		/** Los últimos avisos de la plataforma y el total sin leer. */
+		notifications: NotificationInbox;
 		children: Snippet;
 	}
 
-	let { email, hasStores, children }: Props = $props();
+	let { email, hasStores, notifications, children }: Props = $props();
+
+	const BASE_PATH = '/platform/notifications';
+
+	const center = liveNotifications({ inbox: () => notifications, basePath: BASE_PATH });
 
 	const LINKS = [
 		{ href: '/platform', label: 'Resumen' },
@@ -69,6 +80,7 @@ sesión) fija arriba. Cada página pone su contenido con `PageTemplate`.
 				</nav>
 
 				<div class="ml-auto flex items-center gap-3">
+					<NotificationBell {center} basePath={BASE_PATH} />
 					{#if hasStores}
 						<a href="/admin" class="text-muted-foreground hover:text-foreground text-sm">Mi panel</a
 						>

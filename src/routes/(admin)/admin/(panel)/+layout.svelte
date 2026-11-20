@@ -28,6 +28,6 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<AdminTemplate {shell} notice={data.notice}>
+<AdminTemplate {shell} notice={data.notice} notifications={data.notifications}>
 	{@render children()}
 </AdminTemplate>
