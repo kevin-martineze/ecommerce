@@ -1,6 +1,9 @@
 // Librerías
 import { z } from 'zod';
 
+// Dominio
+import { ACTIVATION_STAGES } from '$lib/domain/activation';
+
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
 export const paymentSchema = z
@@ -30,6 +33,8 @@ export const storeStatusSchema = z.enum(['active', 'suspended'], {
 });
 
 export const storeFilterStatusSchema = z.enum(['trial', 'active', 'past_due', 'suspended']);
+
+export const storeFilterStageSchema = z.enum(ACTIVATION_STAGES);
 
 export const userFilterStatusSchema = z.enum(['active', 'disabled']);
 

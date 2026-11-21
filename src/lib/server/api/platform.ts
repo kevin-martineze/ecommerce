@@ -14,6 +14,7 @@ import type {
 	StoreStatus,
 	UserStatus
 } from '$lib/domain/account';
+import type { ActivationStage, StoreActivation } from '$lib/domain/activation';
 
 // Librerías
 import { z } from 'zod';
@@ -28,6 +29,7 @@ import {
 } from '$lib/server/api/statuses';
 
 // Dominio
+import { ACTIVATION_STAGES } from '$lib/domain/activation';
 import { DOMAIN_STATUSES } from '$lib/domain/domain';
 
 /** Consola de la plataforma: `/platform/*`. Solo para cuentas en `platform_admins`. */
@@ -52,10 +54,39 @@ const storeFields = {
 		})
 	),
 	productCount: z.number(),
-	orderCount: z.number()
+	orderCount: z.number(),
+	activation: z.object({
+		stage: z.enum(ACTIVATION_STAGES),
+		stageReachedAt: z.string(),
+		firstProductAt: z.string().nullable(),
+		firstOrderAt: z.string().nullable(),
+		firstSaleAt: z.string().nullable(),
+		firstPaymentAt: z.string().nullable(),
+		lastSeenAt: z.string().nullable(),
+		activeProductsWithPhoto: z.number(),
+		hasLogo: z.boolean(),
+		wompiConnected: z.boolean(),
+		contactPhone: z.string().nullable()
+	})
 };
 
 type RawStore = z.output<z.ZodObject<typeof storeFields>>;
+
+function toActivation(activation: RawStore['activation']): StoreActivation {
+	return {
+		stage: activation.stage,
+		stage_reached_at: activation.stageReachedAt,
+		first_product_at: activation.firstProductAt,
+		first_order_at: activation.firstOrderAt,
+		first_sale_at: activation.firstSaleAt,
+		first_payment_at: activation.firstPaymentAt,
+		last_seen_at: activation.lastSeenAt,
+		active_products_with_photo: activation.activeProductsWithPhoto,
+		has_logo: activation.hasLogo,
+		wompi_connected: activation.wompiConnected,
+		contact_phone: activation.contactPhone
+	};
+}
 
 function toStore(store: RawStore): PlatformStore {
 	return {
@@ -76,11 +107,12 @@ function toStore(store: RawStore): PlatformStore {
 			role: member.role
 		})),
 		product_count: store.productCount,
-		order_count: store.orderCount
+		order_count: store.orderCount,
+		activation: toActivation(store.activation)
 	};
 }
 
-const storeSchema = z.object(storeFields).transform(toStore);
+export const storeSchema = z.object(storeFields).transform(toStore);
 
 const paymentSchema = z
 	.object({
@@ -141,6 +173,7 @@ export interface StoreFilters {
 	q: string | null;
 	status: StoreStatus | null;
 	overdue: boolean;
+	stage: ActivationStage | null;
 }
 
 const STATUS_TO_API: Record<StoreStatus, string> = {
@@ -159,6 +192,7 @@ export function listStores(
 	if (filters.q) params.set('q', filters.q);
 	if (filters.status) params.set('status', STATUS_TO_API[filters.status]);
 	if (filters.overdue) params.set('overdue', 'true');
+	if (filters.stage) params.set('stage', filters.stage);
 
 	const query = params.size > 0 ? `?${params}` : '';
 
@@ -246,7 +280,7 @@ const platformPaymentSchema = z
 		created_at: payment.createdAt
 	}));
 
-const dashboardSchema = z
+export const dashboardSchema = z
 	.object({
 		stores: z.object({
 			total: z.number(),
@@ -269,7 +303,14 @@ const dashboardSchema = z
 				daysOverdue: z.number()
 			})
 		),
-		recentPayments: z.array(platformPaymentSchema)
+		recentPayments: z.array(platformPaymentSchema),
+		activation: z.object({
+			created: z.number(),
+			catalog: z.number(),
+			firstOrder: z.number(),
+			firstSale: z.number(),
+			paying: z.number()
+		})
 	})
 	.transform((dashboard): PlatformDashboard => ({
 		stores: {
@@ -299,7 +340,14 @@ const dashboardSchema = z
 			current_period_end: store.currentPeriodEnd,
 			days_overdue: store.daysOverdue
 		})),
-		recent_payments: dashboard.recentPayments
+		recent_payments: dashboard.recentPayments,
+		activation: {
+			created: dashboard.activation.created,
+			catalog: dashboard.activation.catalog,
+			first_order: dashboard.activation.firstOrder,
+			first_sale: dashboard.activation.firstSale,
+			paying: dashboard.activation.paying
+		}
 	}));
 
 export function getDashboard(ctx: AccountContext): Promise<ApiResult<PlatformDashboard>> {

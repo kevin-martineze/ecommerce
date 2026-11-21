@@ -26,6 +26,7 @@
 	import StoreStatusBadge from '$lib/components/molecules/StoreStatusBadge.svelte';
 	import TypedConfirmDialog from '$lib/components/molecules/TypedConfirmDialog.svelte';
 	import ConfirmDeleteDialog from '$lib/components/organisms/ConfirmDeleteDialog.svelte';
+	import StoreActivationCard from '$lib/components/organisms/StoreActivationCard.svelte';
 	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
 	// Estado
@@ -281,6 +282,10 @@
 				<Button type="submit" variant="outline" class="w-full">Guardar plan</Button>
 			</form>
 		</section>
+	</div>
+
+	<div class="mt-6 lg:max-w-md">
+		<StoreActivationCard activation={store.activation} createdAt={store.created_at} />
 	</div>
 
 	<section class="border-border bg-card mt-6 overflow-hidden rounded-lg border">
