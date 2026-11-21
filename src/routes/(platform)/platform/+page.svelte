@@ -11,6 +11,9 @@
 	import * as Table from '$lib/components/atoms/table';
 	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
+	// Dominio
+	import { ACTIVATION_STAGE_LABEL, ACTIVATION_STAGES } from '$lib/domain/activation';
+
 	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
 
@@ -21,6 +24,22 @@
 	let { data }: Props = $props();
 
 	const dashboard = $derived(data.dashboard);
+
+	/** Una fila por etapa, con cuántas tiendas la alcanzaron (acumulado). */
+	const funnel = $derived(
+		ACTIVATION_STAGES.map((stage) => ({
+			stage,
+			label: ACTIVATION_STAGE_LABEL[stage],
+			count: dashboard.activation[stage]
+		}))
+	);
+
+	/** Porcentaje sobre las tiendas creadas. La primera etapa siempre es 100%. */
+	function percentOfCreated(count: number): number {
+		return dashboard.activation.created > 0
+			? Math.round((count / dashboard.activation.created) * 100)
+			: 0;
+	}
 
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeZone: 'UTC' });
 	const dateTimeFormatter = new Intl.DateTimeFormat('es-CO', {
@@ -204,4 +223,32 @@
 			{/if}
 		</section>
 	</div>
+	<section class="border-border bg-card mt-8 rounded-lg border p-6">
+		<header class="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+			<h2 class="text-lg">Embudo de activación</h2>
+			<p class="text-muted-foreground text-xs">Cuántas tiendas llegan a cada etapa.</p>
+		</header>
+
+		<ol class="space-y-4">
+			{#each funnel as row (row.stage)}
+				<li>
+					<a href={`/platform/stores?stage=${row.stage}`} class="group block text-sm">
+						<span class="flex justify-between gap-4">
+							<span class="font-medium group-hover:underline">{row.label}</span>
+							<span class="tabular-nums">
+								{row.count}
+								<span class="text-muted-foreground text-xs">· {percentOfCreated(row.count)}%</span>
+							</span>
+						</span>
+						<span class="bg-muted mt-1.5 block h-2 overflow-hidden rounded-full">
+							<span
+								class="bg-primary block h-full rounded-full"
+								style="width: {percentOfCreated(row.count)}%"
+							></span>
+						</span>
+					</a>
+				</li>
+			{/each}
+		</ol>
+	</section>
 </PageTemplate>

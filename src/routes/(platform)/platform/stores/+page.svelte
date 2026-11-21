@@ -10,6 +10,7 @@
 	import { page } from '$app/state';
 
 	// Componentes
+	import { Badge } from '$lib/components/atoms/badge';
 	import { Checkbox } from '$lib/components/atoms/checkbox';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
@@ -20,6 +21,7 @@
 
 	// Dominio
 	import { STORE_STATUS_LABEL } from '$lib/domain/account';
+	import { ACTIVATION_STAGE_LABEL, ACTIVATION_STAGES, daysSince } from '$lib/domain/activation';
 
 	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
@@ -35,7 +37,26 @@
 		...Object.entries(STORE_STATUS_LABEL).map(([value, label]) => ({ value, label }))
 	];
 
+	/** A partir de cuántos días sin entrar al panel la tienda se marca. */
+	const IDLE_DAYS = 7;
+
+	const now = new Date();
+
+	const stageOptions = [
+		{ value: 'all', label: 'Todas las etapas' },
+		...ACTIVATION_STAGES.map((value) => ({ value, label: ACTIVATION_STAGE_LABEL[value] }))
+	];
+
 	const dateFormatter = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeZone: 'UTC' });
+
+	function daysLabel(count: number): string {
+		return count === 1 ? '1 día' : `${count} días`;
+	}
+
+	/** «hoy» si fue hoy; si no, «hace N días». */
+	function elapsed(count: number): string {
+		return count === 0 ? 'hoy' : `hace ${daysLabel(count)}`;
+	}
 
 	function formatDate(value: string | null): string {
 		return value ? dateFormatter.format(new Date(`${value.slice(0, 10)}T00:00:00Z`)) : '—';
@@ -66,7 +87,7 @@
 		: 'tiendas'} con este filtro."
 >
 	<section
-		class="border-border bg-card rounded-lg mb-6 grid gap-3 border p-4 sm:grid-cols-[1fr_14rem_auto]"
+		class="border-border bg-card rounded-lg mb-6 grid gap-3 border p-4 sm:grid-cols-[1fr_14rem_14rem_auto]"
 	>
 		<form
 			class="relative"
@@ -94,6 +115,14 @@
 			onValueChange={(value) => applyFilter('status', value === 'all' ? null : value)}
 		/>
 
+		<SelectField
+			name="stage"
+			aria-label="Etapa"
+			value={data.filters.stage ?? 'all'}
+			options={stageOptions}
+			onValueChange={(value) => applyFilter('stage', value === 'all' ? null : value)}
+		/>
+
 		<div class="flex items-center gap-2">
 			<Checkbox
 				id="vencidas"
@@ -117,6 +146,7 @@
 					<Table.Row>
 						<Table.Head>Tienda</Table.Head>
 						<Table.Head>Estado</Table.Head>
+						<Table.Head>Va en</Table.Head>
 						<Table.Head>Plan</Table.Head>
 						<Table.Head>Pago hasta</Table.Head>
 						<Table.Head>Creador</Table.Head>
@@ -127,6 +157,10 @@
 				<Table.Body>
 					{#each data.stores as store (store.id)}
 						{@const owner = store.members.find((member) => member.role === 'owner')}
+						{@const stageDays = daysSince(store.activation.stage_reached_at, now)}
+						{@const idleDays = store.activation.last_seen_at
+							? daysSince(store.activation.last_seen_at, now)
+							: null}
 						<Table.Row>
 							<Table.Cell data-label="Tienda">
 								<a href={`/platform/stores/${store.id}`} class="font-medium hover:underline">
@@ -136,6 +170,15 @@
 							</Table.Cell>
 							<Table.Cell data-label="Estado"><StoreStatusBadge status={store.status} /></Table.Cell
 							>
+							<Table.Cell data-label="Va en">
+								<Badge variant="secondary">{ACTIVATION_STAGE_LABEL[store.activation.stage]}</Badge>
+								{#if store.activation.stage !== 'paying'}
+									<p class="text-muted-foreground mt-1 text-xs">{elapsed(stageDays)}</p>
+								{/if}
+								{#if idleDays !== null && idleDays > IDLE_DAYS}
+									<p class="text-destructive text-xs">Sin entrar hace {daysLabel(idleDays)}</p>
+								{/if}
+							</Table.Cell>
 							<Table.Cell data-label="Plan">{planName(store.plan_code)}</Table.Cell>
 							<Table.Cell data-label="Pago hasta">{formatDate(store.current_period_end)}</Table.Cell
 							>

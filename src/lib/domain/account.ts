@@ -1,4 +1,5 @@
 // Tipos
+import type { ActivationStage, StoreActivation } from '$lib/domain/activation';
 import type { DomainStatus } from '$lib/domain/domain';
 
 /** Cuenta, equipo, plan y plataforma. Los estados van en minúsculas, como el resto del dominio. */
@@ -112,6 +113,7 @@ export interface PlatformStore {
 	members: PlatformMember[];
 	product_count: number;
 	order_count: number;
+	activation: StoreActivation;
 }
 
 export interface PlatformPayment {
@@ -286,6 +288,8 @@ export interface PlatformDashboard {
 	trials_ending: TrialEnding[];
 	overdue: OverdueStore[];
 	recent_payments: PlatformPaymentRow[];
+	/** Cuántas tiendas alcanzaron cada etapa. Acumulado: quien está en una también cuenta en las de antes. */
+	activation: Record<ActivationStage, number>;
 }
 
 export interface MonthPayments {
