@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	discountPercent,
 	formatAmount,
+	formatCompactMoney,
 	formatMoney,
 	parseAmount,
 	typeAmount
@@ -22,6 +23,18 @@ describe('formatMoney', () => {
 
 	it('maneja el cero', () => {
 		expect(formatMoney(0)).toBe('$0');
+	});
+});
+
+describe('formatCompactMoney', () => {
+	it('acorta miles y millones para la etiqueta de la barra', () => {
+		expect(formatCompactMoney(0)).toBe('$0');
+		expect(formatCompactMoney(49000)).toBe('$49k');
+		expect(formatCompactMoney(1250000)).toBe('$1,3 M');
+	});
+
+	it('deja completo lo que no llega a mil', () => {
+		expect(formatCompactMoney(850)).toBe('$850');
 	});
 });
 

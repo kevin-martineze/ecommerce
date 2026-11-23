@@ -278,6 +278,17 @@ export interface PlatformPaymentRow extends PlatformPayment {
 	store_slug: string;
 }
 
+/**
+ * Un mes de la serie del resumen: lo cobrado, las tiendas creadas y las tiendas que
+ * existían al cierre del mes, hora de Colombia.
+ */
+export interface MonthlyPoint {
+	month: string;
+	revenue_cop: number;
+	new_stores: number;
+	total_stores: number;
+}
+
 export interface PlatformDashboard {
 	stores: { total: number; trial: number; active: number; past_due: number; suspended: number };
 	paying_stores: number;
@@ -290,6 +301,8 @@ export interface PlatformDashboard {
 	recent_payments: PlatformPaymentRow[];
 	/** Cuántas tiendas alcanzaron cada etapa. Acumulado: quien está en una también cuenta en las de antes. */
 	activation: Record<ActivationStage, number>;
+	/** Seis meses de Colombia, del más viejo al actual. */
+	monthly: MonthlyPoint[];
 }
 
 export interface MonthPayments {

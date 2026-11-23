@@ -18,6 +18,29 @@ export function formatMoney(value: number): string {
 		.replace(/\s/g, '');
 }
 
+/** Versión corta para etiquetas de gráficas: "$49k", "$1,3 M". La completa va en el tooltip. */
+export function formatCompactMoney(value: number): string {
+	const rounded = Math.round(value);
+
+	if (Math.abs(rounded) >= 1_000_000) {
+		const millions = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 1 }).format(
+			rounded / 1_000_000
+		);
+
+		return `$${millions} M`;
+	}
+
+	if (Math.abs(rounded) >= 1_000) {
+		const thousands = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(
+			rounded / 1_000
+		);
+
+		return `$${thousands}k`;
+	}
+
+	return formatMoney(rounded);
+}
+
 /** Versión sin símbolo, para inputs del panel de administración. */
 export function formatAmount(value: number): string {
 	return new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(Math.round(value));

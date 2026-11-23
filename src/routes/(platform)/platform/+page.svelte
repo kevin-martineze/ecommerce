@@ -9,13 +9,15 @@
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import * as Table from '$lib/components/atoms/table';
+	import AreaChart from '$lib/components/molecules/AreaChart.svelte';
+	import BarChart from '$lib/components/molecules/BarChart.svelte';
 	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
 	// Dominio
 	import { ACTIVATION_STAGE_LABEL, ACTIVATION_STAGES } from '$lib/domain/activation';
 
 	// Utilidades
-	import { formatMoney } from '$lib/utils/money';
+	import { formatCompactMoney, formatMoney } from '$lib/utils/money';
 
 	interface Props {
 		data: PageData;
@@ -48,6 +50,7 @@
 		hour: '2-digit',
 		minute: '2-digit'
 	});
+	const monthFormatter = new Intl.DateTimeFormat('es-CO', { month: 'short', timeZone: 'UTC' });
 
 	function formatDate(value: string | null): string {
 		return value ? dateFormatter.format(new Date(`${value.slice(0, 10)}T00:00:00Z`)) : '—';
@@ -56,6 +59,48 @@
 	function days(count: number): string {
 		return count === 1 ? '1 día' : `${count} días`;
 	}
+
+	/** "2026-11" → "nov": el nombre corto del mes en la serie. */
+	function monthLabel(month: string): string {
+		const [year, monthNumber] = month.split('-');
+
+		return monthFormatter.format(new Date(Date.UTC(Number(year), Number(monthNumber) - 1, 1)));
+	}
+
+	/** Una barra por mes de la serie. La última es el mes en curso y se resalta. */
+	const revenueBars = $derived(
+		dashboard.monthly.map((point, index, months) => ({
+			key: point.month,
+			label: monthLabel(point.month),
+			value: point.revenue_cop,
+			text: formatCompactMoney(point.revenue_cop),
+			title: `${monthLabel(point.month)}: ${formatMoney(point.revenue_cop)}`,
+			current: index === months.length - 1
+		}))
+	);
+
+	const storeBars = $derived(
+		dashboard.monthly.map((point, index, months) => ({
+			key: point.month,
+			label: monthLabel(point.month),
+			value: point.new_stores,
+			text: String(point.new_stores),
+			title: `${monthLabel(point.month)}: ${point.new_stores} ${point.new_stores === 1 ? 'tienda nueva' : 'tiendas nuevas'}`,
+			current: index === months.length - 1
+		}))
+	);
+
+	/** Una columna por mes con las tiendas que existían al cerrar ese mes. */
+	const totalPoints = $derived(
+		dashboard.monthly.map((point, index, months) => ({
+			key: point.month,
+			label: monthLabel(point.month),
+			value: point.total_stores,
+			text: String(point.total_stores),
+			title: `${monthLabel(point.month)}: ${point.total_stores} ${point.total_stores === 1 ? 'tienda' : 'tiendas'} en total`,
+			current: index === months.length - 1
+		}))
+	);
 
 	/** Cambio del mes contra el anterior, o null si no hay con qué comparar. */
 	const revenueChange = $derived(
@@ -131,6 +176,40 @@
 			</Card.Content>
 		</Card.Root>
 	</div>
+
+	<div class="mt-8 grid gap-6 lg:grid-cols-2">
+		<section class="border-border bg-card rounded-lg border p-6">
+			<header class="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+				<h2 class="text-lg">Cobrado por mes</h2>
+				<p class="text-muted-foreground text-xs">Últimos seis meses, hora de Colombia.</p>
+			</header>
+			<BarChart
+				label="Cobrado por mes"
+				bars={revenueBars}
+				empty="Todavía no hay cobros en estos meses."
+			/>
+		</section>
+
+		<section class="border-border bg-card rounded-lg border p-6">
+			<header class="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+				<h2 class="text-lg">Tiendas nuevas por mes</h2>
+				<p class="text-muted-foreground text-xs">Tiendas creadas en cada mes.</p>
+			</header>
+			<BarChart
+				label="Tiendas nuevas por mes"
+				bars={storeBars}
+				empty="Todavía no se crean tiendas en estos meses."
+			/>
+		</section>
+	</div>
+
+	<section class="border-border bg-card mt-6 rounded-lg border p-6">
+		<header class="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+			<h2 class="text-lg">Tiendas acumuladas</h2>
+			<p class="text-muted-foreground text-xs">Tiendas que existían al cierre de cada mes.</p>
+		</header>
+		<AreaChart label="Tiendas acumuladas" points={totalPoints} empty="Todavía no hay tiendas." />
+	</section>
 
 	<div class="mt-8 grid gap-6 lg:grid-cols-2">
 		<section class="border-border bg-card overflow-hidden rounded-lg border">

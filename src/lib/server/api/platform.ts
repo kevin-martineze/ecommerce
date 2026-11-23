@@ -310,7 +310,15 @@ export const dashboardSchema = z
 			firstOrder: z.number(),
 			firstSale: z.number(),
 			paying: z.number()
-		})
+		}),
+		monthly: z.array(
+			z.object({
+				month: z.string(),
+				revenueCop: z.number(),
+				newStores: z.number(),
+				totalStores: z.number()
+			})
+		)
 	})
 	.transform((dashboard): PlatformDashboard => ({
 		stores: {
@@ -341,6 +349,12 @@ export const dashboardSchema = z
 			days_overdue: store.daysOverdue
 		})),
 		recent_payments: dashboard.recentPayments,
+		monthly: dashboard.monthly.map((point) => ({
+			month: point.month,
+			revenue_cop: point.revenueCop,
+			new_stores: point.newStores,
+			total_stores: point.totalStores
+		})),
 		activation: {
 			created: dashboard.activation.created,
 			catalog: dashboard.activation.catalog,
