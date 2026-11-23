@@ -9,6 +9,7 @@
 	import { Button } from '$lib/components/atoms/button';
 	import * as Card from '$lib/components/atoms/card';
 	import * as Table from '$lib/components/atoms/table';
+	import AreaChart from '$lib/components/molecules/AreaChart.svelte';
 	import BarChart from '$lib/components/molecules/BarChart.svelte';
 	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
 
@@ -85,6 +86,18 @@
 			value: point.new_stores,
 			text: String(point.new_stores),
 			title: `${monthLabel(point.month)}: ${point.new_stores} ${point.new_stores === 1 ? 'tienda nueva' : 'tiendas nuevas'}`,
+			current: index === months.length - 1
+		}))
+	);
+
+	/** Una columna por mes con las tiendas que existían al cerrar ese mes. */
+	const totalPoints = $derived(
+		dashboard.monthly.map((point, index, months) => ({
+			key: point.month,
+			label: monthLabel(point.month),
+			value: point.total_stores,
+			text: String(point.total_stores),
+			title: `${monthLabel(point.month)}: ${point.total_stores} ${point.total_stores === 1 ? 'tienda' : 'tiendas'} en total`,
 			current: index === months.length - 1
 		}))
 	);
@@ -189,6 +202,14 @@
 			/>
 		</section>
 	</div>
+
+	<section class="border-border bg-card mt-6 rounded-lg border p-6">
+		<header class="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+			<h2 class="text-lg">Tiendas acumuladas</h2>
+			<p class="text-muted-foreground text-xs">Tiendas que existían al cierre de cada mes.</p>
+		</header>
+		<AreaChart label="Tiendas acumuladas" points={totalPoints} empty="Todavía no hay tiendas." />
+	</section>
 
 	<div class="mt-8 grid gap-6 lg:grid-cols-2">
 		<section class="border-border bg-card overflow-hidden rounded-lg border">

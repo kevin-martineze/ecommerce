@@ -45,7 +45,7 @@ const dashboard = {
 	overdue: [],
 	recentPayments: [],
 	activation: { created: 3, catalog: 2, firstOrder: 1, firstSale: 0, paying: 0 },
-	monthly: [{ month: '2026-11', revenueCop: 49000, newStores: 3 }]
+	monthly: [{ month: '2026-11', revenueCop: 49000, newStores: 3, totalStores: 7 }]
 };
 
 describe('storeSchema (tienda en la consola)', () => {
@@ -82,10 +82,12 @@ describe('storeSchema (tienda en la consola)', () => {
 });
 
 describe('dashboardSchema (serie mensual)', () => {
-	it('pasa la serie a snake_case: cobro y tiendas nuevas por mes', () => {
+	it('pasa la serie a snake_case: cobro, tiendas nuevas y tiendas acumuladas por mes', () => {
 		const parsed = dashboardSchema.parse(dashboard);
 
-		expect(parsed.monthly).toEqual([{ month: '2026-11', revenue_cop: 49000, new_stores: 3 }]);
+		expect(parsed.monthly).toEqual([
+			{ month: '2026-11', revenue_cop: 49000, new_stores: 3, total_stores: 7 }
+		]);
 	});
 });
 

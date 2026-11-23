@@ -278,11 +278,15 @@ export interface PlatformPaymentRow extends PlatformPayment {
 	store_slug: string;
 }
 
-/** Un mes de la serie del resumen: lo cobrado y las tiendas creadas, hora de Colombia. */
+/**
+ * Un mes de la serie del resumen: lo cobrado, las tiendas creadas y las tiendas que
+ * existían al cierre del mes, hora de Colombia.
+ */
 export interface MonthlyPoint {
 	month: string;
 	revenue_cop: number;
 	new_stores: number;
+	total_stores: number;
 }
 
 export interface PlatformDashboard {
