@@ -8,6 +8,9 @@ tienda, la navegación y la sesión.
 	import type { Snippet } from 'svelte';
 	import type { AdminShell, NavGroup } from '$lib/config/admin-nav';
 
+	// Svelte
+	import { tick } from 'svelte';
+
 	// Iconos
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import LogOut from '@lucide/svelte/icons/log-out';
@@ -20,6 +23,7 @@ tienda, la navegación y la sesión.
 	// Componentes
 	import { Badge } from '$lib/components/atoms/badge';
 	import { Button } from '$lib/components/atoms/button';
+	import SelectField from '$lib/components/molecules/SelectField.svelte';
 	import StoreBrand from '$lib/components/molecules/StoreBrand.svelte';
 
 	// Dominio
@@ -37,6 +41,20 @@ tienda, la navegación y la sesión.
 	}
 
 	let { shell, groups, actions }: Props = $props();
+
+	// Las otras tiendas de la cuenta. La que se administra no va en la lista:
+	// es el texto del selector.
+	const switchOptions = $derived(
+		shell.otherStores.map((store) => ({ value: store.id, label: store.name }))
+	);
+
+	let switchForm = $state<HTMLFormElement | null>(null);
+
+	// Elegir una tienda envía el form. El valor llega al input oculto en el
+	// siguiente tick, así que el envío espera a ese tick para llevar la tienda.
+	function submitSwitch() {
+		void tick().then(() => switchForm?.requestSubmit());
+	}
 </script>
 
 <div class="flex min-h-full flex-col gap-2 p-3">
@@ -67,22 +85,17 @@ tienda, la navegación y la sesión.
 	{#if shell.otherStores.length > 0}
 		<!-- Una cuenta puede administrar varias tiendas. Sin esto, cambiar
 		     de una a otra era escribir el subdominio a mano. -->
-		<form method="POST" action="/admin/switch-store" class="px-2 pt-2">
+		<form bind:this={switchForm} method="POST" action="/admin/switch-store" class="px-2 pt-2">
 			<label class="text-muted-foreground text-xs" for="switch-store">Cambiar de tienda</label>
-			<select
+			<SelectField
 				id="switch-store"
 				name="storeId"
-				class="border-sidebar-border bg-background mt-1 w-full rounded-md border px-2 py-1 text-sm"
-				onchange={(event) => event.currentTarget.form?.requestSubmit()}
-			>
-				<option value="">{shell.storeName}</option>
-				{#each shell.otherStores as store (store.id)}
-					<option value={store.id}>{store.name}</option>
-				{/each}
-			</select>
-			<noscript>
-				<button type="submit" class="mt-1 text-xs underline">Ir</button>
-			</noscript>
+				class="mt-1"
+				placeholder={shell.storeName}
+				options={switchOptions}
+				align="start"
+				onValueChange={submitSwitch}
+			/>
 		</form>
 	{/if}
 
