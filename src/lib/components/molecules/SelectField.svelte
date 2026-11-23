@@ -21,6 +21,8 @@
 		class?: string;
 		'aria-label'?: string;
 		onValueChange?: (value: string) => void;
+		/** Dónde se alinea la lista con el botón. Por defecto, centrada. */
+		align?: 'start' | 'center' | 'end';
 	}
 
 	let {
@@ -32,7 +34,8 @@
 		disabled = false,
 		class: className,
 		'aria-label': ariaLabel,
-		onValueChange
+		onValueChange,
+		align = 'center'
 	}: Props = $props();
 
 	const selectedLabel = $derived(options.find((option) => option.value === value)?.label ?? '');
@@ -51,7 +54,7 @@
 			{selectedLabel || placeholder}
 		</Select.Trigger>
 
-		<Select.Content>
+		<Select.Content {align}>
 			{#each options as option (option.value)}
 				<Select.Item value={option.value} label={option.label}>
 					{option.label}
