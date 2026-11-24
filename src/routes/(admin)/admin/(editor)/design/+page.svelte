@@ -159,7 +159,12 @@
 		{#if section === 'style'}
 			<StyleSection {editor} />
 		{:else if section === 'brand'}
-			<BrandSection {editor} logoUrl={data.settings.logo_url} {deletion} />
+			<BrandSection
+				{editor}
+				logoUrl={data.settings.logo_url}
+				iconUrl={data.settings.icon_url}
+				{deletion}
+			/>
 		{:else}
 			<CoverSection {editor} {deletion} />
 		{/if}
@@ -220,6 +225,7 @@
 	{/each}
 
 	<form id="remove-logo" method="POST" action="?/removeLogo" use:enhance={onDelete}></form>
+	<form id="remove-icon" method="POST" action="?/removeIcon" use:enhance={onDelete}></form>
 </div>
 
 <ConfirmDeleteDialog

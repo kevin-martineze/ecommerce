@@ -14,6 +14,8 @@ export interface StoreSettings {
 	hero_subtitle: string | null;
 	/** Logo de la tienda: se muestra en vez del nombre. Null: se muestra el nombre. */
 	logo_url: string | null;
+	/** Ícono cuadrado: el favicon y el del celular. Null: se usa el logo. */
+	icon_url: string | null;
 	/** Con qué plantilla se pinta la vitrina. */
 	template: StorefrontTemplate;
 	/** Lo que la dueña le ajusta a la plantilla: color, letras, esquinas, portada. */

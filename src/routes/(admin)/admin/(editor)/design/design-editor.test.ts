@@ -18,6 +18,7 @@ const settings: StoreSettings = {
 	hero_title: 'Ropa para el día',
 	hero_subtitle: null,
 	logo_url: null,
+	icon_url: null,
 	template: 'editorial',
 	theme: { accent: null, fonts: null, corners: null, hero: null },
 	assistant: false,

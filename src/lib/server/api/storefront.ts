@@ -122,6 +122,7 @@ const storefrontSchema = z
 			heroSubtitle: z.string().nullable(),
 			// Opcional a propósito: si la tienda sale antes que la API, no se cae.
 			logoUrl: z.string().nullable().optional(),
+			iconUrl: z.string().nullable().optional(),
 			template: templateSchema,
 			theme: themeSchema,
 			assistant: z.boolean(),
@@ -141,6 +142,7 @@ const storefrontSchema = z
 			hero_title: storefront.settings.heroTitle,
 			hero_subtitle: storefront.settings.heroSubtitle,
 			logo_url: storefront.settings.logoUrl ?? null,
+			icon_url: storefront.settings.iconUrl ?? null,
 			template: storefront.settings.template,
 			theme: storefront.settings.theme,
 			assistant: storefront.settings.assistant,

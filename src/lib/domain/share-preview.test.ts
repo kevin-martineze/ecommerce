@@ -182,15 +182,36 @@ describe('productSharePreview', () => {
 });
 
 describe('storeIcon', () => {
+	const ICON = 'https://cdn.example.com/branding/icon.png';
+
+	it('con ícono, el ícono manda sobre el logo, también en iOS', () => {
+		expect(
+			storeIcon({
+				storeName: 'Marte',
+				iconUrl: ICON,
+				logoUrl: LOGO,
+				accent: null,
+				publicUrl: BASE
+			})
+		).toEqual({ href: ICON, type: 'image/png', appleTouch: ICON });
+	});
+
 	it('con logo, el logo es el favicon y el icono de iOS', () => {
 		expect(
-			storeIcon({ storeName: 'Perfumería', logoUrl: LOGO, accent: null, publicUrl: BASE })
+			storeIcon({
+				storeName: 'Perfumería',
+				iconUrl: null,
+				logoUrl: LOGO,
+				accent: null,
+				publicUrl: BASE
+			})
 		).toEqual({ href: LOGO, type: null, appleTouch: LOGO });
 	});
 
 	it('sin logo, la inicial de la tienda sobre su color', () => {
 		const icon = storeIcon({
 			storeName: 'perfumería',
+			iconUrl: null,
 			logoUrl: null,
 			accent: '#7A1F3D',
 			publicUrl: BASE
@@ -206,6 +227,7 @@ describe('storeIcon', () => {
 	it('escapa lo que no puede ir crudo en el SVG', () => {
 		const icon = storeIcon({
 			storeName: '<Tienda>',
+			iconUrl: null,
 			logoUrl: null,
 			accent: 'rojo',
 			publicUrl: BASE
