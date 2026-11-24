@@ -180,6 +180,25 @@ export function findStoreByDomain(
 	return apiRequest(`/store-domains/${segment(host)}`, storeByDomainSchema, { clientIp });
 }
 
+// ---------------------------------------------------------------------------
+// Subdominio anterior: a dónde se mudó una tienda
+// ---------------------------------------------------------------------------
+
+const movedStoreSchema = z.object({ slug: z.string() });
+
+/**
+ * El subdominio actual de la tienda que antes usaba `slug`. Como la de
+ * dominios propios, es una ruta sin `:storeSlug`: ese slug ya no es de nadie.
+ *
+ * 404 si el subdominio nunca fue de una tienda o la tienda está suspendida.
+ */
+export function findMovedStore(
+	slug: string,
+	clientIp: string | null
+): Promise<ApiResult<z.infer<typeof movedStoreSchema>>> {
+	return apiRequest(`/store-slugs/${segment(slug)}`, movedStoreSchema, { clientIp });
+}
+
 const homeSchema = z.object({
 	featured: z.array(cardSchema),
 	newest: z.array(cardSchema),

@@ -214,6 +214,18 @@ export function setStoreStatus(
 	});
 }
 
+/** Cambia el subdominio. El anterior sigue llevando a la tienda. */
+export function changeStoreSlug(
+	ctx: AccountContext,
+	id: string,
+	slug: string
+): Promise<ApiResult<PlatformStoreDetail>> {
+	return platformRequest(ctx, `/stores/${encodeURIComponent(id)}/slug`, storeDetailSchema, {
+		method: 'PATCH',
+		body: { slug }
+	});
+}
+
 export function changePlan(
 	ctx: AccountContext,
 	id: string,
