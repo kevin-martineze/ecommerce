@@ -101,19 +101,6 @@
 		return data.newest.filter((product) => !shown.has(product.id));
 	});
 
-	// La numeración cuenta solo las secciones que se pintan: sin colecciones
-	// propias, Novedades es 02 y no queda un hueco en la serie. El mosaico no
-	// lleva número: es una fila bajo el hero, no una sección.
-	const sectionNumber = $derived.by(() => {
-		const order: string[] = [];
-
-		if (data.featured.length > 0) order.push('featured');
-		if (!carousel && lookbook.length > 0) order.push('lookbook');
-		if (fresh.length > 0) order.push('newest');
-
-		return (name: string) => String(order.indexOf(name) + 1).padStart(2, '0');
-	});
-
 	/**
 	 * La tarjeta al compartir la portada: con lo guardado, nunca con el
 	 * borrador del editor, que no es lo que ve quien abre el enlace.
@@ -163,12 +150,7 @@
 		class="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-28"
 		data-preview-zone={data.draftPreview ? 'featured' : undefined}
 	>
-		<SectionHeading
-			index={sectionNumber('featured')}
-			eyebrow="Selección"
-			title="Lo que más nos piden"
-			href="/shop"
-		/>
+		<SectionHeading eyebrow="Selección" title="Lo que más nos piden" href="/shop" />
 		{#if carousel}
 			<ProductShelf products={data.featured} label="Lo que más nos piden" />
 		{:else}
@@ -182,15 +164,13 @@
 		class="home-highlights bg-secondary/60"
 		data-preview-zone={data.draftPreview ? 'highlights' : undefined}
 	>
-		<div class="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 md:grid-cols-3">
+		<div class="highlights-grid mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 md:grid-cols-3">
 			{#each highlights as highlight, index (highlight.id)}
-				<div class="border-border space-y-2 border-t pt-6" use:reveal={{ delay: index * 80 }}>
-					<p class="eyebrow flex items-center gap-3">
-						<span class="text-muted-foreground tabular-nums">
-							{String(index + 1).padStart(2, '0')}
-						</span>
-						<span>{highlight.eyebrow}</span>
-					</p>
+				<div
+					class="highlight-item border-border space-y-2 border-t pt-6"
+					use:reveal={{ delay: index * 80 }}
+				>
+					<p class="eyebrow">{highlight.eyebrow}</p>
 					<h3 class="text-2xl">{highlight.title}</h3>
 					<p class="text-muted-foreground text-sm leading-relaxed">{highlight.body}</p>
 				</div>
@@ -205,7 +185,6 @@
 		data-preview-zone={data.draftPreview ? 'lookbook' : undefined}
 	>
 		<SectionHeading
-			index={sectionNumber('lookbook')}
 			eyebrow="Lookbook"
 			title="Colecciones"
 			href="/collections"
@@ -226,12 +205,7 @@
 
 {#if fresh.length > 0}
 	<section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-28">
-		<SectionHeading
-			index={sectionNumber('newest')}
-			eyebrow="Recién llegado"
-			title="Novedades"
-			href="/shop"
-		/>
+		<SectionHeading eyebrow="Recién llegado" title="Novedades" href="/shop" />
 		{#if carousel}
 			<ProductShelf products={fresh} label="Novedades" />
 		{:else}
