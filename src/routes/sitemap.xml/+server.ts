@@ -1,9 +1,13 @@
 // Tipos
 import type { RequestHandler } from './$types';
 
+// Svelte
+import { redirect } from '@sveltejs/kit';
+
 // Servidor
 import { getSitemap, getStorefront } from '$lib/server/api/storefront';
 import { publicContext } from '$lib/server/context';
+import { movedStoreLocation } from '$lib/server/moved-store';
 
 export const GET: RequestHandler = async (event) => {
 	const ctx = publicContext(event);
@@ -11,6 +15,13 @@ export const GET: RequestHandler = async (event) => {
 
 	// Un 503 con Retry-After hace que el buscador vuelva luego. Un sitemap vacío
 	// le diría que la tienda no tiene páginas.
+	// Un subdominio que la tienda dejó manda al buscador al sitemap nuevo.
+	if (!storefront.ok && storefront.status === 404) {
+		const moved = await movedStoreLocation(event);
+
+		if (moved) redirect(308, moved);
+	}
+
 	if (!storefront.ok || !result.ok) {
 		return new Response('No pudimos armar el sitemap.', {
 			status: 503,

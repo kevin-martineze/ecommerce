@@ -9,6 +9,7 @@ import { error, redirect } from '@sveltejs/kit';
 // Servidor
 import { logout, me, switchStore } from '$lib/server/api/auth';
 import { accountContext, clientAddress, storeSlugFor } from '$lib/server/context';
+import { movedStoreLocation } from '$lib/server/moved-store';
 import { clearSession, toAdminSession, writeSession } from '$lib/server/session';
 
 /** El código con que la API rechaza una cuenta deshabilitada (403). */
@@ -71,6 +72,14 @@ export async function requireAdmin(event: GuardEvent): Promise<PanelAccess> {
 
 	const hostSlug = storeSlugFor(event);
 	const hostStore = account.stores.find((store) => store.slug === hostSlug);
+
+	// El subdominio de ninguna de sus tiendas puede ser uno que una tienda dejó:
+	// el panel sigue a la tienda a su dirección nueva.
+	if (hostSlug && !hostStore) {
+		const moved = await movedStoreLocation(event);
+
+		if (moved) redirect(308, moved);
+	}
 
 	if (hostStore && hostStore.id !== session.storeId) {
 		const switched = await switchStore(accountContext(event), hostStore.id, session.refreshToken);
