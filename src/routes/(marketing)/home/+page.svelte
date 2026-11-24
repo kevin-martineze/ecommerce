@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Tipos
+	import type { ModuleName } from '$lib/components/molecules/ModuleIcon.svelte';
 	import type { Industry } from '$lib/components/molecules/VariantDemo.svelte';
 	import type { PageData } from './$types';
 
@@ -15,7 +16,6 @@
 	// Componentes
 	import * as Accordion from '$lib/components/atoms/accordion';
 	import { Button } from '$lib/components/atoms/button';
-	import ModuleIcon, { type ModuleName } from '$lib/components/molecules/ModuleIcon.svelte';
 	import OrderCard from '$lib/components/molecules/OrderCard.svelte';
 	import PaymentCard from '$lib/components/molecules/PaymentCard.svelte';
 	import PlanCard from '$lib/components/molecules/PlanCard.svelte';
@@ -24,6 +24,7 @@
 	import StoreShowcase from '$lib/components/molecules/StoreShowcase.svelte';
 	import VariantDemo from '$lib/components/molecules/VariantDemo.svelte';
 	import HeroCommercial from '$lib/components/organisms/HeroCommercial.svelte';
+	import ModulesBento from '$lib/components/organisms/ModulesBento.svelte';
 	import MarketingTemplate from '$lib/components/templates/MarketingTemplate.svelte';
 
 	// Dominio
@@ -41,9 +42,10 @@
 	let { data }: Props = $props();
 
 	/**
-	 * Los cuatro módulos que se enseñan arriba, con los iconos del brandkit.
-	 * Los demás —cupones, colecciones, avisos, equipo— se nombran en una
-	 * línea: cuatro fichas y una cifra caben de un vistazo; ocho, no.
+	 * Los cuatro módulos del bento, cada uno con su mini-vista del panel
+	 * (`ModulesBento`). Los demás —cupones, colecciones, avisos, equipo— se
+	 * nombran en una línea: cuatro fichas y una cifra caben de un vistazo;
+	 * ocho, no.
 	 */
 	const modulos: { modulo: ModuleName; title: string; detail: string }[] = [
 		{
@@ -250,8 +252,9 @@
 		</div>
 	</section>
 
-	<!-- Cuatro módulos y una cifra: la celda del medio no es una función,
-	     es lo que no cobramos. -->
+	<!-- Bento: la cifra $0 alta a la izquierda —no es una función, es lo
+	     que no cobramos— y cuatro módulos con su mini-vista del panel. En
+	     celular, un slide horizontal (`ModulesBento`). -->
 	<section id="incluye" class="py-16 md:py-24">
 		<div class="mx-auto max-w-6xl px-4 sm:px-6" data-reveal>
 			<h2 class="mx-auto max-w-lg text-center text-3xl text-balance md:text-4xl">
@@ -260,28 +263,7 @@
 				>
 			</h2>
 
-			<ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5" data-reveal-group>
-				{#each modulos as item, index (item.modulo)}
-					{#if index === 2}
-						<li
-							class="bg-primary text-primary-foreground flex flex-col justify-between gap-8 rounded-lg p-6 sm:col-span-2 lg:col-span-1"
-						>
-							<p class="text-6xl font-semibold tabular-nums">$0</p>
-							<p class="text-sm font-medium">de comisión por venta. Lo que vendas es tuyo.</p>
-						</li>
-					{/if}
-					<li class="bg-secondary flex flex-col justify-between gap-8 rounded-lg p-6">
-						<ModuleIcon
-							name={item.modulo}
-							class="size-10 rounded-[calc(var(--radius)-8px)] [&_svg]:size-10"
-						/>
-						<div>
-							<h3 class="text-lg font-semibold">{item.title}</h3>
-							<p class="text-muted-foreground mt-1.5 text-sm text-pretty">{item.detail}</p>
-						</div>
-					</li>
-				{/each}
-			</ul>
+			<ModulesBento {modulos} />
 
 			<p class="text-muted-foreground mt-6 text-center text-sm">
 				Y también cupones, colecciones, avisos de reposición y equipo con permisos.
