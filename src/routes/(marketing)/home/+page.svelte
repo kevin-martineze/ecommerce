@@ -274,18 +274,12 @@
 	<!-- Cómo funciona, en tres piezas: la vitrina grande y dos fichas. -->
 	<section id="como-funciona" class="py-16 md:py-24">
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
-			<div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between" data-reveal>
-				<div class="max-w-2xl">
-					<SectionTag label="Cómo funciona" />
-					<h2 class="mt-3 text-3xl md:text-5xl">De tus fotos a tu primer pedido</h2>
-					<p class="text-muted-foreground mt-4 text-lg text-pretty">
-						Tres pasos. Sin saber de tecnología.
-					</p>
-				</div>
-				<Button href="/signup" size="lg" class="h-12 px-7 text-base">
-					Empieza gratis
-					<ArrowRight class="size-4" />
-				</Button>
+			<div class="max-w-2xl" data-reveal>
+				<SectionTag label="Cómo funciona" />
+				<h2 class="mt-3 text-3xl md:text-5xl">De tus fotos a tu primer pedido</h2>
+				<p class="text-muted-foreground mt-4 text-lg text-pretty">
+					Tres pasos. Sin saber de tecnología.
+				</p>
 			</div>
 
 			<div
@@ -365,11 +359,6 @@
 						</li>
 					{/each}
 				</ul>
-
-				<Button href="/signup" size="lg" class="mt-8 h-12 px-7 text-base">
-					Empieza gratis
-					<ArrowRight class="size-4" />
-				</Button>
 			</div>
 
 			<div class="relative sm:pb-10" data-reveal>
@@ -497,18 +486,13 @@
 		</div>
 	</section>
 
-	<!-- Lo que no cambia con el plan: tres garantías y la franja. -->
+	<!-- Lo que no cambia con el plan: tres garantías y la franja, que es la
+	     que lleva el botón. -->
 	<section class="py-16 md:py-24">
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
-			<div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between" data-reveal>
-				<div class="max-w-2xl">
-					<SectionTag label="Sin letra pequeña" />
-					<h2 class="mt-3 text-3xl md:text-5xl">Lo que no cambia con el plan</h2>
-				</div>
-				<Button href="/signup" size="lg" class="h-12 px-7 text-base">
-					Empieza gratis
-					<ArrowRight class="size-4" />
-				</Button>
+			<div class="max-w-2xl" data-reveal>
+				<SectionTag label="Sin letra pequeña" />
+				<h2 class="mt-3 text-3xl md:text-5xl">Lo que no cambia con el plan</h2>
 			</div>
 
 			<ul class="mt-10 grid gap-4 md:grid-cols-3" data-reveal-group>
