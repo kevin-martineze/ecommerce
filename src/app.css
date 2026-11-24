@@ -1474,18 +1474,52 @@
 	letter-spacing: 0.01em;
 }
 
-/* Los mensajes de la portada, en una franja negra que corta la página. */
+/* Los mensajes de la portada: una franja clara y baja entre dos líneas finas,
+   con los mensajes al centro. Informa sin cortar la vitrina en dos. */
 [data-storefront-template='maison'] .home-highlights {
-	background-color: var(--foreground);
-	color: var(--background);
+	background-color: var(--background);
+	border-block: 1px solid var(--border);
 }
 
-[data-storefront-template='maison'] .home-highlights .border-border {
-	border-color: rgb(255 255 255 / 20%);
+[data-storefront-template='maison'] .highlights-grid {
+	gap: 0;
+	padding-block: 1rem;
 }
 
-[data-storefront-template='maison'] .home-highlights .text-muted-foreground {
-	color: rgb(255 255 255 / 65%);
+[data-storefront-template='maison'] .highlight-item {
+	padding-block: 1.75rem;
+	border-top: 0;
+	text-align: center;
+}
+
+[data-storefront-template='maison'] .highlight-item + .highlight-item {
+	border-top: 1px solid var(--border);
+}
+
+[data-storefront-template='maison'] .highlight-item h3 {
+	font-size: 1.125rem;
+	font-weight: 500;
+	letter-spacing: 0;
+}
+
+[data-storefront-template='maison'] .highlight-item .eyebrow {
+	color: var(--muted-foreground);
+}
+
+/* En pantalla ancha, uno al lado del otro y separados por una línea vertical. */
+@media (min-width: 48rem) {
+	[data-storefront-template='maison'] .highlights-grid {
+		padding-block: 2.5rem;
+	}
+
+	[data-storefront-template='maison'] .highlight-item {
+		padding: 0.5rem 2rem;
+	}
+
+	[data-storefront-template='maison'] .highlight-item + .highlight-item {
+		border-top: 0;
+		border-left: 1px solid var(--border);
+	}
 }
 
 /* El anuncio se desliza en bucle: dos mitades iguales que se mueven media
