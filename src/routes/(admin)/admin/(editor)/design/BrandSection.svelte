@@ -1,9 +1,10 @@
 <!--
 @component
-Sección Marca: nombre, anuncio y logo.
+Sección Marca: nombre, anuncio, logo e ícono.
 -->
 <script lang="ts">
 	// Tipos
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { DeleteConfirm } from '$lib/utils/delete-confirm.svelte';
 	import type { DesignEditor } from './design-editor.svelte';
 
@@ -24,10 +25,23 @@ Sección Marca: nombre, anuncio y logo.
 		editor: DesignEditor;
 		/** El logo guardado. Se sube y se quita al instante, fuera del borrador. */
 		logoUrl: string | null;
+		/** El ícono guardado (favicon). También al instante. */
+		iconUrl: string | null;
 		deletion: DeleteConfirm;
 	}
 
-	let { editor, logoUrl, deletion }: Props = $props();
+	let { editor, logoUrl, iconUrl, deletion }: Props = $props();
+
+	let uploadingIcon = $state(false);
+
+	const onIconUpload: SubmitFunction = () => {
+		uploadingIcon = true;
+
+		return async ({ update }) => {
+			await update();
+			uploadingIcon = false;
+		};
+	};
 </script>
 
 <div class="space-y-6 p-5">
@@ -108,6 +122,72 @@ Sección Marca: nombre, anuncio y logo.
 			>
 				<Trash2 class="size-3" />
 				Quitar logo
+			</Button>
+		{/if}
+	</div>
+
+	<div class="border-border space-y-3 border-t pt-5">
+		<div class="flex items-center justify-between gap-2">
+			<h2 class="text-sm font-semibold">Ícono</h2>
+			<Badge variant="outline">Se guarda al instante</Badge>
+		</div>
+		<p class="text-muted-foreground text-xs">
+			Sale en la pestaña del navegador y en el celular cuando guardan tu tienda. Usa algo que se lea
+			chiquito, como tu inicial o tu símbolo. Si no subes uno, se usa el logo.
+		</p>
+
+		{#if iconUrl}
+			<div class="bg-muted flex items-center gap-4 rounded-md p-4">
+				<img src={iconUrl} alt="" class="size-16 rounded-md" />
+				<div class="bg-background flex items-center gap-2 rounded-md px-3 py-2 text-xs shadow-sm">
+					<img src={iconUrl} alt="" class="size-4" />
+					<span class="max-w-32 truncate">{editor.saved.storeName}</span>
+				</div>
+			</div>
+		{:else}
+			<p class="text-muted-foreground text-sm">
+				Todavía no tienes ícono: la pestaña usa {logoUrl ? 'tu logo' : 'tu inicial'}.
+			</p>
+		{/if}
+
+		<form
+			method="POST"
+			action="?/uploadIcon"
+			enctype="multipart/form-data"
+			class="space-y-3"
+			use:enhance={onIconUpload}
+		>
+			<Label for="icon">Archivo del ícono</Label>
+			<Input
+				id="icon"
+				name="file"
+				type="file"
+				accept="image/png,image/jpeg,image/webp,image/svg+xml"
+				required
+			/>
+			<p class="text-muted-foreground text-xs">
+				Cuadrado, de al menos 512 × 512 px. PNG o SVG, máximo 2 MB.
+			</p>
+			<Button type="submit" size="sm" disabled={uploadingIcon}>
+				{uploadingIcon ? 'Subiendo…' : 'Subir ícono'}
+			</Button>
+		</form>
+
+		{#if iconUrl}
+			<Button
+				type="button"
+				variant="ghost"
+				size="sm"
+				class="text-destructive"
+				onclick={() =>
+					deletion.ask('remove-icon', '¿Quitar el ícono?', {
+						description: 'La pestaña vuelve a usar el logo.',
+						confirmLabel: 'Quitar',
+						pendingLabel: 'Quitando…'
+					})}
+			>
+				<Trash2 class="size-3" />
+				Quitar ícono
 			</Button>
 		{/if}
 	</div>

@@ -158,15 +158,22 @@ export interface StoreIcon {
 }
 
 /**
- * El icono de la pestaña de la vitrina: el logo de la tienda; sin logo, su
- * inicial sobre el color de la marca. Nunca el de Globerce.
+ * El icono de la pestaña de la vitrina: el ícono cuadrado de la tienda; sin
+ * él, su logo; sin logo, su inicial sobre el color de la marca. Nunca el de
+ * Globerce.
  */
 export function storeIcon(input: {
 	storeName: string;
+	iconUrl: string | null;
 	logoUrl: string | null;
 	accent: string | null;
 	publicUrl: string;
 }): StoreIcon {
+	// La API lo guarda como PNG cuadrado: sirve también para iOS.
+	const icon = absoluteUrl(input.iconUrl, input.publicUrl);
+
+	if (icon) return { href: icon, type: 'image/png', appleTouch: icon };
+
 	const logo = absoluteUrl(input.logoUrl, input.publicUrl);
 
 	if (logo) return { href: logo, type: null, appleTouch: logo };

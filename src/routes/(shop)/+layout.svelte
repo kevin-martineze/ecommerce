@@ -56,6 +56,7 @@
 	const icon = $derived(
 		storeIcon({
 			storeName: data.settings.store_name,
+			iconUrl: data.settings.icon_url,
 			logoUrl: data.settings.logo_url,
 			accent: data.settings.theme.accent,
 			publicUrl: data.public_url

@@ -11,9 +11,11 @@ import {
 	listCollections,
 	listHighlights,
 	removeHighlight,
+	removeStoreIcon,
 	removeStoreLogo,
 	updateHighlight,
 	updateSettings,
+	uploadStoreIcon,
 	uploadStoreLogo
 } from '$lib/server/api/panel-content';
 import { requireAdmin } from '$lib/server/auth';
@@ -214,5 +216,46 @@ export const actions: Actions = {
 		}
 
 		return { message: 'Quitaste el logo: la tienda vuelve a mostrar el nombre.' };
+	},
+
+	// El ícono, igual que el logo: se guarda al instante.
+	uploadIcon: async (event) => {
+		const ctx = panelContext(event);
+		const formData = await event.request.formData();
+		const file = formData.get('file');
+
+		if (!(file instanceof File) || file.size === 0) {
+			return fail(400, { error: 'Elige una imagen para el ícono.' });
+		}
+
+		if (!LOGO_TYPES.includes(file.type)) {
+			return fail(400, { error: 'El ícono debe ser PNG, JPG, WebP o SVG.' });
+		}
+
+		if (file.size > LOGO_MAX_BYTES) {
+			return fail(400, { error: 'El ícono pesa más de 2 MB. Pruébalo más liviano.' });
+		}
+
+		const result = await uploadStoreIcon(ctx, file);
+
+		if (!result.ok) {
+			const failure = failWith(result);
+
+			return fail(failure.status, { error: result.message });
+		}
+
+		return { message: 'Ícono guardado. Ya sale en la pestaña de tu tienda.' };
+	},
+
+	removeIcon: async (event) => {
+		const result = await removeStoreIcon(panelContext(event));
+
+		if (!result.ok) {
+			const failure = failWith(result);
+
+			return fail(failure.status, { error: result.message });
+		}
+
+		return { message: 'Quitaste el ícono: la pestaña vuelve a usar el logo.' };
 	}
 };
