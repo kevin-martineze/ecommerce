@@ -10,6 +10,7 @@ import { completeSignIn } from '$lib/server/auth';
 import { clientAddress, displayStatus, storeSlugFor } from '$lib/server/context';
 import { parseForm } from '$lib/server/form';
 import { googleStartHref } from '$lib/server/google-signin';
+import { movedStoreLocation } from '$lib/server/moved-store';
 
 // Dominio
 import { GOOGLE_NOTICE_CODES, GOOGLE_NOTICES } from '$lib/domain/google-auth';
@@ -18,10 +19,17 @@ import { loginSchema } from '$lib/schemas/admin';
 // Utilidades
 import { safeRedirectTarget } from '$lib/utils/redirect';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async (event) => {
+	const { locals, url } = event;
 	const redirectTo = url.searchParams.get('redirectTo');
 
 	if (locals.session) redirect(303, safeRedirectTarget(redirectTo));
+
+	// En el subdominio que la tienda dejó, se entra por el nuevo: la sesión
+	// queda en el host donde la dueña va a trabajar.
+	const moved = await movedStoreLocation(event);
+
+	if (moved) redirect(308, moved);
 
 	return {
 		notice: url.searchParams.get('notice') ?? url.searchParams.get('error'),
