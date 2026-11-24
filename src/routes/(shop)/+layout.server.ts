@@ -1,24 +1,33 @@
 // Tipos
+import type { RequestEvent } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
 // Svelte
 import { error, redirect } from '@sveltejs/kit';
 
 // Servidor
-import { getStorefront } from '$lib/server/api/storefront';
-import { publicContext } from '$lib/server/context';
+import { findMovedStore, getStorefront } from '$lib/server/api/storefront';
+import { clientAddress, publicContext, storeSlugFor } from '$lib/server/context';
 import { serverEnv } from '$lib/server/env';
 import { resolveTemplatePreview } from '$lib/server/template-preview';
 
 // Utilidades
 import { isPreview, redirectToCustomDomain } from '$lib/custom-domain';
-import { parsePlatformHosts } from '$lib/tenant';
+import { movedStoreUrl, parsePlatformHosts } from '$lib/tenant';
 
 export const load: LayoutServerLoad = async (event) => {
 	const result = await getStorefront(publicContext(event));
 
 	if (!result.ok) {
-		if (result.status === 404) error(404, 'Esta tienda no existe.');
+		if (result.status === 404) {
+			// Un subdominio que la tienda dejó sigue llevando a ella. Es un 308:
+			// la mudanza es para siempre y así los buscadores pasan al nuevo.
+			const moved = await movedStoreLocation(event);
+
+			if (moved) redirect(308, moved);
+			error(404, 'Esta tienda no existe.');
+		}
+
 		error(503, result.message);
 	}
 
@@ -61,3 +70,30 @@ export const load: LayoutServerLoad = async (event) => {
 		draftPreview: preview.theme !== null
 	};
 };
+
+/**
+ * El mismo camino en el subdominio nuevo, si el del host es uno que una tienda
+ * dejó. Solo se pregunta cuando la tienda no existe: no le cuesta nada a una
+ * visita normal. Un dominio propio ya trae su tienda resuelta.
+ */
+async function movedStoreLocation(
+	event: Pick<RequestEvent, 'getClientAddress' | 'locals' | 'url'>
+): Promise<string | null> {
+	const slug = event.locals.storeSlug ? null : storeSlugFor(event);
+
+	if (!slug) return null;
+
+	const found = await findMovedStore(slug, clientAddress(event));
+
+	if (!found.ok) return null;
+
+	const env = serverEnv();
+
+	return movedStoreUrl(
+		event.url,
+		found.data.slug,
+		env.PUBLIC_STORE_ROOT_DOMAIN,
+		env.PUBLIC_SITE_URL,
+		parsePlatformHosts(env.PUBLIC_PLATFORM_HOSTS)
+	);
+}

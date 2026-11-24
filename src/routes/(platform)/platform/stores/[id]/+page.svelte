@@ -78,6 +78,16 @@
 
 	let removeOpen = $state(false);
 	let removing = $state(false);
+	let changingSlug = $state(false);
+
+	const onSlug: SubmitFunction = () => {
+		changingSlug = true;
+
+		return async ({ update }) => {
+			await update({ reset: false });
+			changingSlug = false;
+		};
+	};
 
 	/** Al eliminar, la acción redirige al listado: el aviso va aquí porque no queda `form`. */
 	const onRemove: SubmitFunction = () => {
@@ -284,8 +294,35 @@
 		</section>
 	</div>
 
-	<div class="mt-6 lg:max-w-md">
+	<div class="mt-6 grid gap-6 lg:grid-cols-3">
 		<StoreActivationCard activation={store.activation} createdAt={store.created_at} />
+
+		<section class="border-border bg-card rounded-lg border p-6">
+			<h2 class="text-lg">Dirección</h2>
+			<p class="text-muted-foreground mt-1 mb-4 text-sm">
+				El subdominio de la tienda. El anterior sigue llevando a ella y nadie más lo puede tomar.
+			</p>
+
+			{#key store.slug}
+				<form method="POST" action="?/slug" class="space-y-3" use:enhance={onSlug}>
+					<div class="space-y-1.5">
+						<Label for="slug">Subdominio</Label>
+						<Input
+							id="slug"
+							name="slug"
+							required
+							value={store.slug}
+							autocomplete="off"
+							spellcheck={false}
+						/>
+					</div>
+
+					<Button type="submit" variant="outline" class="w-full" disabled={changingSlug}>
+						{changingSlug ? 'Cambiando…' : 'Cambiar dirección'}
+					</Button>
+				</form>
+			{/key}
+		</section>
 	</div>
 
 	<section class="border-border bg-card mt-6 overflow-hidden rounded-lg border">

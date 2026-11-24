@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Servidor
 import { apiRequest } from '$lib/server/api/client';
-import { findStoreByDomain, getStorefront } from '$lib/server/api/storefront';
+import { findMovedStore, findStoreByDomain, getStorefront } from '$lib/server/api/storefront';
 
 vi.mock('$lib/server/api/client', () => ({ apiRequest: vi.fn() }));
 
@@ -41,6 +41,25 @@ describe('findStoreByDomain', () => {
 		}
 		expect(schema.safeParse({ slug: 'boutique', status: 'paused' }).success).toBe(false);
 		expect(schema.safeParse({ status: 'active' }).success).toBe(false);
+	});
+});
+
+describe('findMovedStore', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(apiRequest).mockResolvedValue(notFound);
+	});
+
+	it('pregunta por el subdominio anterior, sin el slug de una tienda', async () => {
+		const result = await findMovedStore('perfumeria', '203.0.113.7');
+
+		const [path, schema, options] = vi.mocked(apiRequest).mock.calls[0];
+
+		expect(path).toBe('/store-slugs/perfumeria');
+		expect(options).toEqual({ clientIp: '203.0.113.7' });
+		expect(schema.safeParse({ slug: 'marte' }).success).toBe(true);
+		expect(schema.safeParse({}).success).toBe(false);
+		expect(result).toEqual(notFound);
 	});
 });
 

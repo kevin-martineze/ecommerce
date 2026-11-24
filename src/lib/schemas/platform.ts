@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 // Dominio
 import { ACTIVATION_STAGES } from '$lib/domain/activation';
+import { STORE_SLUG_PATTERN } from '$lib/schemas/account';
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -27,6 +28,16 @@ export const planChangeSchema = z.object({
 	planCode: z.string().regex(/^[a-z0-9-]{2,40}$/, 'Elige un plan.'),
 	notes: z.string().trim().max(500)
 });
+
+/** El subdominio nuevo de una tienda. Lo de reservado o tomado lo decide la API. */
+export const storeSlugChangeSchema = z
+	.string()
+	.trim()
+	.toLowerCase()
+	.regex(
+		STORE_SLUG_PATTERN,
+		'La dirección admite minúsculas, números y guiones (3 a 40), y empieza y termina con letra o número.'
+	);
 
 export const storeStatusSchema = z.enum(['active', 'suspended'], {
 	errorMap: () => ({ message: 'Estado inválido.' })

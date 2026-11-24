@@ -7,6 +7,7 @@ import { fail, redirect } from '@sveltejs/kit';
 // Servidor
 import {
 	changePlan,
+	changeStoreSlug,
 	deleteStore,
 	getStore,
 	listPlans,
@@ -20,6 +21,7 @@ import {
 	deleteStoreSchema,
 	paymentSchema,
 	planChangeSchema,
+	storeSlugChangeSchema,
 	storeStatusSchema
 } from '$lib/schemas/platform';
 
@@ -80,6 +82,22 @@ export const actions: Actions = {
 		if (!result.ok) return failWith(result);
 
 		return { message: 'Plan actualizado. Los límites nuevos aplican desde ya.' };
+	},
+
+	slug: async (event) => {
+		const ctx = accountContext(event);
+		const formData = await event.request.formData();
+		const slug = storeSlugChangeSchema.safeParse(formData.get('slug') ?? '');
+
+		if (!slug.success) return fail(400, { error: slug.error.issues[0]?.message });
+
+		const result = await changeStoreSlug(ctx, event.params.id, slug.data);
+
+		if (!result.ok) return failWith(result);
+
+		return {
+			message: `La tienda ahora está en ${result.data.public_url}. La dirección anterior lleva a esta.`
+		};
 	},
 
 	status: async (event) => {

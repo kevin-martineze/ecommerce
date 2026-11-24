@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 // Utilidades
 import {
 	hostServesStore,
+	movedStoreUrl,
 	parsePlatformHosts,
 	resolveHost,
 	sessionCookieDomain,
@@ -134,6 +135,38 @@ describe('storefrontUrl', () => {
 		expect(storefrontUrl('boutique', undefined, 'http://localhost:5173/')).toBe(
 			'http://localhost:5173'
 		);
+	});
+});
+
+describe('movedStoreUrl', () => {
+	const site = 'https://globerce.store';
+
+	it('lleva el mismo camino y la misma búsqueda al subdominio nuevo', () => {
+		const url = new URL('https://perfumeria.globerce.store/shop?sort=price&page=2');
+
+		expect(movedStoreUrl(url, 'marte', 'globerce.store', site)).toBe(
+			'https://marte.globerce.store/shop?sort=price&page=2'
+		);
+	});
+
+	it('no redirige el host de la plataforma ni un dominio propio', () => {
+		const platform = new URL('https://globerce.store/shop');
+		const custom = new URL('https://perfumesmarte.com/shop');
+
+		expect(movedStoreUrl(platform, 'marte', 'globerce.store', site)).toBeNull();
+		expect(movedStoreUrl(custom, 'marte', 'globerce.store', site)).toBeNull();
+	});
+
+	it('sin dominio raíz no hay subdominios que mudar', () => {
+		const url = new URL('http://localhost:5173/shop');
+
+		expect(movedStoreUrl(url, 'marte', undefined, 'http://localhost:5173')).toBeNull();
+	});
+
+	it('nunca redirige un host a sí mismo', () => {
+		const url = new URL('https://marte.globerce.store/');
+
+		expect(movedStoreUrl(url, 'marte', 'globerce.store', site)).toBeNull();
 	});
 });
 

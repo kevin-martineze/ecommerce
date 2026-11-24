@@ -165,6 +165,26 @@ export function storefrontUrl(
 }
 
 /**
+ * A dónde mandar a quien abre el subdominio que una tienda dejó: el mismo
+ * camino y la misma búsqueda, en el subdominio nuevo. `null` si el host no es
+ * un subdominio de tienda: un dominio propio o el host de la plataforma no se
+ * mudan así.
+ */
+export function movedStoreUrl(
+	url: URL,
+	newSlug: string,
+	rootDomain: string | undefined,
+	siteUrl: string,
+	platformHosts: readonly string[] = []
+): string | null {
+	const target = resolveHost(url.host, rootDomain, platformHosts);
+
+	if (target.kind !== 'store' || target.slug === newSlug) return null;
+
+	return `${storefrontUrl(newSlug, rootDomain, siteUrl)}${url.pathname}${url.search}`;
+}
+
+/**
  * El dominio con el que se emite la cookie de sesión, o `undefined` para que
  * valga solo en el host que la puso.
  *
