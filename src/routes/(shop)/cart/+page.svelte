@@ -52,6 +52,8 @@
 	const checkoutError = $derived(form && 'checkoutError' in form ? form.checkoutError : null);
 
 	const selectedZone = $derived(data.zones.find((zone) => zone.id === zoneId) ?? null);
+	/** Con pagos en línea, este paso solo lleva al siguiente: el medio de pago se elige allá. */
+	const canPayOnline = $derived(data.settings.online_payments);
 
 	/**
 	 * El carrito vive en localStorage, así que el servidor no puede leerlo en el
@@ -77,7 +79,9 @@
 		<p class="eyebrow">Paso 1 de 2</p>
 		<h1 class="text-4xl md:text-5xl">Tu pedido</h1>
 		<p class="text-muted-foreground text-sm">
-			Confirma los productos y tus datos. Al terminar se abre WhatsApp con el pedido escrito.
+			{canPayOnline
+				? 'Confirma los productos y tus datos. En el siguiente paso pagas en línea o lo envías por WhatsApp.'
+				: 'Confirma los productos y tus datos. Al terminar se abre WhatsApp con el pedido escrito.'}
 		</p>
 	</header>
 
@@ -267,11 +271,17 @@
 							class="w-full"
 							disabled={checkout.pending || quote.pending}
 						>
-							{checkout.pending ? 'Creando pedido…' : 'Confirmar y abrir WhatsApp'}
+							{checkout.pending
+								? 'Creando pedido…'
+								: canPayOnline
+									? 'Continuar al pago'
+									: 'Confirmar y abrir WhatsApp'}
 						</Button>
 
 						<p class="text-muted-foreground text-center text-xs">
-							No se cobra nada en la web. El pago se acuerda por WhatsApp.
+							{canPayOnline
+								? 'En el siguiente paso eliges: pagar en línea con tarjeta, transferencia o billetera, o acordarlo por WhatsApp.'
+								: 'No se cobra nada en la web. El pago se acuerda por WhatsApp.'}
 						</p>
 					</form>
 				</aside>

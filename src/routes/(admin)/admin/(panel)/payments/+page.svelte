@@ -10,6 +10,7 @@
 	import { enhance } from '$app/forms';
 
 	// Componentes
+	import * as Alert from '$lib/components/atoms/alert';
 	import { Button } from '$lib/components/atoms/button';
 	import WompiKeysPaste from '$lib/components/molecules/WompiKeysPaste.svelte';
 	import PageTemplate from '$lib/components/templates/PageTemplate.svelte';
@@ -33,6 +34,8 @@
 
 	const paymentAccount = $derived(data.account);
 	const isConnected = $derived(paymentAccount.connected);
+	/** Cobra con la cuenta de Globerce: sus avisos llegan solos y no hay URL que pegar. */
+	const sharesAccount = $derived(paymentAccount.shares_platform_account);
 	const conAviso = $derived(isConnected && paymentAccount.last_event_at !== null);
 	/** Con la cuenta conectada y avisando, la página es un resumen; si no, los tres pasos. */
 	const summary = $derived(conAviso && !changing);
@@ -116,17 +119,23 @@
 						</Button>
 					</div>
 
-					<details class="text-sm">
-						<summary class="text-muted-foreground cursor-pointer">Ver la URL de eventos</summary>
-						<div class="border-border mt-3 flex items-center gap-2 border p-2">
-							<code class="text-muted-foreground flex-1 truncate text-xs"
-								>{paymentAccount.events_url}</code
-							>
-							<Button type="button" variant="outline" size="sm" onclick={copy}>
-								{copied ? 'Copiado' : 'Copiar'}
-							</Button>
-						</div>
-					</details>
+					{#if sharesAccount}
+						<p class="text-muted-foreground text-sm">
+							Los avisos de pago llegan solos. No cambies la URL de eventos en Wompi.
+						</p>
+					{:else}
+						<details class="text-sm">
+							<summary class="text-muted-foreground cursor-pointer">Ver la URL de eventos</summary>
+							<div class="border-border mt-3 flex items-center gap-2 border p-2">
+								<code class="text-muted-foreground flex-1 truncate text-xs"
+									>{paymentAccount.events_url}</code
+								>
+								<Button type="button" variant="outline" size="sm" onclick={copy}>
+									{copied ? 'Copiado' : 'Copiar'}
+								</Button>
+							</div>
+						</details>
+					{/if}
 				</div>
 			{:else}
 				<ol class="space-y-8">
@@ -203,7 +212,7 @@
 						<span
 							class="border-border grid size-8 flex-none place-items-center rounded-full border text-sm"
 						>
-							3
+							{#if isConnected && sharesAccount}<Check class="size-4" />{:else}3{/if}
 						</span>
 						<div class="min-w-0 flex-1 space-y-3">
 							<h2 class="text-lg">Pide a Wompi que te avise de cada pago</h2>
@@ -211,25 +220,41 @@
 							{#if !isConnected}
 								<p class="text-muted-foreground text-sm">Se activa cuando conectes tu cuenta.</p>
 							{:else}
-								<p class="text-muted-foreground text-sm">
-									En Wompi, ve a
-									<span class="text-foreground"
-										>Desarrollo › Desarrolladores › Pagos a terceros</span
-									>
-									y pega esta dirección como URL de eventos.
-								</p>
+								{#if sharesAccount}
+									<Alert.Root>
+										<Check />
+										<Alert.Title>Ya estás lista</Alert.Title>
+										<Alert.Description>
+											Esta tienda cobra con la misma cuenta de Wompi que Globerce, así que los
+											avisos de pago ya llegan solos. No cambies la URL de eventos en Wompi: si la
+											cambias, Globerce deja de confirmar las suscripciones.
+										</Alert.Description>
+									</Alert.Root>
+								{:else}
+									<p class="text-muted-foreground text-sm">
+										En Wompi, ve a
+										<span class="text-foreground"
+											>Desarrollo › Desarrolladores › Pagos a terceros</span
+										>
+										y pega esta dirección como URL de eventos.
+									</p>
 
-								<div class="border-border flex items-center gap-2 border p-2">
-									<code class="text-muted-foreground flex-1 truncate text-xs">
-										{paymentAccount.events_url}
-									</code>
-									<Button type="button" variant="outline" size="sm" onclick={copy}>
-										{copied ? 'Copiado' : 'Copiar'}
-									</Button>
-								</div>
+									<div class="border-border flex items-center gap-2 border p-2">
+										<code class="text-muted-foreground flex-1 truncate text-xs">
+											{paymentAccount.events_url}
+										</code>
+										<Button type="button" variant="outline" size="sm" onclick={copy}>
+											{copied ? 'Copiado' : 'Copiar'}
+										</Button>
+									</div>
+								{/if}
 
 								{#if paymentAccount.last_event_at === null}
-									<p class="text-caution text-sm">Esperando el primer aviso de Wompi.</p>
+									<p class="text-caution text-sm">
+										{sharesAccount
+											? 'Se confirma con tu primer pedido pagado: Wompi avisa por la cuenta de Globerce.'
+											: 'Esperando el primer aviso de Wompi.'}
+									</p>
 								{/if}
 
 								<p class="text-muted-foreground text-xs">
