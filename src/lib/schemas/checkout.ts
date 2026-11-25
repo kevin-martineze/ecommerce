@@ -9,6 +9,11 @@ const phone = z
 	.max(20, 'Ese número es demasiado largo.')
 	.regex(/^[0-9+ ()-]+$/, 'El número solo puede tener dígitos, espacios, +, ( ) o -.');
 
+/** Cómo paga la clienta: en línea (Wompi) o acordado por WhatsApp. */
+export const paymentMethodSchema = z.enum(['online', 'whatsapp']);
+
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>;
+
 export const checkoutSchema = z.object({
 	name: z.string().trim().min(2, 'Escribe tu nombre.').max(120, 'Ese nombre es demasiado largo.'),
 	phone,
@@ -16,7 +21,8 @@ export const checkoutSchema = z.object({
 	address: z.string().trim().max(200).optional().default(''),
 	notes: z.string().trim().max(500, 'Máximo 500 caracteres.').optional().default(''),
 	shippingZoneId: z.string().uuid('Elige una zona de envío.'),
-	couponCode: z.string().trim().max(40).optional().default('')
+	couponCode: z.string().trim().max(40).optional().default(''),
+	paymentMethod: paymentMethodSchema.default('whatsapp')
 });
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;

@@ -49,12 +49,16 @@ export const load: PageServerLoad = async (event) => {
 	const orderUrl = new URL(`/order/${order.number}?t=${order.public_token}`, public_url).toString();
 
 	const message = buildOrderMessage(order, { storeName: settings.store_name, orderUrl });
+	// Lo deja el carrito cuando la clienta eligió WhatsApp. Cualquier otro valor se ignora.
+	const via: 'whatsapp' | null =
+		event.url.searchParams.get('via') === 'whatsapp' ? 'whatsapp' : null;
 
 	return {
 		order,
 		whatsappUrl: buildWhatsAppUrl(settings.whatsapp_phone, message),
 		// Pagar en línea solo se ofrece si la tienda conectó su cuenta.
-		canPayOnline: settings.online_payments
+		canPayOnline: settings.online_payments,
+		via
 	};
 };
 

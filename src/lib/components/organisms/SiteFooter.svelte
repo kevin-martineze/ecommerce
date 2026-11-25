@@ -90,7 +90,11 @@
 		<div class="space-y-3">
 			<p class="eyebrow">Compra</p>
 			<ul class="text-muted-foreground space-y-2 text-sm">
-				<li>Pedidos y pagos se coordinan por WhatsApp.</li>
+				<li>
+					{settings.online_payments
+						? 'Paga en línea o coordina por WhatsApp.'
+						: 'Pedidos y pagos se coordinan por WhatsApp.'}
+				</li>
 				{#if settings.free_shipping_threshold}
 					<li>Envío gratis desde ${settings.free_shipping_threshold.toLocaleString('es-CO')}.</li>
 				{/if}

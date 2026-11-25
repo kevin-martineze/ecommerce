@@ -10,16 +10,21 @@
 
 	// App
 	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, replaceState } from '$app/navigation';
+	import { page } from '$app/state';
 
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
 	import { Separator } from '$lib/components/atoms/separator';
+	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
 	import WompiChargeStatus from '$lib/components/molecules/WompiChargeStatus.svelte';
 
 	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { wompiCharge } from '$lib/utils/wompi-checkout.svelte';
+
+	// Dominio
+	import { orderPageMode } from '$lib/domain/orders';
 
 	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
@@ -32,17 +37,21 @@
 	let { data, form }: Props = $props();
 
 	let openForm = $state<HTMLFormElement | null>(null);
+	let payForm = $state<HTMLFormElement | null>(null);
 
 	const paid = $derived(data.order.payment_status === 'paid');
+	/** Qué vista toca: pagar, avisar por WhatsApp o ya pagado. */
+	const mode = $derived(orderPageMode({ paid, canPayOnline: data.canPayOnline, via: data.via }));
+	/** El carrito pone `pay=1` cuando la clienta eligió pagar en línea. */
+	const autoPay = $derived(page.url.searchParams.get('pay') === '1');
 
 	const charge = wompiCharge({
 		paid: () => paid,
 		reload: () => invalidateAll()
 	});
 
-	const showPayment = $derived(
-		data.canPayOnline && !paid && !charge.confirming && !charge.isExpired
-	);
+	/** Mientras Wompi confirma o el pago sigue en proceso, no se ofrece otro cobro. */
+	const canCharge = $derived(!charge.confirming && !charge.isExpired);
 
 	/** El botón se apaga mientras se pide el enlace o se abre el pago: son unos segundos y un cobro. */
 	const paying: SubmitFunction = () => {
@@ -50,6 +59,21 @@
 
 		return ({ result, update }) => charge.process(result, () => update());
 	};
+
+	let autoPayStarted = false;
+
+	// Con `pay=1` el pago se abre solo, una sola vez. Se quita de la URL para que recargar no lo vuelva a abrir.
+	$effect(() => {
+		if (!autoPay || mode !== 'pay' || !payForm || autoPayStarted) return;
+
+		autoPayStarted = true;
+
+		const url = new URL(page.url);
+		url.searchParams.delete('pay');
+		replaceState(url, page.state);
+
+		payForm.requestSubmit();
+	});
 
 	// El pedido ya está guardado: el carrito local deja de tener sentido.
 	$effect(() => {
@@ -68,131 +92,209 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-	<div class="space-y-3 text-center">
-		<div
-			class="bg-success text-success-foreground mx-auto grid size-12 place-items-center rounded-full"
-		>
-			<Check class="size-6" />
-		</div>
+<div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+	<SplitLayout variant="summary">
+		{#snippet side()}
+			<aside>
+				<section class="border-border border p-4 sm:p-6">
+					<h2 class="font-display mb-4 text-2xl">Detalle</h2>
 
-		<p class="eyebrow">Paso 2 de 2</p>
-		<h1 class="text-4xl md:text-5xl">Pedido #{data.order.number} guardado</h1>
-		<p class="text-muted-foreground text-sm text-balance">
-			{#if paid}
-				Tu pago quedó registrado. {data.settings.store_name} ya lo está preparando.
-			{:else if data.canPayOnline}
-				Págalo en línea o envíalo por WhatsApp: las dos cosas llegan a {data.settings.store_name}.
-			{:else}
-				Ahora envíalo por WhatsApp para que {data.settings.store_name} lo confirme y coordine el pago.
-			{/if}
-		</p>
-	</div>
+					<ul class="divide-border divide-y">
+						{#each data.order.items as item (item.id)}
+							<li class="flex justify-between gap-4 py-3 text-sm">
+								<div>
+									<p class="font-medium">{item.product_name}</p>
+									<p class="text-muted-foreground text-xs">
+										{item.variant_label} · {item.qty}
+										{item.qty === 1 ? 'unidad' : 'unidades'}
+									</p>
+								</div>
+								<span class="tabular-nums">{formatMoney(item.line_total)}</span>
+							</li>
+						{/each}
+					</ul>
 
-	<!-- El token va en el formulario: `?/opened` reemplaza la query y se perdería el `?t=`. -->
-	<form method="POST" action="?/opened" bind:this={openForm} class="hidden" use:enhance>
-		<input type="hidden" name="t" value={data.order.public_token} />
-	</form>
+					<Separator class="my-4" />
 
-	<div class="mt-8 space-y-3">
-		<WompiChargeStatus {charge} />
+					<dl class="space-y-2 text-sm">
+						<div class="flex justify-between">
+							<dt class="text-muted-foreground">Subtotal</dt>
+							<dd class="tabular-nums">{formatMoney(data.order.subtotal)}</dd>
+						</div>
 
-		{#if showPayment}
-			<form method="POST" action="?/pay" use:enhance={paying}>
+						{#if data.order.discount > 0}
+							<div class="text-success flex justify-between">
+								<dt>Descuento {data.order.coupon_code ? `(${data.order.coupon_code})` : ''}</dt>
+								<dd class="tabular-nums">-{formatMoney(data.order.discount)}</dd>
+							</div>
+						{/if}
+
+						<div class="flex justify-between">
+							<dt class="text-muted-foreground">
+								Envío {data.order.shipping_zone_name ? `· ${data.order.shipping_zone_name}` : ''}
+							</dt>
+							<dd class="tabular-nums">
+								{data.order.shipping_cost === 0 ? 'Gratis' : formatMoney(data.order.shipping_cost)}
+							</dd>
+						</div>
+
+						<Separator />
+
+						<div class="flex justify-between text-base font-medium">
+							<dt>Total</dt>
+							<dd class="tabular-nums">{formatMoney(data.order.total)}</dd>
+						</div>
+					</dl>
+
+					<Separator class="my-4" />
+
+					<div class="text-muted-foreground space-y-1 text-xs">
+						<p>{data.order.customer_name} · {data.order.customer_phone}</p>
+						{#if data.order.customer_city}<p>{data.order.customer_city}</p>{/if}
+						{#if data.order.customer_address}<p>{data.order.customer_address}</p>{/if}
+					</div>
+				</section>
+			</aside>
+		{/snippet}
+
+		<div class="space-y-6">
+			<div class="space-y-3">
+				{#if mode === 'pay'}
+					<div class="bg-muted text-foreground grid size-12 place-items-center rounded-full">
+						<CreditCard class="size-6" />
+					</div>
+
+					<p class="eyebrow">Paso 2 de 2</p>
+					<h1 class="text-3xl sm:text-4xl md:text-5xl">Paga tu pedido #{data.order.number}</h1>
+					<p class="text-muted-foreground text-sm text-balance">
+						Tu pedido está guardado. Se confirma cuando completes el pago.
+					</p>
+				{:else if mode === 'paid'}
+					<div
+						class="bg-success text-success-foreground grid size-12 place-items-center rounded-full"
+					>
+						<Check class="size-6" />
+					</div>
+
+					<h1 class="text-3xl sm:text-4xl md:text-5xl">Pedido #{data.order.number} pagado</h1>
+					<p class="text-muted-foreground text-sm text-balance">
+						Tu pago quedó registrado. {data.settings.store_name} ya lo está preparando.
+					</p>
+				{:else}
+					<div
+						class="bg-success text-success-foreground grid size-12 place-items-center rounded-full"
+					>
+						<Check class="size-6" />
+					</div>
+
+					<p class="eyebrow">Paso 2 de 2</p>
+					<h1 class="text-3xl sm:text-4xl md:text-5xl">Pedido #{data.order.number} guardado</h1>
+					<p class="text-muted-foreground text-sm text-balance">
+						Ahora envíalo por WhatsApp para que {data.settings.store_name} lo confirme y coordine el pago.
+					</p>
+				{/if}
+			</div>
+
+			<!-- El token va en el formulario: `?/opened` reemplaza la query y se perdería el `?t=`. -->
+			<form method="POST" action="?/opened" bind:this={openForm} class="hidden" use:enhance>
 				<input type="hidden" name="t" value={data.order.public_token} />
-				<Button type="submit" size="lg" class="w-full" disabled={charge.opening}>
-					<CreditCard class="mr-2 size-5" />
-					{charge.opening ? 'Abriendo el pago…' : `Pagar ${formatMoney(data.order.total)} en línea`}
-				</Button>
 			</form>
 
-			{#if form?.error}
-				<p class="text-destructive text-center text-sm">{form.error}</p>
-			{/if}
+			<div class="space-y-3">
+				{#if mode === 'paid'}
+					<p class="text-muted-foreground text-xs">
+						¿Tienes alguna duda con tu pedido?
+						<Button
+							type="button"
+							variant="link"
+							size="sm"
+							class="h-auto px-1"
+							onclick={openWhatsApp}
+						>
+							Escríbele a la tienda por WhatsApp
+						</Button>
+					</p>
+				{:else}
+					<WompiChargeStatus {charge} />
 
-			<p class="text-muted-foreground text-center text-xs">
-				Tarjeta, transferencia o billetera. O si prefieres:
-			</p>
-		{/if}
+					{#if mode === 'pay'}
+						{#if canCharge}
+							<form method="POST" action="?/pay" bind:this={payForm} use:enhance={paying}>
+								<input type="hidden" name="t" value={data.order.public_token} />
 
-		<Button
-			type="button"
-			size="lg"
-			class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full"
-			onclick={openWhatsApp}
-		>
-			<MessageCircle class="mr-2 size-5" />
-			Enviar pedido por WhatsApp
-		</Button>
+								<Button type="submit" size="lg" class="w-full" disabled={charge.opening}>
+									<CreditCard class="mr-2 size-5" />
+									{charge.opening
+										? 'Abriendo el pago…'
+										: `Pagar ${formatMoney(data.order.total)} en línea`}
+								</Button>
+							</form>
+						{/if}
 
-		<p class="text-muted-foreground text-center text-xs">
-			Si no se abre solo,
-			<a href={data.whatsappUrl} target="_blank" rel="noopener noreferrer" class="underline">
-				toca aquí
-			</a>.
-		</p>
-	</div>
-
-	<section class="border-border mt-12 border p-6">
-		<h2 class="font-display mb-4 text-2xl">Detalle</h2>
-
-		<ul class="divide-border divide-y">
-			{#each data.order.items as item (item.id)}
-				<li class="flex justify-between gap-4 py-3 text-sm">
-					<div>
-						<p class="font-medium">{item.product_name}</p>
 						<p class="text-muted-foreground text-xs">
-							{item.variant_label} · {item.qty}
-							{item.qty === 1 ? 'unidad' : 'unidades'}
+							¿Prefieres acordar el pago por WhatsApp?
+							<Button
+								type="button"
+								variant="link"
+								size="sm"
+								class="h-auto px-1"
+								onclick={openWhatsApp}
+							>
+								Envíalo por WhatsApp
+							</Button>
 						</p>
-					</div>
-					<span class="tabular-nums">{formatMoney(item.line_total)}</span>
-				</li>
-			{/each}
-		</ul>
+					{:else}
+						<Button
+							type="button"
+							size="lg"
+							class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full"
+							onclick={openWhatsApp}
+						>
+							<MessageCircle class="mr-2 size-5" />
+							Enviar pedido por WhatsApp
+						</Button>
 
-		<Separator class="my-4" />
+						<p class="text-muted-foreground text-xs">
+							Si no se abre solo,
+							<a
+								href={data.whatsappUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="underline"
+							>
+								toca aquí
+							</a>.
+						</p>
 
-		<dl class="space-y-2 text-sm">
-			<div class="flex justify-between">
-				<dt class="text-muted-foreground">Subtotal</dt>
-				<dd class="tabular-nums">{formatMoney(data.order.subtotal)}</dd>
+						{#if data.canPayOnline && canCharge}
+							<form method="POST" action="?/pay" bind:this={payForm} use:enhance={paying}>
+								<input type="hidden" name="t" value={data.order.public_token} />
+
+								<p class="text-muted-foreground text-xs">
+									¿Mejor pagar en línea ahora?
+									<Button
+										type="submit"
+										variant="link"
+										size="sm"
+										class="h-auto px-1"
+										disabled={charge.opening}
+									>
+										{charge.opening ? 'Abriendo el pago…' : 'Pagar en línea'}
+									</Button>
+								</p>
+							</form>
+						{/if}
+					{/if}
+
+					{#if form?.error}
+						<p class="text-destructive text-sm">{form.error}</p>
+					{/if}
+				{/if}
 			</div>
 
-			{#if data.order.discount > 0}
-				<div class="text-success flex justify-between">
-					<dt>Descuento {data.order.coupon_code ? `(${data.order.coupon_code})` : ''}</dt>
-					<dd class="tabular-nums">-{formatMoney(data.order.discount)}</dd>
-				</div>
-			{/if}
-
-			<div class="flex justify-between">
-				<dt class="text-muted-foreground">
-					Envío {data.order.shipping_zone_name ? `· ${data.order.shipping_zone_name}` : ''}
-				</dt>
-				<dd class="tabular-nums">
-					{data.order.shipping_cost === 0 ? 'Gratis' : formatMoney(data.order.shipping_cost)}
-				</dd>
+			<div>
+				<Button href="/shop" variant="outline">Seguir viendo</Button>
 			</div>
-
-			<Separator />
-
-			<div class="flex justify-between text-base font-medium">
-				<dt>Total</dt>
-				<dd class="tabular-nums">{formatMoney(data.order.total)}</dd>
-			</div>
-		</dl>
-
-		<Separator class="my-4" />
-
-		<div class="text-muted-foreground space-y-1 text-xs">
-			<p>{data.order.customer_name} · {data.order.customer_phone}</p>
-			{#if data.order.customer_city}<p>{data.order.customer_city}</p>{/if}
-			{#if data.order.customer_address}<p>{data.order.customer_address}</p>{/if}
 		</div>
-	</section>
-
-	<div class="mt-8 text-center">
-		<Button href="/shop" variant="outline">Seguir viendo</Button>
-	</div>
+	</SplitLayout>
 </div>
