@@ -31,11 +31,16 @@ export interface PaymentAccount {
 	mode: PaymentMode | null;
 	/** Último aviso de la pasarela que pasó la firma. `null` si todavía no llega ninguno. */
 	last_event_at: string | null;
+	/**
+	 * La tienda cobra con la misma cuenta de Wompi que Globerce: sus avisos ya llegan
+	 * por la URL de la plataforma, y la tienda no debe pegar la suya.
+	 */
+	shares_platform_account: boolean;
 }
 
 /**
  * Los campos nuevos son opcionales: una API que todavía no los manda los deja
- * en null, y la página sigue sirviendo.
+ * en null o en false, y la página sigue sirviendo.
  */
 export const accountSchema = z
 	.object({
@@ -46,7 +51,8 @@ export const accountSchema = z
 		updatedAt: z.string().nullable(),
 		merchantName: z.string().nullish(),
 		mode: z.enum(['test', 'prod']).nullish(),
-		lastEventAt: z.string().nullish()
+		lastEventAt: z.string().nullish(),
+		sharesPlatformAccount: z.boolean().default(false)
 	})
 	.transform((account): PaymentAccount => ({
 		connected: account.connected,
@@ -56,7 +62,8 @@ export const accountSchema = z
 		updated_at: account.updatedAt,
 		merchant_name: account.merchantName ?? null,
 		mode: account.mode ?? null,
-		last_event_at: account.lastEventAt ?? null
+		last_event_at: account.lastEventAt ?? null,
+		shares_platform_account: account.sharesPlatformAccount
 	}));
 
 export interface PaymentKeys {
