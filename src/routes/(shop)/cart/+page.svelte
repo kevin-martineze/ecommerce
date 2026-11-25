@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Tipos
+	import type { PaymentMethod } from '$lib/schemas/checkout';
 	import type { ActionData, PageData } from './$types';
 
 	// Svelte
@@ -18,6 +19,7 @@
 	import { Button } from '$lib/components/atoms/button';
 	import { Input } from '$lib/components/atoms/input';
 	import { Label } from '$lib/components/atoms/label';
+	import { RadioGroup, RadioGroupItem } from '$lib/components/atoms/radio-group';
 	import { Separator } from '$lib/components/atoms/separator';
 	import { Textarea } from '$lib/components/atoms/textarea';
 	import SplitLayout from '$lib/components/layouts/SplitLayout.svelte';
@@ -28,8 +30,10 @@
 
 	// Dominio
 	import { COUPON_REJECTION_LABEL } from '$lib/domain/settings';
+	import { paymentMethodSchema } from '$lib/schemas/checkout';
 
 	// Utilidades
+	import { cn } from '$lib/utils';
 	import { formatMoney } from '$lib/utils/money';
 
 	interface Props {
@@ -37,11 +41,19 @@
 		form: ActionData;
 	}
 
+	interface PaymentOption {
+		value: PaymentMethod;
+		label: string;
+		description: string;
+	}
+
 	let { data, form }: Props = $props();
 
 	let prepareForm = $state<HTMLFormElement | null>(null);
 	let couponCode = $state('');
 	let zoneId = $state(untrack(() => data.zones.at(0)?.id ?? ''));
+	/** Lo elige la clienta; solo pesa si la tienda cobra en línea. */
+	let paymentMethod = $state<PaymentMethod>('online');
 	const quote = new FormState({ pending: true });
 	const checkout = new FormState();
 
@@ -52,8 +64,43 @@
 	const checkoutError = $derived(form && 'checkoutError' in form ? form.checkoutError : null);
 
 	const selectedZone = $derived(data.zones.find((zone) => zone.id === zoneId) ?? null);
-	/** Con pagos en línea, este paso solo lleva al siguiente: el medio de pago se elige allá. */
 	const canPayOnline = $derived(data.settings.online_payments);
+	/** Sin cobro en línea todo se acuerda por WhatsApp: no hay nada que elegir. */
+	const method: PaymentMethod = $derived(canPayOnline ? paymentMethod : 'whatsapp');
+
+	const paymentOptions: PaymentOption[] = $derived([
+		{
+			value: 'online',
+			label: 'Pagar en línea',
+			description: 'Tarjeta, transferencia o billetera. Se confirma al instante.'
+		},
+		{
+			value: 'whatsapp',
+			label: 'Acordar por WhatsApp',
+			description: `Envías el pedido y coordinas el pago con ${data.settings.store_name}.`
+		}
+	]);
+
+	// El total sale de la cotización del servidor: aquí no se suma nada.
+	const submitLabel = $derived(
+		method === 'whatsapp'
+			? 'Confirmar y abrir WhatsApp'
+			: totals
+				? `Pagar ${formatMoney(totals.total)}`
+				: 'Pagar'
+	);
+
+	const paymentNote = $derived(
+		method === 'online'
+			? 'Te llevamos al pago seguro de Wompi.'
+			: 'No se cobra nada en la web. El pago se acuerda por WhatsApp.'
+	);
+
+	function choosePaymentMethod(value: string) {
+		const parsed = paymentMethodSchema.safeParse(value);
+
+		if (parsed.success) paymentMethod = parsed.data;
+	}
 
 	/**
 	 * El carrito vive en localStorage, así que el servidor no puede leerlo en el
@@ -80,7 +127,7 @@
 		<h1 class="text-4xl md:text-5xl">Tu pedido</h1>
 		<p class="text-muted-foreground text-sm">
 			{canPayOnline
-				? 'Confirma los productos y tus datos. En el siguiente paso pagas en línea o lo envías por WhatsApp.'
+				? 'Confirma los productos, tus datos y cómo quieres pagar.'
 				: 'Confirma los productos y tus datos. Al terminar se abre WhatsApp con el pedido escrito.'}
 		</p>
 	</header>
@@ -129,6 +176,8 @@
 						})}
 					>
 						<input type="hidden" name="cart" value="[]" />
+
+						<input type="hidden" name="paymentMethod" value={method} />
 
 						<h2 class="font-display text-2xl">Resumen</h2>
 
@@ -261,6 +310,39 @@
 							</div>
 						</div>
 
+						{#if canPayOnline}
+							<div class="space-y-3">
+								<p id="metodo-pago" class="text-sm font-medium">¿Cómo quieres pagar?</p>
+
+								<RadioGroup
+									value={paymentMethod}
+									onValueChange={choosePaymentMethod}
+									aria-labelledby="metodo-pago"
+								>
+									{#each paymentOptions as option (option.value)}
+										<label
+											for={`pago-${option.value}`}
+											class={cn(
+												'border-border flex cursor-pointer items-start gap-3 border p-3',
+												paymentMethod === option.value && 'border-foreground'
+											)}
+										>
+											<RadioGroupItem
+												id={`pago-${option.value}`}
+												value={option.value}
+												class="mt-0.5"
+											/>
+											<span class="space-y-0.5 text-sm">
+												<span class="block font-medium">{option.label}</span>
+												<span class="text-muted-foreground block text-xs">{option.description}</span
+												>
+											</span>
+										</label>
+									{/each}
+								</RadioGroup>
+							</div>
+						{/if}
+
 						{#if checkoutError}
 							<p class="text-destructive text-sm">{checkoutError}</p>
 						{/if}
@@ -271,17 +353,11 @@
 							class="w-full"
 							disabled={checkout.pending || quote.pending}
 						>
-							{checkout.pending
-								? 'Creando pedido…'
-								: canPayOnline
-									? 'Continuar al pago'
-									: 'Confirmar y abrir WhatsApp'}
+							{checkout.pending ? 'Creando pedido…' : submitLabel}
 						</Button>
 
 						<p class="text-muted-foreground text-center text-xs">
-							{canPayOnline
-								? 'En el siguiente paso eliges: pagar en línea con tarjeta, transferencia o billetera, o acordarlo por WhatsApp.'
-								: 'No se cobra nada en la web. El pago se acuerda por WhatsApp.'}
+							{paymentNote}
 						</p>
 					</form>
 				</aside>

@@ -10,7 +10,8 @@
 
 	// App
 	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, replaceState } from '$app/navigation';
+	import { page } from '$app/state';
 
 	// Componentes
 	import { Button } from '$lib/components/atoms/button';
@@ -20,6 +21,9 @@
 	// Estado
 	import { cart } from '$lib/stores/cart.svelte';
 	import { wompiCharge } from '$lib/utils/wompi-checkout.svelte';
+
+	// Dominio
+	import { orderPageMode } from '$lib/domain/orders';
 
 	// Utilidades
 	import { formatMoney } from '$lib/utils/money';
@@ -32,17 +36,21 @@
 	let { data, form }: Props = $props();
 
 	let openForm = $state<HTMLFormElement | null>(null);
+	let payForm = $state<HTMLFormElement | null>(null);
 
 	const paid = $derived(data.order.payment_status === 'paid');
+	/** Qué vista toca: pagar, avisar por WhatsApp o ya pagado. */
+	const mode = $derived(orderPageMode({ paid, canPayOnline: data.canPayOnline, via: data.via }));
+	/** El carrito pone `pay=1` cuando la clienta eligió pagar en línea. */
+	const autoPay = $derived(page.url.searchParams.get('pay') === '1');
 
 	const charge = wompiCharge({
 		paid: () => paid,
 		reload: () => invalidateAll()
 	});
 
-	const showPayment = $derived(
-		data.canPayOnline && !paid && !charge.confirming && !charge.isExpired
-	);
+	/** Mientras Wompi confirma o el pago sigue en proceso, no se ofrece otro cobro. */
+	const canCharge = $derived(!charge.confirming && !charge.isExpired);
 
 	/** El botón se apaga mientras se pide el enlace o se abre el pago: son unos segundos y un cobro. */
 	const paying: SubmitFunction = () => {
@@ -50,6 +58,21 @@
 
 		return ({ result, update }) => charge.process(result, () => update());
 	};
+
+	let autoPayStarted = false;
+
+	// Con `pay=1` el pago se abre solo, una sola vez. Se quita de la URL para que recargar no lo vuelva a abrir.
+	$effect(() => {
+		if (!autoPay || mode !== 'pay' || !payForm || autoPayStarted) return;
+
+		autoPayStarted = true;
+
+		const url = new URL(page.url);
+		url.searchParams.delete('pay');
+		replaceState(url, page.state);
+
+		payForm.requestSubmit();
+	});
 
 	// El pedido ya está guardado: el carrito local deja de tener sentido.
 	$effect(() => {
@@ -70,23 +93,40 @@
 
 <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6">
 	<div class="space-y-3 text-center">
-		<div
-			class="bg-success text-success-foreground mx-auto grid size-12 place-items-center rounded-full"
-		>
-			<Check class="size-6" />
-		</div>
+		{#if mode === 'pay'}
+			<div class="bg-muted text-foreground mx-auto grid size-12 place-items-center rounded-full">
+				<CreditCard class="size-6" />
+			</div>
 
-		<p class="eyebrow">Paso 2 de 2</p>
-		<h1 class="text-4xl md:text-5xl">Pedido #{data.order.number} guardado</h1>
-		<p class="text-muted-foreground text-sm text-balance">
-			{#if paid}
+			<p class="eyebrow">Paso 2 de 2</p>
+			<h1 class="text-4xl md:text-5xl">Paga tu pedido #{data.order.number}</h1>
+			<p class="text-muted-foreground text-sm text-balance">
+				Tu pedido está guardado. Se confirma cuando completes el pago.
+			</p>
+		{:else if mode === 'paid'}
+			<div
+				class="bg-success text-success-foreground mx-auto grid size-12 place-items-center rounded-full"
+			>
+				<Check class="size-6" />
+			</div>
+
+			<h1 class="text-4xl md:text-5xl">Pedido #{data.order.number} pagado</h1>
+			<p class="text-muted-foreground text-sm text-balance">
 				Tu pago quedó registrado. {data.settings.store_name} ya lo está preparando.
-			{:else if data.canPayOnline}
-				Págalo en línea o envíalo por WhatsApp: las dos cosas llegan a {data.settings.store_name}.
-			{:else}
+			</p>
+		{:else}
+			<div
+				class="bg-success text-success-foreground mx-auto grid size-12 place-items-center rounded-full"
+			>
+				<Check class="size-6" />
+			</div>
+
+			<p class="eyebrow">Paso 2 de 2</p>
+			<h1 class="text-4xl md:text-5xl">Pedido #{data.order.number} guardado</h1>
+			<p class="text-muted-foreground text-sm text-balance">
 				Ahora envíalo por WhatsApp para que {data.settings.store_name} lo confirme y coordine el pago.
-			{/if}
-		</p>
+			</p>
+		{/if}
 	</div>
 
 	<!-- El token va en el formulario: `?/opened` reemplaza la query y se perdería el `?t=`. -->
@@ -95,42 +135,78 @@
 	</form>
 
 	<div class="mt-8 space-y-3">
-		<WompiChargeStatus {charge} />
-
-		{#if showPayment}
-			<form method="POST" action="?/pay" use:enhance={paying}>
-				<input type="hidden" name="t" value={data.order.public_token} />
-				<Button type="submit" size="lg" class="w-full" disabled={charge.opening}>
-					<CreditCard class="mr-2 size-5" />
-					{charge.opening ? 'Abriendo el pago…' : `Pagar ${formatMoney(data.order.total)} en línea`}
+		{#if mode === 'paid'}
+			<p class="text-muted-foreground text-center text-xs">
+				¿Tienes alguna duda con tu pedido?
+				<Button type="button" variant="link" size="sm" class="h-auto px-1" onclick={openWhatsApp}>
+					Escríbele a la tienda por WhatsApp
 				</Button>
-			</form>
+			</p>
+		{:else}
+			<WompiChargeStatus {charge} />
+
+			{#if mode === 'pay'}
+				{#if canCharge}
+					<form method="POST" action="?/pay" bind:this={payForm} use:enhance={paying}>
+						<input type="hidden" name="t" value={data.order.public_token} />
+
+						<Button type="submit" size="lg" class="w-full" disabled={charge.opening}>
+							<CreditCard class="mr-2 size-5" />
+							{charge.opening
+								? 'Abriendo el pago…'
+								: `Pagar ${formatMoney(data.order.total)} en línea`}
+						</Button>
+					</form>
+				{/if}
+
+				<p class="text-muted-foreground text-center text-xs">
+					¿Prefieres acordar el pago por WhatsApp?
+					<Button type="button" variant="link" size="sm" class="h-auto px-1" onclick={openWhatsApp}>
+						Envíalo por WhatsApp
+					</Button>
+				</p>
+			{:else}
+				<Button
+					type="button"
+					size="lg"
+					class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full"
+					onclick={openWhatsApp}
+				>
+					<MessageCircle class="mr-2 size-5" />
+					Enviar pedido por WhatsApp
+				</Button>
+
+				<p class="text-muted-foreground text-center text-xs">
+					Si no se abre solo,
+					<a href={data.whatsappUrl} target="_blank" rel="noopener noreferrer" class="underline">
+						toca aquí
+					</a>.
+				</p>
+
+				{#if data.canPayOnline && canCharge}
+					<form method="POST" action="?/pay" bind:this={payForm} use:enhance={paying}>
+						<input type="hidden" name="t" value={data.order.public_token} />
+
+						<p class="text-muted-foreground text-center text-xs">
+							¿Mejor pagar en línea ahora?
+							<Button
+								type="submit"
+								variant="link"
+								size="sm"
+								class="h-auto px-1"
+								disabled={charge.opening}
+							>
+								{charge.opening ? 'Abriendo el pago…' : 'Pagar en línea'}
+							</Button>
+						</p>
+					</form>
+				{/if}
+			{/if}
 
 			{#if form?.error}
 				<p class="text-destructive text-center text-sm">{form.error}</p>
 			{/if}
-
-			<p class="text-muted-foreground text-center text-xs">
-				Tarjeta, transferencia o billetera. O si prefieres:
-			</p>
 		{/if}
-
-		<Button
-			type="button"
-			size="lg"
-			class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full"
-			onclick={openWhatsApp}
-		>
-			<MessageCircle class="mr-2 size-5" />
-			Enviar pedido por WhatsApp
-		</Button>
-
-		<p class="text-muted-foreground text-center text-xs">
-			Si no se abre solo,
-			<a href={data.whatsappUrl} target="_blank" rel="noopener noreferrer" class="underline">
-				toca aquí
-			</a>.
-		</p>
 	</div>
 
 	<section class="border-border mt-12 border p-6">

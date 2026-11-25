@@ -69,7 +69,8 @@ export const actions: Actions = {
 			address: formData.get('address') ?? '',
 			notes: formData.get('notes') ?? '',
 			shippingZoneId: formData.get('shippingZoneId'),
-			couponCode: formData.get('couponCode') ?? ''
+			couponCode: formData.get('couponCode') ?? '',
+			paymentMethod: formData.get('paymentMethod') ?? undefined
 		});
 
 		if (!parsed.success) {
@@ -150,6 +151,9 @@ export const actions: Actions = {
 			maxAge: 60 * 60 * 24 * 30
 		});
 
-		redirect(303, `/order/${result.data.number}?t=${result.data.token}`);
+		// En línea, la página del pedido abre el pago sola; por WhatsApp, deja el aviso.
+		const payment = input.paymentMethod === 'online' ? 'pay=1' : 'via=whatsapp';
+
+		redirect(303, `/order/${result.data.number}?t=${result.data.token}&${payment}`);
 	}
 };

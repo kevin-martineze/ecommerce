@@ -82,6 +82,25 @@ export interface OrderWithItems extends Order {
 /** El pedido como lo ve el cliente en su enlace: sin los datos internos del panel. */
 export type PublicOrderView = Omit<OrderWithItems, 'id' | 'shipping_zone_id' | 'admin_notes'>;
 
+/** Qué muestra la página del pedido: pagarlo, avisarlo por WhatsApp o ya está pagado. */
+export type OrderPageMode = 'paid' | 'pay' | 'whatsapp';
+
+/**
+ * Elige la vista de la página del pedido. Pagado gana siempre. Sin cobro en
+ * línea, o si la clienta eligió WhatsApp en el carrito, va por WhatsApp. Lo
+ * demás es la vista para pagar.
+ */
+export function orderPageMode(input: {
+	paid: boolean;
+	canPayOnline: boolean;
+	via: 'whatsapp' | null;
+}): OrderPageMode {
+	if (input.paid) return 'paid';
+	if (!input.canPayOnline || input.via === 'whatsapp') return 'whatsapp';
+
+	return 'pay';
+}
+
 /** Línea del carrito ya revalidada contra la base de datos. */
 export interface PricedLine {
 	variantId: string;
