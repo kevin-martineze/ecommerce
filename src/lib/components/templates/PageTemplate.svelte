@@ -26,13 +26,26 @@ necesita, una columna al lado.
 		children: Snippet;
 		aside?: Snippet;
 		width?: 'default' | 'narrow' | 'full';
+		/** La cabecera se queda arriba desde `md` (por defecto); `false` la apaga. */
+		stickyHeader?: boolean;
 	}
 
-	let { title, description, eyebrow, back, badge, actions, intro, children, aside, width }: Props =
-		$props();
+	let {
+		title,
+		description,
+		eyebrow,
+		back,
+		badge,
+		actions,
+		intro,
+		children,
+		aside,
+		width,
+		stickyHeader
+	}: Props = $props();
 </script>
 
-<PageLayout {aside} {width}>
+<PageLayout {aside} {width} {stickyHeader}>
 	{#snippet header()}
 		<PageHeader {title} {description} {eyebrow} {back} {badge} {actions} children={intro} />
 	{/snippet}

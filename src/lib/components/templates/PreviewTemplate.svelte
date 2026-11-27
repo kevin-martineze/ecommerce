@@ -30,14 +30,26 @@ borrador que sale de su ViewModel.
 		draft: StorefrontDraft;
 		/** El título del iframe y de la hoja del celular: «Así se ve tu cupón». */
 		previewTitle: string;
+		/** La cabecera se queda arriba desde `md` (por defecto); `false` la apaga. */
+		stickyHeader?: boolean;
 		children: Snippet;
 	}
 
-	let { title, description, back, actions, intro, src, draft, previewTitle, children }: Props =
-		$props();
+	let {
+		title,
+		description,
+		back,
+		actions,
+		intro,
+		src,
+		draft,
+		previewTitle,
+		stickyHeader,
+		children
+	}: Props = $props();
 </script>
 
-<PageLayout asideWidth="half" asideOnMobile={false}>
+<PageLayout asideWidth="half" asideOnMobile={false} {stickyHeader}>
 	{#snippet header()}
 		<PageHeader {title} {description} {back} {actions} children={intro} />
 	{/snippet}
